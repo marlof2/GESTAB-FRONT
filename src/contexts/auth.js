@@ -3,14 +3,13 @@ import api from "../services";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-
 export const AuthContext = createContext({});
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loadingAuth, setLoadingAuth] = useState(false);
     const navigation = useNavigation();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
 
 
@@ -18,24 +17,29 @@ function AuthProvider({ children }) {
         async function loadStorage() {
             const token = await AsyncStorage.getItem('token');
 
-            if (token) {
-                const response = await api.get('/me', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }).catch(async () => {
-                    setUser(null)
-                })
+            if (token != null) {
+                setLoading(true)
+                const response = await api.get('/me')
+                const { status } = response
 
+                if (status == 401) {
+                    setLoading(false)
+                    await AsyncStorage.clear();
+                    navigation.navigate('SignIn')
+                    setUser(null);
+                }
 
-                api.defaults.headers['Authorization'] = `Bearer ${token}`;
-                setUser(response.data);
-                setLoading(false)
+                if (status == 200) {
+                    setUser(response.data);
+                    setLoading(false)
+                }
             }
 
-            setLoading(false)
+
         }
+
         loadStorage();
+
     }, []);
 
 
@@ -47,24 +51,20 @@ function AuthProvider({ children }) {
             })
     }
 
-    async function signIn(email, password) {
+    async function signIn(obj) {
         setLoadingAuth(true);
 
         try {
-            const response = await api.post('/login', { email, password });
-            if (response.status == 200) {
+            const { status, data } = await api.post('/login', obj);
 
-                const data = {
-                    ...response.data,
-                    email
-                }
+            if (status == 200) {
+                const { token, user } = data
 
-                await AsyncStorage.setItem('token', data.token);
+                await AsyncStorage.setItem('token', token);
 
-                api.defaults.headers['Authorization'] = `Bearer ${data.token}`;
+                api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-
-                setUser(data);
+                setUser(user);
                 setLoadingAuth(false);
             }
 
@@ -75,12 +75,11 @@ function AuthProvider({ children }) {
         }
     }
 
-    async function signUp(name, email, password) {
+    async function signUp(obj) {
         setLoadingAuth(true);
-
         try {
-            const response = await api.post('/users', { name, email, password });
-            if (response.status == 200) {
+            const response = await api.post('/register', obj);
+            if (response.status == 201) {
                 navigation.navigate('SignIn')
                 setLoadingAuth(false);
             }

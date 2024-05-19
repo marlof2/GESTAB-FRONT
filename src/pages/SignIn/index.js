@@ -1,6 +1,12 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, Image, KeyboardAvoidingView, TextInput, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+import React, { useContext } from 'react';
+import { View, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
+import { Button, TextInput, Text } from 'react-native-paper';
 import styles from './styles';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import Overlay from '../../components/Ui/Overlay';
+import Input from '../../components/Ui/Input/input';
+import FormButton from '../../components/Ui/Button/FormButton';
 
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth';
@@ -12,22 +18,22 @@ export default function SignIn() {
   const navigation = useNavigation();
   const { signIn, loadingAuth } = useContext(AuthContext);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [validate, setValidate] = useState(false);
-
-  function handleLogin() {
-    if (email === '' || password === '') {
-      setValidate(true)
-      return false;
-    }
-    setValidate(false)
-
-    signIn(email, password)
+  function handleLogin(value) {
+    signIn(value)
   }
+
+
+  const validationSchema = Yup.object().shape({
+    cpf: Yup.string()
+      .required('O cpf é obrigatório'),
+    password: Yup.string()
+      .required('A senha é obrigatória'),
+  });
 
   return (
     <View style={styles.background}>
+      <Overlay isVisible={loadingAuth} />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled
@@ -35,34 +41,34 @@ export default function SignIn() {
 
         <Image style={styles.logo} source={require('../../assets/logo1.png')} />
 
-        <View style={styles.areaInput}>
-          <TextInput
-            style={[styles.input, validate ? {borderColor:'red'}: '#222']}
-            placeholder={ validate ? 'Email é obrigatório' : 'Email'}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-        </View>
-        <View style={styles.areaInput}>
-          <TextInput
-             style={[styles.input, validate ? {borderColor:'red'}: '#222']}
-            placeholder={ validate ? 'Senha é obrigatório' : 'Senha'}
-            value={password}
-            onChangeText={(text) => setPassword(text)} />
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.button}
-          onPress={handleLogin}
+        <Formik
+          initialValues={{ cpf: '', password: '' }}
+          validationSchema={validationSchema}
+          onSubmit={values => {
+            handleLogin(values)
+          }}
         >
-          {
-            loadingAuth ? (
-              <ActivityIndicator size={20} color="#FFF" />
-            ) : (
-              <Text style={styles.textButton}>Entrar</Text>
-            )
-          }
-        </TouchableOpacity>
+          {({ handleSubmit }) => (
+            <View>
+              <Input
+                label="CPF"
+                name="cpf"
+              />
+
+              <Input
+                label="Senha"
+                name="password"
+              />
+
+              <FormButton
+                title='Login'
+                icon='login'
+                mode="contained"
+                onPress={handleSubmit}
+              />
+            </View>
+          )}
+        </Formik>
 
         <TouchableOpacity style={styles.link}
           onPress={() => navigation.navigate('SignUp')}

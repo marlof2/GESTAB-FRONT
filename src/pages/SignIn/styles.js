@@ -11,36 +11,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     logo: {
-        width:200,
-        height:200
+        width: 200,
+        height: 200
     },
-    areaInput: {
-        flexDirection: 'row',
-    },
-    input: {
-        backgroundColor: '#fff',
-        width: '90%',
-        height: 45,
-        borderWidth: 1,
-        borderColor: '#222',
-        borderRadius: 10,
-        padding: 10,
-        margin: 10,
-    },
-    button: {
-        width: '90%',
-        height: 45,
-        borderRadius: 10,
-        backgroundColor: '#3b3dbf',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    textButton: {
-        fontSize: 20,
-        color: '#fff',
-    },
-    link:{
+    link: {
         marginTop: 10,
         marginBottom: 10,
         color: '#3b3dbf',
@@ -48,8 +22,20 @@ const styles = StyleSheet.create({
     textLink: {
         marginTop: 15,
         textAlign: 'center',
-        color:'#171717'
-    }
+        color: '#171717'
+    },
+    areaBtn: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    button: {
+        width: '95%',
+        height: 45,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 15,
+    },
 })
 
 export default styles

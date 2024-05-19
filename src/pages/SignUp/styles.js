@@ -10,34 +10,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    logo: {
-        marginBottom: 25
-    },
     areaInput: {
         flexDirection: 'row',
+        justifyContent: 'center',
     },
     input: {
-        backgroundColor: '#fff',
-        width: '90%',
-        height: 45,
-        borderWidth: 1,
-        borderColor: '#222',
-        borderRadius: 10,
-        padding: 10,
-        margin: 10,
+        width: '95%',
+        marginBottom: 5,
+    },
+    errorText: {
+        color: 'red',
+        marginLeft: 20,
+        marginBottom:8
+    },
+    areaBtn: {
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
     button: {
-        width: '90%',
+        // width: '95%',
         height: 45,
         borderRadius: 10,
-        backgroundColor: '#3b3dbf',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 15,
-    },
-    textButton: {
-        fontSize: 20,
-        color: '#fff',
+        marginTop: 30,
     },
 })
 

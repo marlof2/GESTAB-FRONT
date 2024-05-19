@@ -21,15 +21,15 @@ export default function Header({ title }) {
 
     return (
         <SafeAreaView>
-            <Appbar.Header style={{backgroundColor:theme.light.colors.primary}}>
-                <Icon style={{ marginLeft: 10, marginRight: 15 }} name="menu" size={28} color={theme.light.colors.iconHeader} onPress={() => navigation.openDrawer()} />
-                <Appbar.Content color={theme.light.colors.iconHeader} title={title} />
+            <Appbar.Header >
+                <Icon style={{ marginLeft: 10, marginRight: 15 }} name="menu" size={28}  onPress={() => navigation.openDrawer()} />
+                <Appbar.Content  title={title} />
                 <Menu
                     visible={menuVisible}
                     onDismiss={closeMenu}
-                    anchor={<Appbar.Action icon={MORE_ICON} color={theme.light.colors.iconHeader} onPress={openMenu} />}
+                    anchor={<Appbar.Action icon={MORE_ICON}  onPress={openMenu} />}
                 >
-                    <Menu.Item dense leadingIcon="exit-to-app" onPress={signOut} title="Sair" icon="information" color={theme.light.colors.iconHeader} />
+                    <Menu.Item dense leadingIcon="exit-to-app" onPress={signOut} title="Sair" icon="information"  />
                 </Menu>
             </Appbar.Header>
         </SafeAreaView>

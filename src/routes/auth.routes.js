@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
+import theme from '../themes/theme.json';
+import string from '../strings';
 
 const AuthStack = createNativeStackNavigator();
 
@@ -20,12 +22,10 @@ function AuthRoutes(){
         component={SignUp}
         options={{
           headerStyle: {
-            backgroundColor: '#3b3bdf',
-            borderBottomWidth: 1,
-            borderBottomColor: '#00b94a'
+            backgroundColor: '#2D4EB2',
           },
-          headerTintColor: '#FFF',
-          headerTitle:"Voltar",
+          headerTintColor: '#fff',
+          headerTitle: string.btnVoltar,
           headerBackTitleVisible: false
         }}
       />
