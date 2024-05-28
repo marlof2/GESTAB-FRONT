@@ -1,19 +1,13 @@
 import { StyleSheet } from 'react-native';
-
+import theme from '../../themes/theme.json'
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f4ff'
-    },
-    container: {
-        width: '90%',
-        maxWidth: 400,
     },
     input: {
         marginBottom: 5,
     },
+    container: { flex: 1 },
     errorText: {
         color: 'red',
         marginLeft: 20,
@@ -21,16 +15,22 @@ const styles = StyleSheet.create({
     },
     button: {
         marginTop: 10,
-        borderRadius: 10
+        borderRadius: 10,
     },
     card: {
-        padding: 10,
         borderRadius: 15,
-        elevation: 5,
+        margin: 5
     },
     titleCard: {
-        textAlign: 'center',
+        marginLeft: 15,
         fontSize: 20,
+    },
+    fab: {
+        position: 'absolute',
+        margin: 10,
+        right: 0,
+        bottom: 0,
+        backgroundColor: theme.colors.primary
     },
 })
 

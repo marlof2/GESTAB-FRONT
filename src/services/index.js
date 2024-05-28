@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import { Alert } from 'react-native';
 
 
 const api = axios.create({
@@ -31,33 +32,45 @@ api.interceptors.response.use(
         // Qualquer código específico para tratar dados de resposta bem-sucedidos
         return response;
     },
-     error => {
-        return error.response
+    error => {
+        return handleError(error.response)
     }
 );
 
 
-// const handleError = async (response) => {
-//     const { status } = response;
+const handleError = async (response) => {
+    // console.log(response)
+    const { status, data } = response;
 
-//     switch (status) {
-//         case 401:
-//             if (response.data.message == "Unauthenticated.") {
-//                 await AsyncStorage.clear();
-//                 console.log('Sessão expirada. Por favor, faça login novamente.')
-//             } else {
-//                 // messageError(
-//                 //     response,
-//                 //     response.data.message,
-//                 //     response.data.title,
-//                 //     response.data.type
-//                 // );
-//             }
-//             break;
-//         case 500:
-//             console.log('Erro de servidor. Tente novamente mais tarde.')
-//             break;
-//     }
-// }
+    switch (status) {
+        case 406:
+            if (data.message == "Usuário ou Senha Inválido.") {
+                return AlertModal('Atenção!', data.message)
+            }
+            break;
+        case 404:
+            if (data.message == "Usuario não encontrado na base de dados.") {
+                return AlertModal('Atenção!', data.message)
+            }
+            break;
+        case 500:
+            return AlertModal('Atenção!', 'Erro interno, Tente novamente mais tarde.')
+        default: return response
+    }
+}
+
+
+
+const AlertModal = (title = 'Atenção!', text) => {
+    return Alert.alert(
+        title,
+        text,
+        [
+            { text: 'OK' },
+        ],
+    );
+}
+
+
 
 export default api;

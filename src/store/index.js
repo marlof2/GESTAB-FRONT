@@ -1,17 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
+import EstablishmentReducer from '../pages/Establishment/reducer/slice';
 
-// Reducer para gerenciar estados de mensagens
-const getMessagesError = (state = '') => {
-    return state;
-};
-
-const store = configureStore({
-    reducer: {
-        message: getMessagesError
-    }
+export const store = configureStore({
+  reducer: {
+    establishment: EstablishmentReducer,
+  },
 });
 
-export const setMessagesError = message => (message);
-
-
-export default store;

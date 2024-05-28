@@ -1,10 +1,8 @@
 import React, { useContext } from "react";
 
-// import Home from "../pages/Home";
-// import CustomDrawer from "../components/CustomDrawer";
 import { ActivityIndicator, View } from "react-native";
 import AuthRoutes from "./auth.routes";
-import AppRoutes from "./app.routes";
+import AppRoutes from "./app.routes.stack";
 import { AuthContext } from "../contexts/auth";
 
 

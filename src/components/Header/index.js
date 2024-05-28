@@ -1,36 +1,51 @@
 import React, { useContext, useState } from 'react';
-import { Appbar, Menu } from 'react-native-paper';
+import { Appbar, Divider, Menu, MD3LightTheme } from 'react-native-paper';
 import { Platform, SafeAreaView } from 'react-native';
 import { AuthContext } from '../../contexts/auth';
-import Icon from 'react-native-vector-icons/Feather'
 import { useNavigation } from '@react-navigation/native'
-
+// import theme from "../../themes/theme.json"
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 
-import theme from '../../themes';
-
-export default function Header({ title }) {
-
-    const [menuVisible, setMenuVisible] = useState(false);
-
-    const { signOut } = useContext(AuthContext)
-    
+export default function Header({ title, showBack = true, showMenu = false }) {
     const navigation = useNavigation()
+    const [menuVisible, setMenuVisible] = useState(false);
+    const { signOut } = useContext(AuthContext)
+
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
 
-    return (
-        <SafeAreaView>
-            <Appbar.Header >
-                <Icon style={{ marginLeft: 10, marginRight: 15 }} name="menu" size={28}  onPress={() => navigation.openDrawer()} />
-                <Appbar.Content  title={title} />
+    const IconMenu = () => {
+        if (showMenu) {
+            return (
                 <Menu
                     visible={menuVisible}
                     onDismiss={closeMenu}
-                    anchor={<Appbar.Action icon={MORE_ICON}  onPress={openMenu} />}
+                    anchor={<Appbar.Action icon={MORE_ICON} onPress={openMenu} />}
                 >
-                    <Menu.Item dense leadingIcon="exit-to-app" onPress={signOut} title="Sair" icon="information"  />
+                    <Menu.Item dense leadingIcon="account" title="Perfil" />
+                    <Divider />
+                    <Menu.Item dense leadingIcon="exit-to-app" onPress={signOut} title="Sair" />
                 </Menu>
+            )
+        }
+    }
+
+    const IconBack = () => {
+        if (showBack) {
+            return (
+                <Appbar.BackAction onPress={() => navigation.goBack()} />
+            )
+        }
+    }
+
+
+
+    return (
+        <SafeAreaView>
+            <Appbar.Header elevated>
+                {IconBack()}
+                <Appbar.Content title={title} />
+                {IconMenu()}
             </Appbar.Header>
         </SafeAreaView>
     )

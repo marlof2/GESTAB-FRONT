@@ -16,12 +16,11 @@ function AuthProvider({ children }) {
     useEffect(() => {
         async function loadStorage() {
             const token = await AsyncStorage.getItem('token');
-
             if (token != null) {
                 setLoading(true)
                 const response = await api.get('/me')
                 const { status } = response
-
+                
                 if (status == 401) {
                     setLoading(false)
                     await AsyncStorage.clear();
@@ -57,14 +56,18 @@ function AuthProvider({ children }) {
         try {
             const { status, data } = await api.post('/login', obj);
 
-            if (status == 200) {
-                const { token, user } = data
+            if (status) {
+                if (status == 200) {
+                    const { token, user } = data
 
-                await AsyncStorage.setItem('token', token);
+                    await AsyncStorage.setItem('token', token);
 
-                api.defaults.headers['Authorization'] = `Bearer ${token}`;
+                    api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-                setUser(user);
+                    setUser(user);
+                    setLoadingAuth(false);
+                }
+                
                 setLoadingAuth(false);
             }
 

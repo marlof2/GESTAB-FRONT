@@ -13,7 +13,7 @@ const Fila = () => {
         <View backgroundColor="#f0f4ff" style={{ flex: 1 }}>
 
             <ScrollView>
-                <Header title="Fila de espera" />
+                <Header title="Fila de espera" showBack={false} />
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, margin: 10 }}>
                     <Chip style={{ width: '100%', backgroundColor: 'white' }}>Profissional: Tiquinho  | Data: 01/02/2024</Chip>

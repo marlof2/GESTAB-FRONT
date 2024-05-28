@@ -9,7 +9,6 @@ import Header from "../../components/Header";
 // import api from "../../services";
 // import { format } from "date-fns";
 import { useIsFocused } from '@react-navigation/native'
-import BalanceItem from "../../components/BalanceItem";
 
 
 export default function Home() {
@@ -39,16 +38,7 @@ export default function Home() {
     // }, [isFocused])
     return (
         <SafeAreaView style={styles.background}>
-            <Header title="Home" />
-
-            {/* <FlatList style={styles.flatList}
-                data={listBalance}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={item => item.tag}
-                renderItem={({ item }) => (<BalanceItem data={item} />)}
-            /> */}
-
+            <Header title="Home" showBack={false} showMenu={true} />
         </SafeAreaView>
     )
 }
