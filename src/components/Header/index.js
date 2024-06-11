@@ -44,7 +44,7 @@ export default function Header({ title, showBack = true, showMenu = false }) {
         <SafeAreaView>
             <Appbar.Header elevated>
                 {IconBack()}
-                <Appbar.Content title={title} />
+                <Appbar.Content title={title}  />
                 {IconMenu()}
             </Appbar.Header>
         </SafeAreaView>

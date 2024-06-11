@@ -43,7 +43,7 @@ const Menu = ({navigation}) => {
                     title="Serviços"
                     left={props => <List.Icon {...props} icon="cogs" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
-                    onPress={() => navigation.navigate('Profile')}
+                    onPress={() => navigation.navigate('Service')}
                 />
 
                 <Divider />

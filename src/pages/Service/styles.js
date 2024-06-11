@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     titleCard: {
         marginLeft: 15,
         fontSize: 20,
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
     fab: {
         position: 'absolute',

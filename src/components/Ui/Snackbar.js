@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Snackbar } from 'react-native-paper';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { setSnackbar } from '../../pages/Establishment/reducer/slice';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSnackbar } from '../../store/globalSlice';
 
 function AlertSnackbar() {
-    const visible = useSelector((state) => state.establishment.snackbar.visible);
-    const title = useSelector((state) => state.establishment.snackbar.title);
+    const visible = useSelector((state) => state.global.snackbar.visible);
+    const title = useSelector((state) => state.global.snackbar.title);
     const dispatch = useDispatch();
 
     const onDismissSnackBar = () => {
@@ -15,9 +14,11 @@ function AlertSnackbar() {
 
     return (
         <Snackbar
+        style={{backgroundColor:'green'}}
             visible={visible}
             onDismiss={onDismissSnackBar}
             action={{
+                textColor:'white',
                 label: 'Fechar',
                 // onPress: () => {
                 // Do something

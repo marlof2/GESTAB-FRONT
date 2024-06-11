@@ -42,8 +42,12 @@
     "backdrop": "rgba(41, 50, 52, 0.4)",
     "white" : "#fff",
     "action" : {
-      "delete" : "rgb(186, 26, 26)",
-      "edit" : "blue"
+      "delete" : "#FF3300",
+      "inactive" : "#FF3300",
+      "active" : "#009933",
+      "edit" : "blue",
+      "association" : "black",
+      "service" : "orange"
     }
   }
 }

@@ -1,5 +1,8 @@
 import React from 'react'
 import Establishment from "../pages/Establishment";
+import EstablishmentUser from "../pages/EstablishmentUser/";
+import Service from "../pages/Service/";
+import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/componets/BindProfessional";
 import { createStackNavigator } from '@react-navigation/stack';
 
 import TabRoutes from '../routes/app.routes.tab'
@@ -21,6 +24,28 @@ function Routes() {
                 options={{
                     headerShown: false
                 }} />
+
+            <Stack.Screen
+                name="EstablishmentUser"
+                component={EstablishmentUser}
+                options={{
+                    headerShown: false
+                }} />
+
+            <Stack.Screen
+                name="EstablishmentUserBindProfessional"
+                component={EstablishmentUserBindProfessional}
+                options={{
+                    headerShown: false
+                }} />
+
+            <Stack.Screen
+                name="Service"
+                component={Service}
+                options={{
+                    headerShown: false
+                }} />
+
         </Stack.Navigator>
     );
 }

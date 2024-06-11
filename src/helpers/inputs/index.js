@@ -1,4 +1,5 @@
 const maskCpfCnpj = (inputText) => {
+    if (!inputText) return ""
     let cleaned = inputText.replace(/\D/g, '');
     let masked = '';
 
@@ -15,6 +16,7 @@ const maskCpfCnpj = (inputText) => {
     return masked
 };
 const maskCnpj = (inputText) => {
+    if (!inputText) return ""
     let cleaned = inputText.replace(/\D/g, '');
     let masked = '';
 
@@ -25,6 +27,7 @@ const maskCnpj = (inputText) => {
     return masked
 };
 const maskCpf = (inputText) => {
+    if (!inputText) return ""
     let cleaned = inputText.replace(/\D/g, '');
     let masked = '';
 

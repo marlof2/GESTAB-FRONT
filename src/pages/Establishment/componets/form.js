@@ -1,68 +1,90 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button, TextInput, Text, Card, RadioButton, IconButton } from 'react-native-paper';
-import styles from './styles';
+import styles from '../styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-// import { AuthContext } from '../../contexts/auth';
-import Overlay from '../../components/Ui/Overlay';
-import { helper } from '../../helpers/inputs';
-import api from "../../services";
-import { useDispatch } from 'react-redux';
-import { infoModal, reloadItemsCard } from './reducer/slice';
-import { useSelector } from 'react-redux';
+import Overlay from '../../../components/Ui/Overlay';
+import { helper } from '../../../helpers/inputs';
+import api from "../../../services";
+import { useDispatch, useSelector } from 'react-redux';
+import { infoModal, reloadItemsCard } from '../reducer';
+import { setSnackbar } from '../../../store/globalSlice';
 
 
 export default function Form() {
-  // const { signUp, loadingAuth } = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const reloadListCard = useSelector((state) => state.establishment.reloadCards);
-  
-  
+  const [loading, setLoading] = useState(false);
+  const modalForm = useSelector((state) => state.establishment.modal);
+
+
   const validationSchema = Yup.object().shape({
     type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
-    phone: Yup.string()
-      .required('Campo obrigatório')
-      .matches(/^\(\d{2}\) \d{4,5}-\d{4}$/, 'Número de telefone inválido'),
-    cpf: Yup.string().required('Campo obrigatório')
-      .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
-    cnpj: Yup.string().required('Campo obrigatório')
-      .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido'),
+    cpf: Yup.string().when('type_of_person_id', {
+      is: (value) => value === 1, // Ajuste este valor conforme a lógica do seu sistema
+      then: (schema) => schema
+        .required('Campo obrigatório')
+        .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    cnpj: Yup.string().when('type_of_person_id', {
+      is: (value) => value === 2, // Ajuste este valor conforme a lógica do seu sistema
+      then: (schema) => schema
+        .required('Campo obrigatório')
+        .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   });
 
-
   function closeModal() {
-    dispatch(infoModal({ visible: false }));
+    dispatch(reloadItemsCard(true));
+    dispatch(infoModal({ action:'create', visible: false }));
+
   }
 
-  async function saveForm() {
-    closeModal()
-    dispatch(reloadItemsCard(true));
+  async function saveForm(obj) {
 
-    // setLoading(true);
+    if (modalForm?.data?.id == null) {
+      setLoading(true);
+      try {
+        const { status } = await api.post('/establishments', obj);
 
-    // try {
-    //   const { status } = await api.post('/establishments', obj);
+        if (status == 201) {
+          closeModal()
+          dispatch(setSnackbar({ visible: true, title: 'Adicionado com sucesso!' }));
+          setLoading(false);
+        }
 
-    //   if (status == 201) {
-    //     setLoading(false);
-    //   }
+      } catch (error) {
+        console.log('erro ao adicionar estabelecimento', error)
+        setLoading(false);
+      }
+    } else {
+      setLoading(true);
+      try {
+        const { status } = await api.put(`/establishments/${modalForm.data.id}`, obj);
 
+        if (status == 200) {
+          closeModal()
+          dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
+          setLoading(false);
+        }
 
-    // } catch (error) {
-    //   console.log('erro ao logar', error)
-    //   setLoading(false);
-    // }
+      } catch (error) {
+        console.log('erro ao alterar estabelecimento', error)
+        setLoading(false);
+      }
+
+    }
   }
 
   return (
     <View>
-      {/* <Overlay isVisible={loadingAuth} /> */}
+      <Overlay isVisible={loading} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
         <Card style={styles.card}>
-          <Card.Title title="Cadastrar" titleStyle={styles.titleCard}
+          <Card.Title title="Novo Estabelecimento" titleStyle={styles.titleCard}
             right={(props) => (
               <IconButton
                 {...props}
@@ -82,12 +104,15 @@ export default function Form() {
             >
               {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => {
                 useEffect(() => {
-                  if (values.type_of_person_id == 1) {
-                    setFieldValue('cnpj', '');
-                  } else if (values.type_of_person_id == 2) {
-                    setFieldValue('cpf', '');
+                  if (modalForm.action == 'edit') {
+                    setFieldValue('type_of_person_id', modalForm.data.type_of_person_id);
+                    setFieldValue('name', modalForm.data.name);
+                    setFieldValue('cpf', helper.maskCpf(modalForm.data.cpf));
+                    setFieldValue('cnpj', helper.maskCnpj(modalForm.data.cnpj));
+                    setFieldValue('phone', helper.maskPhone(modalForm.data.phone));
                   }
-                }, [values.type_of_person_id]);
+
+                }, [modalForm.action]);
 
                 return (
                   <View>
@@ -124,7 +149,7 @@ export default function Form() {
                     />
                     {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-                    {values.type_of_person_id == 1 ? (
+                    {values?.type_of_person_id == 1 ? (
                       <View>
                         <TextInput
                           outlineStyle={{ borderRadius: 10 }}
@@ -178,10 +203,10 @@ export default function Form() {
                     <Button
                       style={styles.button}
                       mode="contained"
-                      icon="plus"
-                      onPress={saveForm}
+                      icon="content-save"
+                      onPress={handleSubmit}
                     >
-                      Adicionar
+                      Salvar
                     </Button>
                   </View>
                 );

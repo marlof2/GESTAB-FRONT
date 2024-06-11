@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
-import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Chip, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
 import RenderItem from './componets/RenderItem'
 import theme from '../../themes/theme.json'
-import Form from './componets/form';
 import Snackbar from '../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { infoModal, reloadItemsCard } from './reducer';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/ModalDelete'
-// import { useIsFocused } from '@react-navigation/native'
-// import { useNavigation } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
 
-export default function Index() {
+export default function Index({ route }) {
+  const { establishmentId, establishmentName } = route.params;
   const dispatch = useDispatch();
-  // const navigation = useNavigation();
-  // const isFocused = useIsFocused()
+  const navigation = useNavigation();
+  const isFocused = useIsFocused()
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false);
@@ -27,23 +27,24 @@ export default function Index() {
   const [search, setSearch] = useState('');
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [itemsCount, setItemsCount] = useState(null);
-  const visibleForm = useSelector((state) => state.establishment.modal.visible);
-  const reloadListCard = useSelector((state) => state.establishment.reloadCards);
+  const reloadListCard = useSelector((state) => state.establishmentUser.reloadCards);
 
 
   useEffect(() => {
-    getAll()
+    if(isFocused){
+      getAll()
+    }
 
     return () => { }
 
-  }, [])
-
-
+  }, [isFocused])
+  
   const getAll = async () => {
     if (loading) return;
+    handleRefreshWithOutGetAll()
 
     setLoading(true);
-    const response = await api.get('/establishments', { params: search ? { search: search } : null })
+    const response = await api.get(`/establishment_user/user_by_establishment/${establishmentId}`, { params: search ? { search: search } : null })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -79,6 +80,11 @@ export default function Index() {
     setRefreshing(false);
   };
 
+  const handleRefreshWithOutGetAll = () => {
+    setItems([]);
+    setNextPageUrl(null)
+  };
+
 
   const renderFooter = () => {
     if (loading || loadingMore) {
@@ -93,9 +99,8 @@ export default function Index() {
   }
 
 
-  // MODAL FORM ESSA AÇÃO VEM DO COMPOENETE PAI
-  const openModal = () => {
-    dispatch(infoModal({ action: 'create', visible: true }));
+  const navigateToBindProfessional = () => {
+    navigation.navigate('EstablishmentUserBindProfessional', {establishmentId, establishmentName})
 
   }
 
@@ -103,11 +108,12 @@ export default function Index() {
   return (
     <View style={{ flex: 1 }}>
 
-      <Header title={'Estabelecimentos'} />
+      <Header title={'Profissionais Vinculados '} />
 
+      <Chip elevation={0} style={{ marginBottom: 5, marginTop:0, backgroundColor:theme.colors.elevation.level2}}>Estabelecimento: {establishmentName}</Chip>
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
-        placeholder="Nome, CPF, CNPJ e telefone"
+        placeholder="Nome e CPF"
         onChangeText={setSearch}
         value={search}
         onSubmitEditing={handleRefresh}
@@ -141,17 +147,11 @@ export default function Index() {
 
       <FAB
         color={theme.colors.white}
-        label='Adicionar'
-        icon="plus"
+        label='Vincular'
+        icon="link-variant-plus"
         style={styles.fab}
-        onPress={openModal}
+        onPress={navigateToBindProfessional}
       />
-
-      <Portal>
-        <Modal visible={visibleForm} dismissable={!visibleForm} contentContainerStyle={{ borderRadius: 15, margin: 3 }}>
-          <Form />
-        </Modal>
-      </Portal>
 
       <ModalDelete />
 

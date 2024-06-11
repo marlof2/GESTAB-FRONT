@@ -4,27 +4,15 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
     },
-    input: {
-        marginBottom: 5,
-    },
     container: { flex: 1 },
-    errorText: {
-        color: 'red',
-        marginLeft: 20,
-        marginBottom: 8
-    },
-    button: {
-        marginTop: 10,
-        borderRadius: 10,
-    },
     card: {
-        borderRadius: 15,
-        margin: 5
+        margin:8,
+        // marginVertical: 8,
+        backgroundColor: '#ffffff',
     },
     titleCard: {
-        marginLeft: 15,
-        fontSize: 20,
-        fontWeight:'bold'
+        fontSize:17,
+        fontWeight: 'bold',
     },
     fab: {
         position: 'absolute',
@@ -33,7 +21,6 @@ const styles = StyleSheet.create({
         bottom: 0,
         backgroundColor: theme.colors.primary
     },
-    contentCard: { marginLeft: 15 }
 })
 
 export default styles

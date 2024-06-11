@@ -41,11 +41,21 @@ api.interceptors.response.use(
 const handleError = async (response) => {
     // console.log(response)
     const { status, data } = response;
+    let bodyMessage = "";
 
     switch (status) {
         case 406:
             if (data.message == "Usuário ou Senha Inválido.") {
                 return AlertModal('Atenção!', data.message)
+            }
+
+
+            if (data.error) {
+                Object.keys(data.error).forEach((item) => {
+                    bodyMessage += `${data.error[item]}, `;
+                });
+
+                AlertModal('Atenção', bodyMessage)
             }
             break;
         case 404:

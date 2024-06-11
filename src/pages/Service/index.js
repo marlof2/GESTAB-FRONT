@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
-import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Chip, FAB, Modal, Portal, Searchbar, Text } from 'react-native-paper';
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
@@ -15,8 +15,9 @@ import ModalDelete from './componets/ModalDelete'
 // import { useIsFocused } from '@react-navigation/native'
 // import { useNavigation } from '@react-navigation/native';
 
-export default function Index() {
+export default function Index({ route }) {
   const dispatch = useDispatch();
+  const { establishmentId, establishmentName } = route.params;
   // const navigation = useNavigation();
   // const isFocused = useIsFocused()
 
@@ -27,8 +28,8 @@ export default function Index() {
   const [search, setSearch] = useState('');
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [itemsCount, setItemsCount] = useState(null);
-  const visibleForm = useSelector((state) => state.establishment.modal.visible);
-  const reloadListCard = useSelector((state) => state.establishment.reloadCards);
+  const visibleForm = useSelector((state) => state.service.modal.visible);
+  const reloadListCard = useSelector((state) => state.service.reloadCards);
 
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function Index() {
     if (loading) return;
 
     setLoading(true);
-    const response = await api.get('/establishments', { params: search ? { search: search } : null })
+    const response = await api.get(`/services/by_establishment`, { params: search ? { search: search, establishment_id:establishmentId } : {establishment_id:establishmentId} })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -103,11 +104,11 @@ export default function Index() {
   return (
     <View style={{ flex: 1 }}>
 
-      <Header title={'Estabelecimentos'} />
-
+      <Header title={'Serviços'} />
+      <Chip elevation={0} style={{ marginBottom: 5, marginTop: 0, backgroundColor: theme.colors.elevation.level2 }}>Estabelecimento: <Text style={{ fontWeight:'bold'}} >{establishmentName}</Text></Chip>
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
-        placeholder="Nome, CPF, CNPJ e telefone"
+        placeholder="Busca por nome"
         onChangeText={setSearch}
         value={search}
         onSubmitEditing={handleRefresh}
