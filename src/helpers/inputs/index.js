@@ -40,6 +40,7 @@ const maskCpf = (inputText) => {
     return masked
 };
 
+
 const maskPhone = (value) => {
     if (!value) return value;
     const cleanedValue = value.replace(/\D/g, '');
@@ -62,11 +63,47 @@ const validateEmail = (email) => {
     return regex.test(email);
 };
 
+const formatMoney = (value) => {
+    // Remove tudo que não é dígito
+    const cleanValue = value.replace(/\D/g, '');
+
+    // Formata o valor para o formato de moeda brasileiro
+    const formattedValue = (cleanValue / 100).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+
+    return `R$ ${formattedValue}`;
+};
+
+
+const formatMoneyRemoveCaracters = (formattedValue) => {
+    const cleanValue = formattedValue.replace(/[^\d,-]/g, '').replace(',', '.');
+    return parseFloat(cleanValue).toFixed(2);
+};
+
+
+const formatTime = (input) => {
+    if (!input) return input;
+    let formattedInput = input.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+
+    // Formatação da entrada
+    if (formattedInput.length > 4) {
+      formattedInput = formattedInput.substring(0, 4);
+    }
+    if (formattedInput.length > 2) {
+      formattedInput = formattedInput.replace(/(\d{2})(\d{1,2})/, '$1:$2');
+    }
+
+   return formattedInput
+};
+
+
 
 export const helper = {
     maskCpfCnpj,
     maskCpf,
     validateEmail,
     maskPhone,
-    maskCnpj
+    maskCnpj,
+    formatMoney,
+    formatMoneyRemoveCaracters,
+    formatTime
 };

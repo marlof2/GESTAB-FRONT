@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
-import { ActivityIndicator, Chip, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
+import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
+import { ActivityIndicator, Divider, FAB, Modal, Portal, Searchbar, Text, Chip } from 'react-native-paper';
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
@@ -13,6 +13,8 @@ import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/ModalDelete'
 import { useIsFocused } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native';
+// import Chip from '../../components/Ui/Chip';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Index({ route }) {
   const { establishmentId, establishmentName } = route.params;
@@ -31,14 +33,14 @@ export default function Index({ route }) {
 
 
   useEffect(() => {
-    if(isFocused){
+    if (isFocused) {
       getAll()
     }
 
     return () => { }
 
   }, [isFocused])
-  
+
   const getAll = async () => {
     if (loading) return;
     handleRefreshWithOutGetAll()
@@ -92,7 +94,7 @@ export default function Index({ route }) {
     }
   };
 
-  //RECARREGA A LISTA COM OS CARDS (ESSA AÇÃO VEM DO COMPONENTE FILHO RenderItem)
+  
   if (reloadListCard) {
     dispatch(reloadItemsCard(false));
     handleRefresh()
@@ -100,33 +102,33 @@ export default function Index({ route }) {
 
 
   const navigateToBindProfessional = () => {
-    navigation.navigate('EstablishmentUserBindProfessional', {establishmentId, establishmentName})
+    navigation.navigate('EstablishmentUserBindProfessional', { establishmentId, establishmentName })
 
   }
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
 
-      <Header title={'Profissionais Vinculados '} />
+      <Header title={'Profissionais Vinculados '} subtitle={establishmentName} />
 
-      <Chip elevation={0} style={{ marginBottom: 5, marginTop:0, backgroundColor:theme.colors.elevation.level2}}>Estabelecimento: {establishmentName}</Chip>
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
         placeholder="Nome e CPF"
         onChangeText={setSearch}
         value={search}
         onSubmitEditing={handleRefresh}
-        onIconPress={handleRefresh}
         elevation={1}
-      // onClearIconPress={closeSearch}
+        icon='filter-outline'
+        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
+
 
       <View style={styles.background}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : ''}
-          enabled
-          style={styles.container}>
+          enabled>
+
 
           <FlatList
             data={items}
@@ -157,6 +159,6 @@ export default function Index({ route }) {
 
       <Snackbar />
 
-    </View>
+    </SafeAreaView>
   )
 }

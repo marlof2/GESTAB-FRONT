@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, FlatList, StyleSheet } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, FlatList, StyleSheet, SafeAreaView } from 'react-native';
 import { ActivityIndicator, Button, Chip, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
 import Header from '../../../components/Header';
 import api from "../../../services";
@@ -13,6 +13,7 @@ import EmptyListMessage from '../../../components/Ui/EmptyListMessage';
 import { useNavigation } from '@react-navigation/native';
 import { setSnackbar } from '../../../store/globalSlice';
 import Overlay from '../../../components/Ui/Overlay';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Index({ route }) {
   const { establishmentId, establishmentName } = route.params;
@@ -42,7 +43,7 @@ export default function Index({ route }) {
     if (loading) return;
 
     setLoading(true);
-    const response = await api.get(`/users/listProfessionalsToEstablishimentUser`, { params: search ? { search: search, profile_id: 3 } : { profile_id: 3 } })
+    const response = await api.get(`/users/listProfessionalsToEstablishmentUser`, { params: search ? { search: search, profile_id: 3,  establishment_id: establishmentId } : { profile_id: 3, establishment_id: establishmentId } })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -109,29 +110,27 @@ export default function Index({ route }) {
     }
   }
 
-
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loadingBindProfessional} />
-      <Header title={'Vincular Profissional '} />
+      <Header title={'Vincular Profissional '} subtitle={establishmentName} />
 
-      <Chip elevation={0} style={{ marginBottom: 5, marginTop: 0, backgroundColor: theme.colors.elevation.level2 }}>Estabelecimento: {establishmentName}</Chip>
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
         placeholder="Nome e CPF"
-        onChangeText={setSearch}
+        onChangeText={(text) => setSearch(text)}
         value={search}
         onSubmitEditing={handleRefresh}
-        onIconPress={handleRefresh}
         elevation={1}
-      // onClearIconPress={closeSearch}
+        icon='filter-outline'
+        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
+
 
       <View style={styles.background}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : ''}
-          enabled
-          style={styles.container}>
+          enabled>
 
           <FlatList
             data={items}
@@ -160,7 +159,7 @@ export default function Index({ route }) {
 
       <Snackbar />
 
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -169,6 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: { flex: 1 },
+  safeArea: { flex: 1 },
   card: {
     margin: 8,
     backgroundColor: '#ffffff',

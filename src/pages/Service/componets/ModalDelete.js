@@ -11,7 +11,7 @@ import { View } from "react-native";
 export default function ModalDelete() {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
-    const modalDelete = useSelector((state) => state.establishment.modalDelete);
+    const modalDelete = useSelector((state) => state.service.modalDelete);
 
     const closeModal = () => {
         dispatch(infoModalDelete({ visible: false }));
@@ -20,17 +20,17 @@ export default function ModalDelete() {
     const deleteItem = async () => {
         setLoading(true);
         try {
-            const { status } = await api.delete(`/establishments/${modalDelete.id}`);
+            const { status } = await api.delete(`/services/${modalDelete.id}`);
 
             if (status == 200) {
                 dispatch(reloadItemsCard(true));
                 closeModal()
-                dispatch(setSnackbar({ visible: true, title: 'Inativado com sucesso!' }));
+                dispatch(setSnackbar({ visible: true, title: 'Deletado com sucesso!' }));
                 setLoading(false);
             }
 
         } catch (error) {
-            console.log('erro ao Deletar estabelecimento', error)
+            console.log('erro ao deletar o serviço', error)
             setLoading(false);
         }
     }
@@ -42,14 +42,14 @@ export default function ModalDelete() {
                     <Card style={{ borderRadius: 8, }}>
                         <Card.Title
                             titleStyle={{ fontWeight: 'bold', }}
-                            title="Confirmar Inativação!"
+                            title="Deseja Deletar?"
                             left={(props) => <IconButton {...props} icon="alert-circle" iconColor={theme.colors.error} />}
                         />
                         <Card.Content>
                             <Text style={{
                                 fontSize: 16,
                                 marginBottom: 20,
-                            }}>Tem certeza de que deseja inativar este item?</Text>
+                            }}>Essa ação não poderá ser desfeita?</Text>
                         </Card.Content>
                         <Card.Actions >
                             <Button disabled={loading} loading={loading} mode="outlined" onPress={closeModal} style={{ marginTop: 10, borderRadius: 10 }}>

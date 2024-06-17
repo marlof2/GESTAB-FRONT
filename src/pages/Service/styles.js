@@ -5,9 +5,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     input: {
-        marginBottom: 5,
+        marginBottom: 10,
     },
-    container: { flex: 1 },
+    safeArea: { flex: 1 },
     errorText: {
         color: 'red',
         marginLeft: 20,

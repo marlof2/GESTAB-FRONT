@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
 import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
 import RenderItem from './componets/RenderItem'
 import theme from '../../themes/theme.json'
-import Form from './componets/form';
+import Form from './componets/Form';
 import Snackbar from '../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { infoModal, reloadItemsCard } from './reducer';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/ModalDelete'
-// import { useIsFocused } from '@react-navigation/native'
-// import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Index() {
   const dispatch = useDispatch();
-  // const navigation = useNavigation();
-  // const isFocused = useIsFocused()
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false);
@@ -86,22 +83,19 @@ export default function Index() {
     }
   };
 
-  //RECARREGA A LISTA COM OS CARDS (ESSA AÇÃO VEM DO COMPONENTE FILHO RenderItem)
   if (reloadListCard) {
     dispatch(reloadItemsCard(false));
     handleRefresh()
   }
 
 
-  // MODAL FORM ESSA AÇÃO VEM DO COMPOENETE PAI
   const openModal = () => {
     dispatch(infoModal({ action: 'create', visible: true }));
-
   }
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
 
       <Header title={'Estabelecimentos'} />
 
@@ -111,16 +105,15 @@ export default function Index() {
         onChangeText={setSearch}
         value={search}
         onSubmitEditing={handleRefresh}
-        onIconPress={handleRefresh}
         elevation={1}
-      // onClearIconPress={closeSearch}
+        icon='filter-outline'
+        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
 
       <View style={styles.background}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : ''}
-          enabled
-          style={styles.container}>
+          enabled>
 
           <FlatList
             data={items}
@@ -157,6 +150,6 @@ export default function Index() {
 
       <Snackbar />
 
-    </View>
+    </SafeAreaView>
   )
 }

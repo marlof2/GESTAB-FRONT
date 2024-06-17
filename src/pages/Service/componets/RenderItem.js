@@ -8,9 +8,6 @@ import theme from '../../../themes/theme.json'
 import { helper } from '../../../helpers/inputs';
 import { useDispatch } from 'react-redux';
 import { infoModal, infoModalDelete, reloadItemsCard } from '../reducer';
-import { setSnackbar } from '../../../store/globalSlice';
-import api from "../../../services";
-import { useNavigation } from '@react-navigation/native';
 
 export default function RenderItem({ data }) {
     const dispatch = useDispatch();
@@ -18,7 +15,6 @@ export default function RenderItem({ data }) {
     const [menuVisible, setMenuVisible] = useState(false);
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
-    const navigation = useNavigation();
 
     function openModalEdit(item) {
         dispatch(infoModal({ action: 'edit', data: item, visible: true }));
@@ -29,21 +25,6 @@ export default function RenderItem({ data }) {
         dispatch(infoModalDelete({ id: id, visible: true }));
         closeMenu()
     }
-
-    async function deleteItem(id) {
-        try {
-            const { status } = await api.patch(`/establishments/${id}`);
-
-            if (status == 200) {
-                dispatch(reloadItemsCard(true));
-                dispatch(setSnackbar({ visible: true, title: 'Ativo com sucesso!' }));
-            }
-
-        } catch (error) {
-            console.log('erro ao ativar estabelecimento', error)
-        }
-    }
-
 
     return (
         <Card style={styles.card} >
@@ -69,7 +50,7 @@ export default function RenderItem({ data }) {
                         <Divider />
                         <Menu.Item
                             title="Deletar"
-                            onPress={() => deleteItem(item.id)}
+                            onPress={() => openModalDelete(item.id)}
                             leadingIcon={(props) => <Icon name="delete" color={theme.colors.action.delete} size={26} />}
                         />
 
@@ -79,10 +60,10 @@ export default function RenderItem({ data }) {
             />
             <Card.Content style={styles.contentCard}>
                 <Text variant="titleMedium">Preço:</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{item.amount}</Paragraph>
+                <Paragraph style={{ marginBottom: 10 }} >{helper.formatMoney(item.amount)}</Paragraph>
 
                 <Text variant="titleMedium">Tempo:</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{item.time ?? 'Não cadastrado'}</Paragraph>
+                <Paragraph style={{ marginBottom: 10 }} >{helper.formatTime(item.time)}</Paragraph>
             </Card.Content>
         </Card>
     )

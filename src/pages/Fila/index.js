@@ -1,62 +1,94 @@
-import React, { useState } from 'react';
-import Header from '../../components/Header';
-import { ScrollView, View } from 'react-native';
-import { Avatar, Button, Card, Text, TextInput, Chip } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/Feather'
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, FlatList, StyleSheet } from 'react-native';
+import { Appbar, Searchbar, Card, Title, Paragraph } from 'react-native-paper';
+import { Calendar } from 'react-native-calendars';
 
+const AppointmentsScreen = () => {
+  const [selectedDate, setSelectedDate] = useState('');
+  const [clients, setClients] = useState([]);
+  const [search, setSearch] = useState('');
 
-const Fila = () => {
-    const [text, setText] = useState("");
+  useEffect(() => {
+    if (selectedDate) {
+      // Simulate fetching clients for the selected date
+      fetchClients(selectedDate);
+    }
+  }, [selectedDate]);
 
-    return (
+  const fetchClients = (date) => {
+    // Simulate an API call to fetch clients based on the selected date
+    const fetchedClients = [
+      { id: '1', name: 'John Doe', time: '10:00 AM' },
+      { id: '2', name: 'Jane Smith', time: '11:00 AM' },
+      // Add more clients as needed
+    ];
+    setClients(fetchedClients);
+  };
 
-        <View backgroundColor="#f0f4ff" style={{ flex: 1 }}>
+  const handleDatePress = (day) => {
+    setSelectedDate(day.dateString);
+  };
 
-            <ScrollView>
-                <Header title="Fila de espera" showBack={false} />
+  const renderClient = ({ item }) => (
+    <Card style={styles.card}>
+      <Card.Content>
+        <Title>{item.name}</Title>
+        <Paragraph>{item.time}</Paragraph>
+      </Card.Content>
+    </Card>
+  );
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, margin: 10 }}>
-                    <Chip style={{ width: '100%', backgroundColor: 'white' }}>Profissional: Tiquinho  | Data: 01/02/2024</Chip>
-                </View>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Appbar.Header>
+        <Appbar.Content title="Agendamentos" />
+      </Appbar.Header>
 
-                <Card style={{ padding: 20, margin: 10, backgroundColor: 'white' }} >
-                    <Card.Title style={{ marginLeft: 0 }} title="Marlo Marques" left={() => <Icon style={{ marginTop: -8 }} name="user" size={28} />} />
-                    <Card.Content >
-                        <View style={{ flexDirection: 'row', marginBottom: 5, alignItems: 'center' }}>
-                            <Text variant="titleMedium" >Tipo de serviço: </Text>
-                            <Chip >Corte Simples</Chip>
-                        </View>
-
-                        <View style={{ flexDirection: 'row', marginBottom: 5, alignItems: 'center' }}>
-                            <Text variant="titleMedium" >Status: </Text>
-                            <Chip>Em andamento</Chip>
-                        </View>
-                    </Card.Content>
-                    <Card.Actions style={{ marginTop: 20 }}>
-                        <Button style={{width:'100%'}} mode='outlined' textColor='white' buttonColor='red'>Sair da fila</Button>
-                    </Card.Actions>
-                </Card>
-
-                <View style={{ margin: 15, }}>
-                    <Button icon="plus-circle" mode="contained" onPress={() => console.log('Pressed')}>
-                        Adicionar
-                    </Button>
-
-                    <TextInput
-                        outlineStyle={{ borderRadius: 10 }}
-                        dense
-                        label="Email"
-                        value={text}
-                        onChangeText={text => setText(text)}
-                        mode="outlined"
-                    />
-                </View >
-
-
-
-            </ScrollView>
-        </View>
-    );
+      <View style={styles.container}>
+        <Calendar
+          onDayPress={handleDatePress}
+          markedDates={{
+            [selectedDate]: { selected: true, marked: true, selectedColor: 'blue' },
+          }}
+          style={styles.calendar}
+        />
+        <Searchbar
+          style={styles.searchbar}
+          placeholder="Buscar cliente"
+          onChangeText={setSearch}
+          value={search}
+        />
+        <FlatList
+          data={clients.filter(client => client.name.toLowerCase().includes(search.toLowerCase()))}
+          keyExtractor={item => item.id}
+          renderItem={renderClient}
+          style={styles.list}
+        />
+      </View>
+    </SafeAreaView>
+  );
 };
 
-export default Fila;
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  calendar: {
+    marginBottom: 10,
+  },
+  searchbar: {
+    marginBottom: 10,
+  },
+  list: {
+    flex: 1,
+  },
+  card: {
+    marginBottom: 10,
+  },
+});
+
+export default AppointmentsScreen;

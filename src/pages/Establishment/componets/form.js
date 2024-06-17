@@ -38,8 +38,7 @@ export default function Form() {
   });
 
   function closeModal() {
-    dispatch(reloadItemsCard(true));
-    dispatch(infoModal({ action:'create', visible: false }));
+    dispatch(infoModal({ action: 'create', visible: false }));
 
   }
 
@@ -51,6 +50,7 @@ export default function Form() {
         const { status } = await api.post('/establishments', obj);
 
         if (status == 201) {
+          dispatch(reloadItemsCard(true));
           closeModal()
           dispatch(setSnackbar({ visible: true, title: 'Adicionado com sucesso!' }));
           setLoading(false);
@@ -66,6 +66,7 @@ export default function Form() {
         const { status } = await api.put(`/establishments/${modalForm.data.id}`, obj);
 
         if (status == 200) {
+          dispatch(reloadItemsCard(true));
           closeModal()
           dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
           setLoading(false);
@@ -79,12 +80,16 @@ export default function Form() {
     }
   }
 
+  const titleForm = () => {
+   return modalForm.action == 'edit' ? 'Editar Estabelecimento' : 'Novo Estabelecimento'
+  }
+
   return (
     <View>
       <Overlay isVisible={loading} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
         <Card style={styles.card}>
-          <Card.Title title="Novo Estabelecimento" titleStyle={styles.titleCard}
+          <Card.Title title={titleForm()} titleStyle={styles.titleCard}
             right={(props) => (
               <IconButton
                 {...props}

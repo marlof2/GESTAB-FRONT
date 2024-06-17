@@ -5,11 +5,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import { useNavigation } from '@react-navigation/native';
 //  const navigation = useNavigation();
 
-const Menu = ({navigation}) => {
+const Menu = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <List.Section>
-                <List.Subheader>Menu de Opções</List.Subheader>
+                <List.Subheader style={{fontWeight:'bold'}}>Menu de Opções</List.Subheader>
 
                 <Divider />
 
@@ -28,6 +28,16 @@ const Menu = ({navigation}) => {
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Profile')}
                 />
+
+                <Divider />
+
+                <List.Item
+                    title="Profissionais"
+                    left={props => <List.Icon {...props} icon="account-tie" />}
+                    right={props => <Icon {...props} name="chevron-right" size={24} />}
+                    onPress={() => navigation.navigate('Professional')}
+                />
+
                 <Divider />
 
                 <List.Item
@@ -36,35 +46,6 @@ const Menu = ({navigation}) => {
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Profile')}
                 />
-
-                <Divider />
-
-                <List.Item
-                    title="Serviços"
-                    left={props => <List.Icon {...props} icon="cogs" />}
-                    right={props => <Icon {...props} name="chevron-right" size={24} />}
-                    onPress={() => navigation.navigate('Service')}
-                />
-
-                <Divider />
-
-                <List.Item
-                    title="Profissionais"
-                    left={props => <List.Icon {...props} icon="account-tie" />}
-                    right={props => <Icon {...props} name="chevron-right" size={24} />}
-                    onPress={() => navigation.navigate('Profile')}
-                />
-
-                <Divider />
-
-                <List.Item
-                    title="Clientes"
-                    left={props => <List.Icon {...props} icon="account-group" />}
-                    right={props => <Icon {...props} name="chevron-right" size={24} />}
-                    onPress={() => navigation.navigate('Profile')}
-                />
-
-                <Divider />
 
 
             </List.Section>

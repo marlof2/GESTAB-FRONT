@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
 import { ActivityIndicator, Chip, FAB, Modal, Portal, Searchbar, Text } from 'react-native-paper';
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
 import RenderItem from './componets/RenderItem'
 import theme from '../../themes/theme.json'
-import Form from './componets/form';
+import Form from './componets/Form';
 import Snackbar from '../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { infoModal, reloadItemsCard } from './reducer';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/ModalDelete'
-// import { useIsFocused } from '@react-navigation/native'
-// import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Index({ route }) {
   const dispatch = useDispatch();
   const { establishmentId, establishmentName } = route.params;
-  // const navigation = useNavigation();
-  // const isFocused = useIsFocused()
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false);
@@ -44,7 +41,7 @@ export default function Index({ route }) {
     if (loading) return;
 
     setLoading(true);
-    const response = await api.get(`/services/by_establishment`, { params: search ? { search: search, establishment_id:establishmentId } : {establishment_id:establishmentId} })
+    const response = await api.get(`/services/by_establishment`, { params: search ? { search: search, establishment_id: establishmentId } : { establishment_id: establishmentId } })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -87,14 +84,12 @@ export default function Index({ route }) {
     }
   };
 
-  //RECARREGA A LISTA COM OS CARDS (ESSA AÇÃO VEM DO COMPONENTE FILHO RenderItem)
   if (reloadListCard) {
     dispatch(reloadItemsCard(false));
     handleRefresh()
   }
 
 
-  // MODAL FORM ESSA AÇÃO VEM DO COMPOENETE PAI
   const openModal = () => {
     dispatch(infoModal({ action: 'create', visible: true }));
 
@@ -102,26 +97,25 @@ export default function Index({ route }) {
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
 
-      <Header title={'Serviços'} />
-      <Chip elevation={0} style={{ marginBottom: 5, marginTop: 0, backgroundColor: theme.colors.elevation.level2 }}>Estabelecimento: <Text style={{ fontWeight:'bold'}} >{establishmentName}</Text></Chip>
+      <Header title={'Serviços'}  subtitle={establishmentName}/>
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
         placeholder="Busca por nome"
         onChangeText={setSearch}
         value={search}
         onSubmitEditing={handleRefresh}
-        onIconPress={handleRefresh}
         elevation={1}
-      // onClearIconPress={closeSearch}
+        icon='filter-outline'
+        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
 
       <View style={styles.background}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : ''}
           enabled
-          style={styles.container}>
+        >
 
           <FlatList
             data={items}
@@ -150,7 +144,7 @@ export default function Index({ route }) {
 
       <Portal>
         <Modal visible={visibleForm} dismissable={!visibleForm} contentContainerStyle={{ borderRadius: 15, margin: 3 }}>
-          <Form />
+          <Form establishmentId={establishmentId} />
         </Modal>
       </Portal>
 
@@ -158,6 +152,6 @@ export default function Index({ route }) {
 
       <Snackbar />
 
-    </View>
+    </SafeAreaView>
   )
 }

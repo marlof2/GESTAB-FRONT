@@ -1,17 +1,14 @@
 import { StyleSheet } from 'react-native';
 import theme from '../../themes/theme.json'
 const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-    },
-    container: { flex: 1 },
+    safeArea: { flex: 1 },
+    background: { flex: 1,},
     card: {
-        margin:8,
-        // marginVertical: 8,
+        margin: 8,
         backgroundColor: '#ffffff',
     },
     titleCard: {
-        fontSize:17,
+        fontSize: 17,
         fontWeight: 'bold',
     },
     fab: {
@@ -21,6 +18,10 @@ const styles = StyleSheet.create({
         bottom: 0,
         backgroundColor: theme.colors.primary
     },
+    titleEstablishment: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 })
 
 export default styles

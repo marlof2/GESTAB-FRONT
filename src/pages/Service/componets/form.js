@@ -10,43 +10,41 @@ import api from "../../../services";
 import { useDispatch, useSelector } from 'react-redux';
 import { infoModal, reloadItemsCard } from '../reducer';
 import { setSnackbar } from '../../../store/globalSlice';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 
 
-export default function Form() {
+export default function Form({ establishmentId }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const modalForm = useSelector((state) => state.establishment.modal);
-
+  const modalForm = useSelector((state) => state.service.modal);
 
   const validationSchema = Yup.object().shape({
-    type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
-    cpf: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 1, // Ajuste este valor conforme a lógica do seu sistema
-      then: (schema) => schema
-        .required('Campo obrigatório')
-        .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    cnpj: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 2, // Ajuste este valor conforme a lógica do seu sistema
-      then: (schema) => schema
-        .required('Campo obrigatório')
-        .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido'),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+    amount: Yup.string().required('Campo obrigatório'),
+    time: Yup.string()
+      .required('Campo obrigatório')
+      .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora inválida')
+      .test('is-valid-time', 'Hora inválida', value => {
+        if (value) {
+          const [hours, minutes] = value.split(':').map(Number);
+          return hours >= 0 && hours <= 24 && minutes >= 0 && minutes < 60;
+        }
+        return false;
+      })
+      .min(5, 'Hora deve ter 5 caracteres no formato HH:MM')
   });
 
   function closeModal() {
-    dispatch(infoModal({ action:'create', visible: false }));
+    dispatch(infoModal({ action: 'create', visible: false }));
   }
 
   async function saveForm(obj) {
+    obj.establishment_id = establishmentId
 
     if (modalForm?.data?.id == null) {
       setLoading(true);
       try {
-        const { status } = await api.post('/establishments', obj);
+        const { status } = await api.post('/services', obj);
 
         if (status == 201) {
           dispatch(reloadItemsCard(true));
@@ -56,13 +54,13 @@ export default function Form() {
         }
 
       } catch (error) {
-        console.log('erro ao adicionar estabelecimento', error)
+        console.log('erro ao adicionar serviço', error)
         setLoading(false);
       }
     } else {
       setLoading(true);
       try {
-        const { status } = await api.put(`/establishments/${modalForm.data.id}`, obj);
+        const { status } = await api.put(`/services/${modalForm.data.id}`, obj);
 
         if (status == 200) {
           dispatch(reloadItemsCard(true));
@@ -72,11 +70,15 @@ export default function Form() {
         }
 
       } catch (error) {
-        console.log('erro ao alterar estabelecimento', error)
+        console.log('erro ao alterar serviço', error)
         setLoading(false);
       }
 
     }
+  }
+
+  const titleForm = () => {
+    return modalForm.action == 'edit' ? 'Editar Serviço' : 'Novo Serviço'
   }
 
   return (
@@ -84,7 +86,7 @@ export default function Form() {
       <Overlay isVisible={loading} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
         <Card style={styles.card}>
-          <Card.Title title="Novo Estabelecimento" titleStyle={styles.titleCard}
+          <Card.Title title={titleForm()} titleStyle={styles.titleCard}
             right={(props) => (
               <IconButton
                 {...props}
@@ -96,46 +98,25 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '' }}
+              initialValues={{ name: '', time: "00:00", amount: "" }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
+                values.amount = helper.formatMoneyRemoveCaracters(values.amount);
                 saveForm(values);
               }}
             >
               {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => {
                 useEffect(() => {
                   if (modalForm.action == 'edit') {
-                    setFieldValue('type_of_person_id', modalForm.data.type_of_person_id);
                     setFieldValue('name', modalForm.data.name);
-                    setFieldValue('cpf', helper.maskCpf(modalForm.data.cpf));
-                    setFieldValue('cnpj', helper.maskCnpj(modalForm.data.cnpj));
-                    setFieldValue('phone', helper.maskPhone(modalForm.data.phone));
+                    setFieldValue('amount', helper.formatMoney(modalForm.data.amount));
+                    setFieldValue('time', helper.formatTime(modalForm.data.time));
                   }
 
                 }, [modalForm.action]);
 
                 return (
                   <View>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Você é?</Text>
-                    <RadioButton.Group
-                      onValueChange={(value) => setFieldValue('type_of_person_id', value)}
-                      value={values.type_of_person_id}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
-                          <RadioButton value={1} />
-                          <Text>Pessoa Física</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RadioButton value={2} />
-                          <Text>Pessoa Jurídica</Text>
-                        </View>
-                      </View>
-                    </RadioButton.Group>
-                    {touched.type_of_person_id && errors.type_of_person_id && (
-                      <Text style={styles.errorText}>{errors.type_of_person_id}</Text>
-                    )}
-
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}
                       style={styles.input}
@@ -149,56 +130,35 @@ export default function Form() {
                     />
                     {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-                    {values?.type_of_person_id == 1 ? (
-                      <View>
-                        <TextInput
-                          outlineStyle={{ borderRadius: 10 }}
-                          style={styles.input}
-                          onChangeText={(text) => setFieldValue('cpf', helper.maskCpf(text))}
-                          onBlur={handleBlur('cpf')}
-                          value={values.cpf}
-                          mode="outlined"
-                          label="CPF"
-                          dense
-                          maxLength={14}
-                          error={touched.cpf && Boolean(errors.cpf)}
-                          keyboardType="numeric"
-                        />
-                        {touched.cpf && errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
-                      </View>
-                    ) : (
-                      <View>
-                        <TextInput
-                          outlineStyle={{ borderRadius: 10 }}
-                          style={styles.input}
-                          onChangeText={(text) => setFieldValue('cnpj', helper.maskCnpj(text))}
-                          onBlur={handleBlur('cnpj')}
-                          value={values.cnpj}
-                          mode="outlined"
-                          label="CNPJ"
-                          dense
-                          maxLength={18}
-                          error={touched.cnpj && Boolean(errors.cnpj)}
-                          keyboardType="numeric"
-                        />
-                        {touched.cnpj && errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
-                      </View>
-                    )}
 
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}
                       style={styles.input}
-                      onChangeText={(text) => setFieldValue('phone', helper.maskPhone(text))}
-                      onBlur={handleBlur('phone')}
-                      value={values.phone}
+                      onChangeText={(text) => setFieldValue('amount', helper.formatMoney(text))}
+                      onBlur={handleBlur('amount')}
+                      value={values.amount}
                       mode="outlined"
-                      label="Celular"
-                      dense
-                      error={touched.phone && Boolean(errors.phone)}
+                      label="Valor"
                       keyboardType="numeric"
-                      maxLength={15}
+                      dense
+                      error={touched.amount && Boolean(errors.amount)}
                     />
-                    {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+                    {touched.amount && errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
+
+                    <TextInput
+                      outlineStyle={{ borderRadius: 10 }}
+                      style={styles.input} time
+                      onChangeText={(text) => setFieldValue('time', helper.formatTime(text))}
+                      onBlur={handleBlur('time')}
+                      value={values.time}
+                      mode="outlined"
+                      label="Quanto tempo gasta"
+                      dense
+                      keyboardType="numeric"
+                      maxLength={5}
+                      error={touched.time && Boolean(errors.time)}
+                    />
+                    {touched.time && errors.time && <Text style={styles.errorText}>{errors.time}</Text>}
 
                     <Button
                       style={styles.button}
