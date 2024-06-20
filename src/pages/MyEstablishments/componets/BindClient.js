@@ -7,18 +7,16 @@ import RenderItemForm from './RenderItemForm'
 import theme from '../../../themes/theme.json'
 import Snackbar from '../../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
-import { resetArrayProfessional } from '../reducer';
+import { resetArrayEstablishments } from '../reducer';
 import EmptyListMessage from '../../../components/Ui/EmptyListMessage';
 // import { useIsFocused } from '@react-navigation/native'
-import { useNavigation } from '@react-navigation/native';
 import { setSnackbar } from '../../../store/globalSlice';
 import Overlay from '../../../components/Ui/Overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Index({ route }) {
-  const { establishmentId, establishmentName } = route.params;
+export default function Index({route}) {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const { user_id } = route.params;
   // const isFocused = useIsFocused()
 
   const [items, setItems] = useState([])
@@ -43,7 +41,7 @@ export default function Index({ route }) {
     if (loading) return;
 
     setLoading(true);
-    const response = await api.get(`/users/listUsersByEstablishiment`, { params: search ? { search: search, profile_id: 3,  establishment_id: establishmentId } : { profile_id: 3, establishment_id: establishmentId } })
+    const response = await api.get(`/establishments/listEstablishimentByUser`, { params: search ? { search: search, user_id:user_id} : {user_id:user_id} })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -99,7 +97,7 @@ export default function Index({ route }) {
       if (status == 201) {
         handleRefresh()
         dispatch(setSnackbar({ visible: true, title: 'Vinculado com sucesso!' }));
-        dispatch(resetArrayProfessional());
+        dispatch(resetArrayEstablishments());
 
         setLoadingBindProfessional(false);
       }
@@ -113,11 +111,11 @@ export default function Index({ route }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loadingBindProfessional} />
-      <Header title={'Vincular Profissional '} subtitle={establishmentName} />
+      <Header title={'Vincular Estabelecimento '}  />
 
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
-        placeholder="Nome e CPF"
+        placeholder="Nome"
         onChangeText={(text) => setSearch(text)}
         value={search}
         onSubmitEditing={handleRefresh}
@@ -151,7 +149,7 @@ export default function Index({ route }) {
 
       <FAB
         color={theme.colors.white}
-        label='Salvar Profissionais'
+        label='Salvar'
         icon="content-save-outline"
         style={styles.fab}
         onPress={addProfessionals}

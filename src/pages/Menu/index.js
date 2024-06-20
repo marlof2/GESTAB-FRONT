@@ -9,13 +9,13 @@ const Menu = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <List.Section>
-                <List.Subheader style={{fontWeight:'bold'}}>Menu de Opções</List.Subheader>
+                <List.Subheader style={{ fontWeight: 'bold' }}>Menu de Opções</List.Subheader>
 
                 <Divider />
 
                 <List.Item
                     title="Estabelecimentos"
-                    left={props => <List.Icon {...props} icon="store" />}
+                    left={props => <List.Icon {...props} icon="store-plus" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Establishment')}
                 />
@@ -24,27 +24,28 @@ const Menu = ({ navigation }) => {
 
                 <List.Item
                     title="Gerênciar Perfis"
-                    left={props => <List.Icon {...props} icon="face-man-profile" />}
+                    left={props => <List.Icon {...props} icon="shield-account" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Profile')}
                 />
 
                 <Divider />
 
-                <List.Item
-                    title="Profissionais"
-                    left={props => <List.Icon {...props} icon="account-tie" />}
-                    right={props => <Icon {...props} name="chevron-right" size={24} />}
-                    onPress={() => navigation.navigate('Professional')}
-                />
-
-                <Divider />
 
                 <List.Item
                     title="Relatórios"
                     left={props => <List.Icon {...props} icon="clipboard-file" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Profile')}
+                />
+
+                <Divider />
+
+                <List.Item
+                    title="Meus Estabelecimentos"
+                    left={props => <List.Icon {...props} icon="store" />}
+                    right={props => <Icon {...props} name="chevron-right" size={24} />}
+                    onPress={() => navigation.navigate('MyEstablishments')}
                 />
 
 
