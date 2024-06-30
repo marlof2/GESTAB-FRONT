@@ -12,7 +12,7 @@ export default function ModalDelete() {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const modalDelete = useSelector((state) => state.establishmentUser.modalDelete);
-
+    
     const closeModal = () => {
         dispatch(infoModalDelete({ visible: false }));
     }
@@ -20,7 +20,7 @@ export default function ModalDelete() {
     const deleteItem = async () => {
         setLoading(true);
         try {
-            const { status } = await api.delete(`/establishment_user`, { params: modalDelete.data });
+            const { status } = await api.delete(`/establishment_user/${modalDelete.data.id}`);
 
             if (status == 200) {
                 dispatch(reloadItemsCard(true));
@@ -42,7 +42,7 @@ export default function ModalDelete() {
                     <Card style={{ borderRadius: 8, }}>
                         <Card.Title
                             titleStyle={{ fontWeight: 'bold', }}
-                            title="Deseja Deletar?"
+                            title="Deseja Desvincular?"
                             left={(props) => <IconButton {...props} icon="delete-circle" iconColor={theme.colors.error} />}
                         />
                         <Card.Content >

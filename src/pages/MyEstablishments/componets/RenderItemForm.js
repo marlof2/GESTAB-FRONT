@@ -2,15 +2,15 @@ import { Card, Switch, Avatar, Paragraph, } from 'react-native-paper';
 import styles from '../styles';
 import { helper } from '../../../helpers/inputs';
 import { useDispatch, useSelector } from 'react-redux';
-import { addOrRemoveProfessionalInArray } from '../reducer';
+import { addOrRemoveEstablishmentInArray } from '../reducer';
 
 export default function RenderItem({ data }) {
     const item = data.item
     const dispatch = useDispatch();
-    const selectedItem = useSelector((state) => state.establishmentUser.professionals);
+    const selectedItem = useSelector((state) => state.myEstablishments.establishiments);
 
     const toggleSwitch = (id) => {
-        dispatch(addOrRemoveProfessionalInArray(id));
+        dispatch(addOrRemoveEstablishmentInArray(id));
     };
 
     return (

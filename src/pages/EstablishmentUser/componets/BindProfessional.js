@@ -94,7 +94,7 @@ export default function Index({ route }) {
         user_id: professionalsToBind,
         establishment_id: establishmentId
       }
-      const { status } = await api.post('/establishment_user', data);
+      const { status } = await api.post('/establishment_user/associationProfessionalAndEstablishment', data);
 
       if (status == 201) {
         handleRefresh()
@@ -151,7 +151,7 @@ export default function Index({ route }) {
 
       <FAB
         color={theme.colors.white}
-        label='Salvar Profissionais'
+        label='Salvar'
         icon="content-save-outline"
         style={styles.fab}
         onPress={addProfessionals}

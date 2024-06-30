@@ -21,13 +21,13 @@ export default function Index({route}) {
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false);
-  const [loadingBindProfessional, setLoadingBindProfessional] = useState(false);
+  const [loadingBindEstablishment, setLoadingBindEstablishment] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [itemsCount, setItemsCount] = useState(null);
-  const professionalsToBind = useSelector((state) => state.establishmentUser.professionals);
+  const establishimentsToBind = useSelector((state) => state.myEstablishments.establishiments);
 
 
   useEffect(() => {
@@ -86,31 +86,31 @@ export default function Index({route}) {
 
 
   async function addProfessionals() {
-    setLoadingBindProfessional(true);
+    setLoadingBindEstablishment(true);
     try {
       const data = {
-        user_id: professionalsToBind,
-        establishment_id: establishmentId
+        establishment_ids: establishimentsToBind,
+        user_id: user_id
       }
-      const { status } = await api.post('/establishment_user', data);
+      const { status } = await api.post('/establishment_user/associationClientAndEstablishment', data);
 
       if (status == 201) {
         handleRefresh()
         dispatch(setSnackbar({ visible: true, title: 'Vinculado com sucesso!' }));
         dispatch(resetArrayEstablishments());
 
-        setLoadingBindProfessional(false);
+        setLoadingBindEstablishment(false);
       }
 
     } catch (error) {
-      console.log('erro ao vincular profissional', error)
-      setLoadingBindProfessional(false);
+      console.log('erro ao vincular estabelecimento', error)
+      setLoadingBindEstablishment(false);
     }
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Overlay isVisible={loadingBindProfessional} />
+      <Overlay isVisible={loadingBindEstablishment} />
       <Header title={'Vincular Estabelecimento '}  />
 
       <Searchbar

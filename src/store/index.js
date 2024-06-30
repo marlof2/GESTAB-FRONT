@@ -4,6 +4,7 @@ import MyEstablishments from '../pages/MyEstablishments/reducer';
 import EstablishmentUserReducer from '../pages/EstablishmentUser/reducer';
 import ServiceReducer from '../pages/Service/reducer';
 import GlobalReducer from './globalSlice';
+import ScheduleReducer from '../pages/Schedule/reducer'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     establishmentUser: EstablishmentUserReducer,
     myEstablishments : MyEstablishments,
     service: ServiceReducer,
+    schedule: ScheduleReducer,
   },
 });
 

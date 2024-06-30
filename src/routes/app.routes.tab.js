@@ -1,7 +1,7 @@
 import React from "react";
 
 import Home from '../pages/Home'
-import Fila from '../pages/Fila'
+import Schedule from '../pages/Schedule'
 import Menu from '../pages/Menu'
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -33,12 +33,12 @@ export default function AppRouteStack() {
             />
 
             <Tab.Screen
-                name="Fila"
-                component={Fila}
+                name="Schedule"
+                component={Schedule}
                 options={{
-                    tabBarLabel: 'Fila',
+                    tabBarLabel: 'Agenda',
                     tabBarIcon: () => (
-                        <Icon name="human-queue" color={theme.colors.white} size={26} />
+                        <Icon name="notebook-outline" color={theme.colors.white} size={26} />
                     ),
                 }}
             />

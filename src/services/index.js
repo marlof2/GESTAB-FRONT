@@ -4,7 +4,8 @@ import { Alert } from 'react-native';
 
 
 const api = axios.create({
-    baseURL: 'http://192.168.0.26:8000/api',
+    // baseURL: 'http://192.168.0.26:8000/api',
+    baseURL: 'http://192.168.176.214:8000/api',
 })
 
 
@@ -39,7 +40,7 @@ api.interceptors.response.use(
 
 
 const handleError = async (response) => {
-    // console.log(response)
+    console.log(response)
     const { status, data } = response;
     let bodyMessage = "";
 
