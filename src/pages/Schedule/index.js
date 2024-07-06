@@ -30,11 +30,11 @@ const AppointmentsScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header title={'Agenda'} showBack={false} />
-      <View style={styles.iconContainer}>
-        <Icon name="calendar-check" size={30} color="rgb(0, 104, 116)" />
-        <Text style={styles.iconText}>Clique em uma data para abrir.</Text>
-      </View>
       <View style={styles.container}>
+        <View style={styles.iconContainer}>
+          <Icon name="information-outline" size={30} color="orange" />
+          <Text style={styles.iconText}>Escolha o dia desejado.</Text>
+        </View>
         <Calendar
           onDayPress={handleDatePress}
           markedDates={{
@@ -54,10 +54,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding:5,
+    padding: 5,
   },
   calendar: {
-    borderWidth: 5,
+    borderWidth: 3,
     borderColor: 'rgb(0, 104, 116)',
     height: 350
   },
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
   iconText: {
     marginLeft: 10,
     fontSize: 16,
-    color: 'rgb(0, 104, 116)',
   },
 });
 

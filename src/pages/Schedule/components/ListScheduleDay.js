@@ -15,6 +15,7 @@ import { useIsFocused } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native';
 // import Chip from '../../components/Ui/Chip';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import moment from 'moment';
 
 export default function Index({ route }) {
     const { date } = route.params;
@@ -46,7 +47,7 @@ export default function Index({ route }) {
         handleRefreshWithOutGetAll()
 
         setLoading(true);
-        const response = await api.get(`/list`, { params: search ? { search: search } : null })
+        const response = await api.get(`/list`, { params: search ? { search: search , date } : {date} })
 
         if (response.status == 200) {
             setItems(response.data.data);
@@ -106,7 +107,7 @@ export default function Index({ route }) {
     return (
         <SafeAreaView style={styles.safeArea}>
 
-            <Header title={'Profissionais Vinculados '}  />
+            <Header title={`Agenda`} subtitle={`${moment(date).format('DD/MM/YYYY')}`}  />
 
             <Searchbar
                 style={{ margin: 10, borderRadius: 15 }}

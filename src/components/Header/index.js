@@ -39,16 +39,14 @@ export default function Header({ title, subtitle = null, showBack = true, showMe
         }
     }
 
-
-
     return (
         <SafeAreaView>
-            <Appbar.Header elevated>
+            <Appbar.Header elevated style={{borderBottomLeftRadius:20, borderBottomRightRadius:20}}>
                 {IconBack()}
                 <View style={styles.container}>
                     <Text style={styles.title}>{title}</Text>
                     {
-                       subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : ''
+                        subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : ''
                     }
                 </View>
                 {IconMenu()}
