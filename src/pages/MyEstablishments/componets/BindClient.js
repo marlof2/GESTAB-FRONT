@@ -89,6 +89,7 @@ export default function Index({route}) {
     setLoadingBindEstablishment(true);
     try {
       const data = {
+        created_by_functionality:'ME',
         establishment_ids: establishimentsToBind,
         user_id: user_id
       }

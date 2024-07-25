@@ -87,10 +87,11 @@ export default function Index({ route }) {
   };
 
 
-  async function addProfessionals() {
+  async function saveProfessionals() {
     setLoadingBindProfessional(true);
     try {
       const data = {
+        created_by_functionality:'EP',
         user_id: professionalsToBind,
         establishment_id: establishmentId
       }
@@ -154,7 +155,7 @@ export default function Index({ route }) {
         label='Salvar'
         icon="content-save-outline"
         style={styles.fab}
-        onPress={addProfessionals}
+        onPress={saveProfessionals}
       />
 
       <Snackbar />

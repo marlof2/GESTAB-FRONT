@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
 import { ActivityIndicator, Divider, FAB, Modal, Portal, Searchbar, Text, Chip } from 'react-native-paper';
-import styles  from '../styles'
+import styles from '../styles'
 import Header from '../../../components/Header';
 import api from "../../../services";
 import RenderItem from '../components/RenderItem'
@@ -13,12 +13,15 @@ import EmptyListMessage from '../../../components/Ui/EmptyListMessage';
 import ModalDelete from '../components/ModalDelete'
 import { useIsFocused } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native';
-// import Chip from '../../components/Ui/Chip';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
+import Form from './Form';
 
 export default function Index({ route }) {
-    const { date } = route.params;
+    const { date, establishment_id, professional_id, user, professional_name } = route.params;
+    const dataParams = {
+        date, establishment_id, professional_id
+    }
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const isFocused = useIsFocused()
@@ -31,6 +34,7 @@ export default function Index({ route }) {
     const [nextPageUrl, setNextPageUrl] = useState(null);
     const [itemsCount, setItemsCount] = useState(null);
     const reloadListCard = useSelector((state) => state.schedule.reloadCards);
+    const visibleForm = useSelector((state) => state.schedule.modal.visible);
 
 
     useEffect(() => {
@@ -47,7 +51,8 @@ export default function Index({ route }) {
         handleRefreshWithOutGetAll()
 
         setLoading(true);
-        const response = await api.get(`/list`, { params: search ? { search: search , date } : {date} })
+
+        const response = await api.get(`/list`, { params: search ? { search: search, ...dataParams } : dataParams })
 
         if (response.status == 200) {
             setItems(response.data.data);
@@ -102,16 +107,26 @@ export default function Index({ route }) {
     }
 
 
+    const openModal = () => {
+        dispatch(infoModal({
+            action: 'create', visible: true, data:
+                { establishment_id, date, professional_id, user_id: user.id }
+        }));
+    }
+
+    const subtitle = () => {
+      return `${moment(date).format('DD/MM/YYYY')}` 
+    }
 
 
     return (
         <SafeAreaView style={styles.safeArea}>
 
-            <Header title={`Agenda`} subtitle={`${moment(date).format('DD/MM/YYYY')}`}  />
+            <Header title={`${subtitle()}`} subtitle={`Profissional: ${professional_name}`} />
 
             <Searchbar
                 style={{ margin: 10, borderRadius: 15 }}
-                placeholder="Nome e CPF"
+                placeholder="Nome do cliente"
                 onChangeText={setSearch}
                 value={search}
                 onSubmitEditing={handleRefresh}
@@ -146,11 +161,19 @@ export default function Index({ route }) {
 
             <FAB
                 color={theme.colors.white}
-                label='Vincular'
-                icon="link-variant-plus"
+                label='Agendar'
+                icon="calendar-account"
                 style={styles.fab}
-                onPress={() => {}}
+                onPress={openModal}
             />
+
+
+            <Portal>
+                <Modal visible={visibleForm} dismissable={!visibleForm} contentContainerStyle={{ borderRadius: 15, margin: 3 }}>
+                    <Form />
+                </Modal>
+            </Portal>
+
 
             <ModalDelete />
 

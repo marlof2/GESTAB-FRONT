@@ -46,7 +46,7 @@ export default function Index({ route }) {
     handleRefreshWithOutGetAll()
 
     setLoading(true);
-    const response = await api.get(`/establishment_user/user_by_establishment/${establishmentId}`, { params: search ? { search: search } : null })
+    const response = await api.get(`/establishment_user/user_by_establishment/${establishmentId}`, { params: search ? { search: search, created_by_functionality:'EP' } : {created_by_functionality:'EP'} })
 
     if (response.status == 200) {
       setItems(response.data.data);

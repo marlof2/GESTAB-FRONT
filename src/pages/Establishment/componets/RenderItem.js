@@ -114,17 +114,30 @@ export default function RenderItem({ data }) {
                 )}
             />
             <Card.Content style={styles.contentCard}>
-                <Text variant="titleMedium">Tipo de pessoa:</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{item.tipo_pessoa.name}</Paragraph>
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> Responsável: </Text>{item.responsible}</Paragraph>
+                </View>
 
-                <Text variant="titleMedium">{item.tipo_pessoa.id == 1 ? 'CPF:' : 'CNPJ:'}</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{item.tipo_pessoa.id == 1 ? helper.maskCpf(item.cpf) : helper.maskCnpj(item.cnpj)}</Paragraph>
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> Telefone: </Text>{helper.maskPhone(item.phone) ?? 'Não cadastrado'}</Paragraph>
+                </View>
 
-                <Text variant="titleMedium">Telefone:</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{helper.maskPhone(item.phone) ?? 'Não cadastrado'}</Paragraph>
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> {item.tipo_pessoa.id == 1 ? 'CPF:' : 'CNPJ:'} </Text>{item.tipo_pessoa.id == 1 ? helper.maskCpf(item.cpf) : helper.maskCnpj(item.cnpj)}</Paragraph>
+                </View>
 
-                <Text variant="titleMedium">Ativo:</Text>
-                <Paragraph style={{ marginBottom: 10 }} >{item.deleted_at ? 'Não' : 'Sim'}</Paragraph>
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> Tipo de pessoa: </Text>{item.tipo_pessoa.name}</Paragraph>
+                </View>
+                
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> Tipo de agenda: </Text>{item.type_schedule == 1 ? 'Horário marcado' : 'Ordem de chegada'}</Paragraph>
+                </View>
+
+                <View style={styles.iconText}>
+                    <Paragraph > <Text style={styles.titleCardContent}> Ativo: </Text>{item.deleted_at ? 'Não' : 'Sim'}</Paragraph>
+                </View>
+
             </Card.Content>
         </Card>
     )

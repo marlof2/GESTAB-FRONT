@@ -147,7 +147,7 @@ export default function Form({ establishmentId }) {
 
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}
-                      style={styles.input} time
+                      style={styles.input}
                       onChangeText={(text) => setFieldValue('time', helper.formatTime(text))}
                       onBlur={handleBlur('time')}
                       value={values.time}

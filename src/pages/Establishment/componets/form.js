@@ -21,6 +21,8 @@ export default function Form() {
   const validationSchema = Yup.object().shape({
     type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
+    responsible: Yup.string().required('Campo obrigatório'),
+    type_schedule: Yup.string().required('Campo obrigatório'),
     cpf: Yup.string().when('type_of_person_id', {
       is: (value) => value === 1, // Ajuste este valor conforme a lógica do seu sistema
       then: (schema) => schema
@@ -101,7 +103,7 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '' }}
+              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible: '', type_schedule:'' }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 saveForm(values);
@@ -111,6 +113,8 @@ export default function Form() {
                 useEffect(() => {
                   if (modalForm.action == 'edit') {
                     setFieldValue('type_of_person_id', modalForm.data.type_of_person_id);
+                    setFieldValue('type_schedule', modalForm.data.type_schedule);
+                    setFieldValue('responsible', modalForm.data.responsible);
                     setFieldValue('name', modalForm.data.name);
                     setFieldValue('cpf', helper.maskCpf(modalForm.data.cpf));
                     setFieldValue('cnpj', helper.maskCnpj(modalForm.data.cnpj));
@@ -141,6 +145,26 @@ export default function Form() {
                       <Text style={styles.errorText}>{errors.type_of_person_id}</Text>
                     )}
 
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Tipo de agenda</Text>
+                    <RadioButton.Group
+                      onValueChange={(value) => setFieldValue('type_schedule', value)}
+                      value={values.type_schedule}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
+                          <RadioButton value={1} />
+                          <Text>Horário marcado</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <RadioButton value={2} />
+                          <Text>Ordem de chegada</Text>
+                        </View>
+                      </View>
+                    </RadioButton.Group>
+                    {touched.type_schedule && errors.type_schedule && (
+                      <Text style={styles.errorText}>{errors.type_schedule}</Text>
+                    )}
+
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}
                       style={styles.input}
@@ -153,6 +177,19 @@ export default function Form() {
                       error={touched.name && Boolean(errors.name)}
                     />
                     {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
+                    <TextInput
+                      outlineStyle={{ borderRadius: 10 }}
+                      style={styles.input}
+                      onChangeText={handleChange('responsible')}
+                      onBlur={handleBlur('responsible')}
+                      value={values.responsible}
+                      mode="outlined"
+                      label="Responsável"
+                      dense
+                      error={touched.responsible && Boolean(errors.responsible)}
+                    />
+                    {touched.responsible && errors.responsible && <Text style={styles.errorText}>{errors.responsible}</Text>}
 
                     {values?.type_of_person_id == 1 ? (
                       <View>

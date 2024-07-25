@@ -6,6 +6,7 @@ import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/compon
 import MyEstablishments from "../pages/MyEstablishments";
 import MyEstablishmentUserBindCliente from "../pages/MyEstablishments/componets/BindClient";
 import ListScheduleDay from "../pages/Schedule/components/ListScheduleDay";
+import FormSchedule from "../pages/Schedule/components/Form";
 import { createStackNavigator } from '@react-navigation/stack';
 
 import TabRoutes from '../routes/app.routes.tab'
@@ -66,6 +67,13 @@ function Routes() {
             <Stack.Screen
                 name="ListScheduleDay"
                 component={ListScheduleDay}
+                options={{
+                    headerShown: false
+                }} />
+
+            <Stack.Screen
+                name="FormSchedule"
+                component={FormSchedule}
                 options={{
                     headerShown: false
                 }} />

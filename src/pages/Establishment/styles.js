@@ -29,7 +29,18 @@ const styles = StyleSheet.create({
         bottom: 0,
         backgroundColor: theme.colors.primary
     },
-    contentCard: { marginLeft: 15 }
+    contentCard: {
+        marginLeft: 9
+    },
+    iconText: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 2,
+    },
+    titleCardContent: {
+        fontWeight: '900',
+        fontSize: 15
+    }
 })
 
 export default styles

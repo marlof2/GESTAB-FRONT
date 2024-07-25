@@ -48,7 +48,9 @@
       "active" : "#009933",
       "edit" : "blue",
       "association" : "black",
-      "service" : "orange"
+      "service" : "orange",
+      "blue" : "blue",
+      "gray" : "gray"
     }
   }
 }
