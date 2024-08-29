@@ -1,8 +1,9 @@
-import { Card, Switch, Avatar, } from 'react-native-paper';
+import { Card, Switch, Avatar, Text, Paragraph, } from 'react-native-paper';
 import styles from '../styles';
 import { helper } from '../../../helpers/inputs';
 import { useDispatch, useSelector } from 'react-redux';
 import { addOrRemoveProfessionalInArray } from '../reducer';
+import { View } from 'react-native';
 
 export default function RenderItem({ data }) {
     const item = data.item
@@ -17,7 +18,7 @@ export default function RenderItem({ data }) {
         <Card style={styles.card}>
             <Card.Title
                 title={item.name} titleStyle={styles.titleCard}
-                subtitle={`CPF: ${helper.maskCpf(item.cpf)}`}
+                subtitle={<Text style={{ fontWeight: 'bold' }}>CPF: <Text>{helper.maskCpf(item.cpf)}</Text></Text>}
                 left={(props) => <Avatar.Text {...props} label={item.name[0]} />}
                 right={(props) => (
                     <Switch
@@ -26,6 +27,12 @@ export default function RenderItem({ data }) {
                     />
                 )}
             />
+
+            <Card.Content>
+                <View style={{ marginLeft: 50 }}>
+                    <Paragraph> <Text style={{fontWeight: 'bold'}}> Tipo de agenda: </Text>{item.type_schedule == 'HM' ? 'Horário marcado' : 'Ordem de chegada'}</Paragraph>
+                </View>
+            </Card.Content>
         </Card>
     )
 };

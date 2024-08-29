@@ -12,20 +12,9 @@ import { useIsFocused } from '@react-navigation/native'
 
 
 export default function Home() {
-    const [listBalance, setListaBalance] = useState([])
-    const [dateMovements, setDateMoviments] = useState(new Date())
     const isFocused = useIsFocused()
 
     // useEffect(() => {
-    //     let isActived = true;
-
-    //     async function getMoviments() {
-
-    //         let formatDate = format(dateMovements, "dd-MM-yyyy")
-
-    //         const balance = await api.get('/balance', { params: { date: formatDate } })
-    //         setListaBalance(balance.data)
-    //     }
 
     //     if (isFocused) {
     //         getMoviments()

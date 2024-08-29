@@ -131,10 +131,6 @@ export default function RenderItem({ data }) {
                 </View>
                 
                 <View style={styles.iconText}>
-                    <Paragraph > <Text style={styles.titleCardContent}> Tipo de agenda: </Text>{item.type_schedule == 1 ? 'Horário marcado' : 'Ordem de chegada'}</Paragraph>
-                </View>
-
-                <View style={styles.iconText}>
                     <Paragraph > <Text style={styles.titleCardContent}> Ativo: </Text>{item.deleted_at ? 'Não' : 'Sim'}</Paragraph>
                 </View>
 

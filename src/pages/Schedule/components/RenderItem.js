@@ -1,7 +1,6 @@
 import { Card, IconButton, Avatar, Paragraph, Chip, Button, Menu, Divider, } from 'react-native-paper';
 import theme from '../../../themes/theme.json'
 import { useDispatch } from 'react-redux';
-import { infoModalDelete } from '../reducer';
 import { helper } from '../../../helpers/inputs';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
@@ -9,6 +8,9 @@ import moment from 'moment';
 import { useState } from 'react';
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import api from '../../../services';
+import { reloadItemsCard } from '../reducer';
+import { setSnackbar } from '../../../store/globalSlice';
 
 export default function RenderItem({ data }) {
     const item = data.item;
@@ -18,35 +20,84 @@ export default function RenderItem({ data }) {
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
 
-    const handleMenuItemPress = (action) => {
-        if (action === 'concluir') {
-            // Lógica para concluir item
-        } else if (action === 'desistir') {
-            // Lógica para desistir
-        } else if (action === 'aguardando-atendimento') {
-            // Lógica para mudar para aguardando atendimento
+    const statusEmAtendimento = async (id) => {
+        try {
+            const { status } = await api.put(`/list/statusEmAtendimento/${id}`);
+
+            if (status == 200) {
+                dispatch(reloadItemsCard(true));
+                closeModal()
+                dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
+            }
+            closeMenu();
+        } catch (error) {
+            console.log('erro ao alterar o status', error)
+            closeMenu();
         }
-        closeMenu();
+    };
+    const statusConcluido = async (id) => {
+        try {
+            const { status } = await api.put(`/list/statusConcluido/${id}`);
+
+            if (status == 200) {
+                dispatch(reloadItemsCard(true));
+                dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
+            }
+            closeMenu();
+        } catch (error) {
+            console.log('erro ao alterar o status', error)
+            closeMenu();
+        }
+    };
+    const statusAguardandoAtendimento = async (id) => {
+        try {
+            const { status } = await api.put(`/list/statusAguardandoAtendimento/${id}`);
+
+            if (status == 200) {
+                dispatch(reloadItemsCard(true));
+                dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
+            }
+            closeMenu();
+        } catch (error) {
+            console.log('erro ao alterar o status', error)
+            closeMenu();
+        }
+    };
+    const statusDesistiu = async (id) => {
+        try {
+            const { status } = await api.put(`/list/statusDesistiu/${id}`);
+
+            if (status == 200) {
+                dispatch(reloadItemsCard(true));
+                dispatch(setSnackbar({ visible: true, title: 'Alterado com sucesso!' }));
+            }
+            closeMenu();
+        } catch (error) {
+            console.log('erro ao alterar o status', error)
+            closeMenu();
+        }
     };
 
-    const renderMenuItems = (status) => {
+
+
+    const renderMenuItems = (status, id) => {
         switch (status) {
             case 1: // Em atendimento
                 return (
                     <>
                         <Menu.Item
                             title="Concluído"
-                            onPress={() => handleMenuItemPress('concluir')}
+                            onPress={() => statusConcluido(id)}
                             leadingIcon={(props) => <Icon name="check-circle-outline" color={theme.colors.action.active} size={26} />}
                         />
                         <Menu.Item
                             title="Desistir"
-                            onPress={() => handleMenuItemPress('desistir')}
+                            onPress={() => statusDesistiu(id)}
                             leadingIcon={(props) => <Icon name="exit-to-app" color={theme.colors.action.inactive} size={26} />}
                         />
                         <Menu.Item
                             title="Aguardando atendimento"
-                            onPress={() => handleMenuItemPress('aguardando-atendimento')}
+                            onPress={() => statusAguardandoAtendimento(id)}
                             leadingIcon={(props) => <Icon name="clock-alert-outline" color={theme.colors.action.gray} size={26} />}
                         />
                     </>
@@ -56,12 +107,12 @@ export default function RenderItem({ data }) {
                     <>
                         <Menu.Item
                             title="Em atendimento"
-                            onPress={() => handleMenuItemPress('em-atendimento')}
+                            onPress={() => statusEmAtendimento(id)}
                             leadingIcon={(props) => <Icon name="progress-clock" color={theme.colors.action.active} size={26} />}
                         />
                         <Menu.Item
                             title="Desistir"
-                            onPress={() => handleMenuItemPress('desistir')}
+                            onPress={() => statusDesistiu(id)}
                             leadingIcon={(props) => <Icon name="exit-to-app" color={theme.colors.action.inactive} size={26} />}
                         />
                     </>
@@ -98,15 +149,19 @@ export default function RenderItem({ data }) {
                             />
                         }
                     >
-                        {renderMenuItems(item.status.id)}
+                        {renderMenuItems(item.status.id, item.id)}
                     </Menu>
                 )}
             />
             <Card.Content>
-                <View style={styles.iconText}>
-                    <FontAwesome name="clock-o" size={16} style={styles.icon} />
-                    <Paragraph> <Text style={styles.titleCardContent}> Hora: </Text>{`${helper.formatTime(item.time)}`}</Paragraph>
-                </View>
+                {
+                    item.time != null && (
+                        <View style={styles.iconText}>
+                            <FontAwesome name="clock-o" size={16} style={styles.icon} />
+                            <Paragraph> <Text style={styles.titleCardContent}> Hora: </Text>{`${helper.formatTime(item.time)}`}</Paragraph>
+                        </View>
+                    )
+                }
                 <View style={styles.iconText}>
                     <FontAwesome name="cog" size={16} style={styles.icon} />
                     <Paragraph> <Text style={styles.titleCardContent}> Serviço: </Text>{`${item.service.name}`}</Paragraph>
@@ -122,7 +177,7 @@ export default function RenderItem({ data }) {
                 <View style={styles.iconText}>
                     <FontAwesome name="info-circle" size={16} style={styles.icon} />
                     <Paragraph style={styles.titleCardContent}> Status: </Paragraph>
-                    <Chip style={{ backgroundColor: getStatusColor(item.status.id),  }}>{`${item.status.name}`}</Chip>
+                    <Chip style={{ backgroundColor: getStatusColor(item.status.id), }}>{`${item.status.name}`}</Chip>
                 </View>
             </Card.Content>
         </Card>

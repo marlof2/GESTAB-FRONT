@@ -21,17 +21,17 @@ export default function Form({ establishmentId }) {
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Campo obrigatório'),
     amount: Yup.string().required('Campo obrigatório'),
-    time: Yup.string()
-      .required('Campo obrigatório')
-      .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora inválida')
-      .test('is-valid-time', 'Hora inválida', value => {
-        if (value) {
-          const [hours, minutes] = value.split(':').map(Number);
-          return hours >= 0 && hours <= 24 && minutes >= 0 && minutes < 60;
-        }
-        return false;
-      })
-      .min(5, 'Hora deve ter 5 caracteres no formato HH:MM')
+    // time: Yup.string()
+    //   .required('Campo obrigatório')
+    //   .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora inválida')
+    //   .test('is-valid-time', 'Hora inválida', value => {
+    //     if (value) {
+    //       const [hours, minutes] = value.split(':').map(Number);
+    //       return hours >= 0 && hours <= 24 && minutes >= 0 && minutes < 60;
+    //     }
+    //     return false;
+    //   })
+    //   .min(5, 'Hora deve ter 5 caracteres no formato HH:MM')
   });
 
   function closeModal() {
@@ -98,7 +98,7 @@ export default function Form({ establishmentId }) {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', time: "00:00", amount: "" }}
+              initialValues={{ name: '', amount: "" }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 values.amount = helper.formatMoneyRemoveCaracters(values.amount);
@@ -110,7 +110,6 @@ export default function Form({ establishmentId }) {
                   if (modalForm.action == 'edit') {
                     setFieldValue('name', modalForm.data.name);
                     setFieldValue('amount', helper.formatMoney(modalForm.data.amount));
-                    setFieldValue('time', helper.formatTime(modalForm.data.time));
                   }
 
                 }, [modalForm.action]);
@@ -145,7 +144,7 @@ export default function Form({ establishmentId }) {
                     />
                     {touched.amount && errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
 
-                    <TextInput
+                    {/* <TextInput
                       outlineStyle={{ borderRadius: 10 }}
                       style={styles.input}
                       onChangeText={(text) => setFieldValue('time', helper.formatTime(text))}
@@ -158,7 +157,7 @@ export default function Form({ establishmentId }) {
                       maxLength={5}
                       error={touched.time && Boolean(errors.time)}
                     />
-                    {touched.time && errors.time && <Text style={styles.errorText}>{errors.time}</Text>}
+                    {touched.time && errors.time && <Text style={styles.errorText}>{errors.time}</Text>} */}
 
                     <Button
                       style={styles.button}

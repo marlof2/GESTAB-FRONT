@@ -14,29 +14,6 @@ function AuthProvider({ children }) {
 
 
     useEffect(() => {
-        async function loadStorage() {
-            const token = await AsyncStorage.getItem('token');
-            if (token != null) {
-                setLoading(true)
-                const response = await api.get('/me')
-                const { status } = response
-                
-                if (status == 401) {
-                    setLoading(false)
-                    await AsyncStorage.clear();
-                    navigation.navigate('SignIn')
-                    setUser(null);
-                }
-
-                if (status == 200) {
-                    setUser(response.data);
-                    setLoading(false)
-                }
-            }
-
-
-        }
-
         loadStorage();
 
     }, []);
@@ -48,6 +25,29 @@ function AuthProvider({ children }) {
             .then(() => {
                 setUser(null)
             })
+    }
+
+    async function loadStorage() {
+        const token = await AsyncStorage.getItem('token');
+        if (token != null) {
+            setLoading(true)
+            const response = await api.get('/me')
+            const { status } = response
+
+            if (status == 401) {
+                setLoading(false)
+                await AsyncStorage.clear();
+                navigation.navigate('SignIn')
+                setUser(null);
+            }
+
+            if (status == 200) {
+                setUser(response.data);
+                setLoading(false)
+            }
+        }
+
+
     }
 
     async function signIn(obj) {
@@ -66,8 +66,9 @@ function AuthProvider({ children }) {
 
                     setUser(user);
                     setLoadingAuth(false);
+                    loadStorage()
                 }
-                
+
                 setLoadingAuth(false);
             }
 
@@ -81,6 +82,11 @@ function AuthProvider({ children }) {
     async function signUp(obj) {
         setLoadingAuth(true);
         try {
+
+            if (obj.profile_id == 2) {
+                obj.type_schedule = null
+            }
+
             const response = await api.post('/register', obj);
             if (response.status == 201) {
                 navigation.navigate('SignIn')

@@ -7,25 +7,19 @@ import * as Yup from 'yup';
 import { AuthContext } from '../../contexts/auth';
 import Overlay from '../../components/Ui/Overlay';
 import InputCpf from '../../components/Ui/Input/inputCpf';
-import {helper} from '../../helpers/inputs';
-
+import { helper } from '../../helpers/inputs';
 
 export default function SignUp() {
   const { signUp, loadingAuth } = useContext(AuthContext);
 
   function handleSignUp(data) {
-    signUp(data)
+    signUp(data);
   }
 
-
   const validationSchema = Yup.object().shape({
-    profile_id: Yup.number()
-      .required('Campo obrigatório'),
-    name: Yup.string()
-      .required('Campo obrigatório'),
-    email: Yup.string()
-      .email('E-mail inválido')
-      .required('Campo obrigatório'),
+    profile_id: Yup.number().required('Campo obrigatório'),
+    name: Yup.string().required('Campo obrigatório'),
+    email: Yup.string().email('E-mail inválido').required('Campo obrigatório'),
     cpf: Yup.string()
       .required('Campo obrigatório')
       .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
@@ -35,8 +29,13 @@ export default function SignUp() {
     password: Yup.string()
       .min(6, 'A senha deve ter pelo menos 6 caracteres')
       .required('Campo obrigatório'),
+    type_schedule: Yup.string().when('profile_id', {
+      is: (value) => value === 3,
+      then: (schema) => schema
+        .required('Campo obrigatório'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   });
-
 
   return (
     <View style={styles.background}>
@@ -44,21 +43,31 @@ export default function SignUp() {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled
-        style={styles.container}>
-        <Card style={styles.card} >
-          <Card.Title title="Registrar" titleStyle={styles.titleCard} />
+        style={styles.container}
+      >
+        <Card style={styles.card}>
+          <Card.Title tit title="🚀 Criar acesso. " titleStyle={styles.titleCard} />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', cpf: '', email: '', password: '', profile_id: null, phone: null }}
+              initialValues={{
+                name: '',
+                cpf: '',
+                email: '',
+                password: '',
+                profile_id: null,
+                phone: null,
+                type_schedule: null,
+              }}
               validationSchema={validationSchema}
-              onSubmit={values => {
-                handleSignUp(values)
+              onSubmit={(values) => {
+                handleSignUp(values);
               }}
             >
               {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                 <View>
-
-                  <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Você é ?</Text>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+                    Você é ?
+                  </Text>
                   <RadioButton.Group
                     onValueChange={(value) => setFieldValue('profile_id', value)}
                     value={values.profile_id}
@@ -68,13 +77,45 @@ export default function SignUp() {
                         <RadioButton value={3} />
                         <Text>Profissional</Text>
                       </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <RadioButton value={2} />
                         <Text>Cliente</Text>
                       </View>
                     </View>
                   </RadioButton.Group>
-                  {touched.profile_id && errors.profile_id && <Text style={styles.errorText}>{errors.profile_id}</Text>}
+                  {touched.profile_id && errors.profile_id && (
+                    <Text style={styles.errorText}>{errors.profile_id}</Text>
+                  )}
+
+                  {values.profile_id == 3 && (
+                    <>
+                      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+                        Tipo de agenda
+                      </Text>
+                      <RadioButton.Group
+                        onValueChange={(value) => setFieldValue('type_schedule', value)}
+                        value={values.type_schedule}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
+                            <RadioButton value={'HM'} />
+                            <Text>Horário marcado</Text>
+                          </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <RadioButton value={'OC'} />
+                            <Text>Ordem de chegada</Text>
+                          </View>
+                        </View>
+                      </RadioButton.Group>
+                      {touched.type_schedule && errors.type_schedule && (
+                        <Text style={styles.errorText}>{errors.type_schedule}</Text>
+                      )}
+                    </>
+                  )}
 
                   <TextInput
                     outlineStyle={{ borderRadius: 10 }}
@@ -90,11 +131,7 @@ export default function SignUp() {
                   />
                   {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-
-                  <InputCpf
-                    label='CPF'
-                    name='cpf'
-                  />
+                  <InputCpf label="CPF" name="cpf" />
 
                   <TextInput
                     outlineStyle={{ borderRadius: 10 }}
@@ -121,7 +158,7 @@ export default function SignUp() {
                     dense
                     error={touched.phone && Boolean(errors.phone)}
                     left={<TextInput.Icon icon="phone-outline" />}
-                    keyboardType='numeric'
+                    keyboardType="numeric"
                     maxLength={15}
                   />
                   {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
@@ -141,16 +178,14 @@ export default function SignUp() {
                   />
                   {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-
                   <Button
                     style={styles.button}
                     mode="contained"
-                    icon='content-save-outline'
+                    icon="content-save-outline"
                     onPress={handleSubmit}
                   >
                     Salvar
                   </Button>
-
                 </View>
               )}
             </Formik>
@@ -158,5 +193,5 @@ export default function SignUp() {
         </Card>
       </KeyboardAvoidingView>
     </View>
-  )
+  );
 }

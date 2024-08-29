@@ -15,7 +15,7 @@ export default function RenderItem({ data }) {
     const item = data.item.user
     const id = data.item.id
     const dispatch = useDispatch();
-    
+
     async function openModalDelete(establishment_user_id) {
         const obj = { id: establishment_user_id }
         dispatch(infoModalDelete({ data: obj, visible: true }));
@@ -25,12 +25,17 @@ export default function RenderItem({ data }) {
         <Card style={styles.card}>
             <Card.Title
                 title={item.name} titleStyle={styles.titleCard}
-                subtitle={`CPF: ${helper.maskCpf(item.cpf)}`}
+                subtitle={<Text style={{fontWeight:'bold'}}>CPF: <Text>{helper.maskCpf(item.cpf)}</Text></Text>}
                 left={(props) => <Avatar.Text {...props} label={item.name[0]} />}
                 right={(props) => (
                     <IconButton icon='delete' iconColor={theme.colors.action.delete} onPress={() => openModalDelete(id)} />
                 )}
             />
+            <Card.Content>
+                <View style={{ marginLeft: 50 }}>
+                    <Paragraph > <Text style={{fontWeight: 'bold'}}> Tipo de agenda: </Text>{item.type_schedule == 'HM' ? 'Horário marcado' : 'Ordem de chegada'}</Paragraph>
+                </View>
+            </Card.Content>
         </Card>
     )
 };

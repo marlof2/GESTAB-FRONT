@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     background: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#f0f4ff'
@@ -15,8 +14,10 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     logo: {
-        width: 200,
-        height: 200
+        width: 150,
+        height: 150,
+        marginBottom:5,
+        marginTop:'30%'
     },
     button: {
         marginTop: 10,
@@ -35,10 +36,12 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 15,
         elevation: 5,
+        marginTop:20
     },
     titleCard: {
         textAlign: 'center',
         fontSize: 20,
+        fontWeight:'bold'
     },
 })
 

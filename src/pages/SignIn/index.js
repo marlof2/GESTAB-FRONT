@@ -34,13 +34,13 @@ export default function SignIn() {
     <View style={styles.background}>
       <Overlay isVisible={loadingAuth} />
       <Image style={styles.logo} source={require('../../assets/logo1.png')} />
-      {/* <Text style={{ marginBottom: 20, fontWeight: 'bold', fontSize: 16 }}>GLE - Gerênciamento de lista de estabelecimentos</Text> */}
+      <Text style={{marginBottom: 20, fontWeight: 'bold', fontSize: 18, textAlign:'center' }}>Gerênciamento de estabelecimentos.</Text>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled
         style={styles.container}>
         <Card style={styles.card}>
-          <Card.Title title="Bem vindo !!" titleStyle={styles.titleCard} />
+          <Card.Title title="😎 Bem vindo !" titleStyle={styles.titleCard} />
           <Card.Content>
             <Formik
               initialValues={{ cpf: '', password: '' }}
@@ -84,11 +84,11 @@ export default function SignIn() {
             </Formik>
 
             <View style={styles.footer}>
-              <Text>Não tem uma conta?</Text>
+              <Text>Ainda não tem acesso?</Text>
               <Button
                 onPress={() => navigation.navigate('SignUp')}
               >
-                Criar conta
+                Crie seu acesso.
               </Button>
             </View>
 

@@ -29,6 +29,7 @@ const AppointmentsScreen = () => {
   const [itemsEstablishment, setItemsEstablishment] = useState([])
   const [itemsProfessional, setItemsProfessional] = useState([])
   const [establishimentId, setEstablishimentId] = useState(null)
+  const [typeSchedule, setTypeSchedule] = useState(null)
   const [professionalId, setProfessionalId] = useState(null)
   const isFocused = useIsFocused()
   const { user } = useContext(AuthContext);
@@ -45,6 +46,7 @@ const AppointmentsScreen = () => {
         professional_id: professionalId,
         professional_name: professional.user.name,
         user: user.user,
+        typeSchedule
       }
       navigation.navigate('ListScheduleDay', objParams);
     } else {
@@ -105,7 +107,6 @@ const AppointmentsScreen = () => {
     }
 
   }, [isFocused])
-
 
 
   const getEstablisiments = async () => {
@@ -175,6 +176,7 @@ const AppointmentsScreen = () => {
             onBlur={() => setIsFocus(false)}
             onChange={item => {
               setProfessionalId(item.user_id);
+              setTypeSchedule(item.user.type_schedule);
               setIsFocus(false);
             }}
           />

@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     titleCard: {
         textAlign: 'center',
         fontSize: 20,
+        fontWeight:'bold',
     },
 })
 

@@ -7,7 +7,7 @@ import { View } from 'react-native';
 // import theme from "../../themes/theme.json"
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 
-export default function Header({ title, subtitle = null, showBack = true, showMenu = false }) {
+export default function Header({ title, subtitle = null, description = null, showBack = true, showMenu = false }) {
     const navigation = useNavigation()
     const [menuVisible, setMenuVisible] = useState(false);
     const { signOut } = useContext(AuthContext)
@@ -46,7 +46,10 @@ export default function Header({ title, subtitle = null, showBack = true, showMe
                 <View style={styles.container}>
                     <Text style={styles.title}>{title}</Text>
                     {
-                        subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : ''
+                        subtitle  && (<Text style={styles.subtitle}>{subtitle}</Text>)
+                    }
+                    {
+                        description  && (<Text style={styles.subtitle}>{description}</Text>)
                     }
                 </View>
                 {IconMenu()}
@@ -60,7 +63,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        paddingLeft: 10
+        paddingLeft: 10,
+        paddingBottom:10
     },
     title: {
         fontSize: 20,

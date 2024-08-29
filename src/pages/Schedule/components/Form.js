@@ -17,19 +17,27 @@ export default function Form() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [serviceId, setServiceId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const isFocused = useIsFocused();
   const [isFocus, setIsFocus] = useState(false);
   const [itemsService, setItemsService] = useState([]);
+  const [itemsUsers, setItemsUsers] = useState([]);
   const modalForm = useSelector((state) => state.schedule.modal);
 
+  const typeSchedule = modalForm?.data?.typeSchedule;
+
   const validationSchema = Yup.object().shape({
-    time: Yup.string().required('Campo obrigatório'),
+    time: typeSchedule == 'HM' ? Yup.string().required('Campo obrigatório') :  Yup.string() ,
     service_id: Yup.string().required('Campo obrigatório'),
+    user_id: Yup.string().required('Campo obrigatório'),
   });
+  
+
 
   useEffect(() => {
     if (isFocused) {
       getServices();
+      getAllUsers();
     }
 
     return () => { };
@@ -40,6 +48,14 @@ export default function Form() {
 
     if (response.status == 200) {
       setItemsService(response.data);
+    }
+  };
+
+  const getAllUsers = async () => {
+    const response = await api.get(`/combo/userByEstablishiment/${modalForm.data.establishment_id}`);
+
+    if (response.status == 200) {
+      setItemsUsers(response.data);
     }
   };
 
@@ -80,6 +96,17 @@ export default function Form() {
     return null;
   };
 
+  const renderLabelUser = () => {
+    if (userId && isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
+          Pessoa
+        </Text>
+      );
+    }
+    return null;
+  };
+
   return (
     <View>
       <Overlay isVisible={loading} />
@@ -97,7 +124,7 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ time: '', service_id: '' }}
+              initialValues={{ time: '', service_id: '', user_id: '', }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 saveForm(values);
@@ -112,13 +139,33 @@ export default function Form() {
 
                 return (
                   <View>
-                    <Field
-                      component={TimePickerField}
-                      name="time"
-                      label="Hora do agendamento"
-                    />
-
                     <View style={styles.containerDropdown}>
+                      {renderLabelUser()}
+                      <Dropdown
+                        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={itemsUsers}
+                        search
+                        maxHeight={300}
+                        labelField="user.name"
+                        valueField="user.id"
+                        placeholder={'Selecione a pessoa'}
+                        searchPlaceholder="Pesquisar..."
+                        value={values.user_id}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item => {
+                          setFieldValue('user_id', item.user.id);
+                          setUserId(item.user.id);
+                          setIsFocus(false);
+                        }}
+                      />
+                      {touched.user_id && errors.user_id && <Text style={styles.errorText}>{errors.user_id}</Text>}
+                    </View>
+
+                    <View style={[styles.containerDropdown, { marginBottom: 30 }]}>
                       {renderLabel()}
                       <Dropdown
                         style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
@@ -144,6 +191,18 @@ export default function Form() {
                       {touched.service_id && errors.service_id && <Text style={styles.errorText}>{errors.service_id}</Text>}
                     </View>
 
+
+                    {
+                      typeSchedule == 'HM' && (
+                        <Field
+                          component={TimePickerField}
+                          name="time"
+                          label="Hora do agendamento"
+                        />
+                      )
+                    }
+
+
                     <Button
                       style={styles.button}
                       mode="contained"
@@ -167,7 +226,7 @@ const styles = StyleSheet.create({
   input: { marginBottom: 5, },
   errorText: {
     color: 'red',
-    marginTop:20,
+    marginTop: 20,
     marginLeft: 20,
     marginBottom: 8
   },
@@ -187,7 +246,7 @@ const styles = StyleSheet.create({
 
   //dropdown
   containerDropdown: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   dropdown: {
     backgroundColor: 'white',

@@ -22,16 +22,15 @@ export default function Form() {
     type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
     responsible: Yup.string().required('Campo obrigatório'),
-    type_schedule: Yup.string().required('Campo obrigatório'),
     cpf: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 1, // Ajuste este valor conforme a lógica do seu sistema
+      is: (value) => value === 1, 
       then: (schema) => schema
         .required('Campo obrigatório')
         .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
       otherwise: (schema) => schema.notRequired(),
     }),
     cnpj: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 2, // Ajuste este valor conforme a lógica do seu sistema
+      is: (value) => value === 2, 
       then: (schema) => schema
         .required('Campo obrigatório')
         .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido'),
@@ -103,7 +102,7 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible: '', type_schedule:'' }}
+              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible: '',  }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 saveForm(values);
@@ -113,7 +112,6 @@ export default function Form() {
                 useEffect(() => {
                   if (modalForm.action == 'edit') {
                     setFieldValue('type_of_person_id', modalForm.data.type_of_person_id);
-                    setFieldValue('type_schedule', modalForm.data.type_schedule);
                     setFieldValue('responsible', modalForm.data.responsible);
                     setFieldValue('name', modalForm.data.name);
                     setFieldValue('cpf', helper.maskCpf(modalForm.data.cpf));
@@ -145,25 +143,6 @@ export default function Form() {
                       <Text style={styles.errorText}>{errors.type_of_person_id}</Text>
                     )}
 
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Tipo de agenda</Text>
-                    <RadioButton.Group
-                      onValueChange={(value) => setFieldValue('type_schedule', value)}
-                      value={values.type_schedule}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
-                          <RadioButton value={1} />
-                          <Text>Horário marcado</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RadioButton value={2} />
-                          <Text>Ordem de chegada</Text>
-                        </View>
-                      </View>
-                    </RadioButton.Group>
-                    {touched.type_schedule && errors.type_schedule && (
-                      <Text style={styles.errorText}>{errors.type_schedule}</Text>
-                    )}
 
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}

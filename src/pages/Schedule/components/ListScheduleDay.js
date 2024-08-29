@@ -18,7 +18,7 @@ import moment from 'moment';
 import Form from './Form';
 
 export default function Index({ route }) {
-    const { date, establishment_id, professional_id, user, professional_name } = route.params;
+    const { date, establishment_id, professional_id, professional_name, typeSchedule } = route.params;
     const dataParams = {
         date, establishment_id, professional_id
     }
@@ -108,21 +108,37 @@ export default function Index({ route }) {
 
 
     const openModal = () => {
-        dispatch(infoModal({
-            action: 'create', visible: true, data:
-                { establishment_id, date, professional_id, user_id: user.id }
-        }));
+        dispatch(infoModal(
+            {
+                action: 'create',
+                visible: true,
+                data:
+                {
+                    establishment_id,
+                    date,
+                    professional_id,
+                    typeSchedule
+                }
+            }));
+    }
+
+    const title = () => {
+        return `${moment(date).format('DD/MM/YYYY')}`
     }
 
     const subtitle = () => {
-      return `${moment(date).format('DD/MM/YYYY')}` 
+        return `Profissional: ${professional_name}`
+    }
+
+    const description = () => {
+        return `Tipo de agenda: ${typeSchedule == 'HM' ? 'Horário marcado' : 'Ordem de chegada'}`
     }
 
 
     return (
         <SafeAreaView style={styles.safeArea}>
 
-            <Header title={`${subtitle()}`} subtitle={`Profissional: ${professional_name}`} />
+            <Header title={title()} subtitle={subtitle()} description={description()} />
 
             <Searchbar
                 style={{ margin: 10, borderRadius: 15 }}
