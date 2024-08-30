@@ -14,7 +14,7 @@ const Menu = ({ navigation }) => {
                 <Divider />
 
                 <List.Item
-                    title="Estabelecimentos"
+                    title="Gestão dos estabelecimentos"
                     left={props => <List.Icon {...props} icon="store-plus" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Establishment')}
