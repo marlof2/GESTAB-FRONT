@@ -4,8 +4,8 @@ import { Alert } from 'react-native';
 
 
 const api = axios.create({
-    // baseURL: 'http://192.168.0.128:8000/api'
-    baseURL: 'http://192.168.0.26:8000/api',
+    baseURL: 'https://orange-manatee-370597.hostingersite.com/api'
+    // baseURL: 'http://192.168.0.26:8000/api',
 })
 
 
