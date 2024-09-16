@@ -22,14 +22,14 @@ const Menu = ({ navigation }) => {
 
                 <Divider />
 
-                <List.Item
+                {/* <List.Item
                     title="Gerênciar Perfis"
                     left={props => <List.Icon {...props} icon="shield-account" />}
                     right={props => <Icon {...props} name="chevron-right" size={24} />}
                     onPress={() => navigation.navigate('Profile')}
                 />
 
-                <Divider />
+                <Divider /> */}
 
 
                 <List.Item
