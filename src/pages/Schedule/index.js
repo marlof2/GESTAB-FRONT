@@ -33,11 +33,11 @@ const AppointmentsScreen = () => {
   const [professionalId, setProfessionalId] = useState(null)
   const isFocused = useIsFocused()
   const { user } = useContext(AuthContext);
-
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDatePress = (day) => {
     if (establishimentId != null && professionalId != null) {
-
+      setSelectedDate(day.dateString);
       let professional = itemsProfessional.find(el => el.user.id == professionalId)
 
       const objParams = {
@@ -154,6 +154,7 @@ const AppointmentsScreen = () => {
               setEstablishimentId(item.establishment_id);
               getProfessionalByEstablishment(item.establishment_id)
               setIsFocus(false);
+              setSelectedDate(null); // Limpa a data selecionada
             }}
           />
         </View>
@@ -178,17 +179,20 @@ const AppointmentsScreen = () => {
               setProfessionalId(item.user_id);
               setTypeSchedule(item.user.type_schedule);
               setIsFocus(false);
+              setSelectedDate(null); // Limpa a data selecionada
             }}
           />
         </View>
-        <Calendar
-          onDayPress={handleDatePress}
-          markedDates={{
-            [0]: { selected: true, marked: true, activeOpacity: 10, selectedColor: 'rgb(0, 104, 116)' },
-          }}
-          firstDay={1}
-          style={styles.calendar}
-        />
+        <View style={styles.calendarContainer}>
+            <Calendar
+              onDayPress={handleDatePress}
+              markedDates={{
+                [selectedDate]: { selected: true, marked: true, selectedColor: 'rgb(0, 104, 116)' },
+              }}
+              firstDay={1}
+              style={styles.calendar}
+            />
+          </View>
       </View>
     </SafeAreaView>
   );
@@ -203,9 +207,19 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   calendar: {
-    borderWidth: 3,
+    borderRadius: 15, // Para bordas arredondadas
+    marginBottom: 10
+  },
+  calendarContainer: {
+    borderWidth: 2,
     borderColor: 'rgb(0, 104, 116)',
-    height: 350
+    borderRadius: 15, // Para bordas arredondadas
+    backgroundColor: '#fff', // Necessário para que a sombra seja visível
+    elevation: 5, // Elevação para Android
+    shadowColor: '#000', // Cor da sombra para iOS
+    shadowOffset: { width: 0, height: 2 }, // Deslocamento da sombra para iOS
+    shadowOpacity: 0.25, // Opacidade da sombra para iOS
+    shadowRadius: 3.84, // Raio da sombra para iOS
   },
   iconContainer: {
     flexDirection: 'row',
