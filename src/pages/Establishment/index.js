@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
 import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
 import styles from './styles';
@@ -13,10 +13,11 @@ import { infoModal, reloadItemsCard } from './reducer';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/ModalDelete'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AuthContext } from '../../contexts/auth'
 
 export default function Index() {
   const dispatch = useDispatch();
-
+  const { user } = useContext(AuthContext);
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -26,7 +27,6 @@ export default function Index() {
   const [itemsCount, setItemsCount] = useState(null);
   const visibleForm = useSelector((state) => state.establishment.modal.visible);
   const reloadListCard = useSelector((state) => state.establishment.reloadCards);
-
 
   useEffect(() => {
     getAll()
@@ -41,7 +41,6 @@ export default function Index() {
 
     setLoading(true);
     const response = await api.get('/establishments', { params: search ? { search: search } : null })
-
     if (response.status == 200) {
       setItems(response.data.data);
       setNextPageUrl(response.data.next_page_url);
@@ -90,7 +89,7 @@ export default function Index() {
 
 
   const openModal = () => {
-    dispatch(infoModal({ action: 'create', visible: true }));
+    dispatch(infoModal({ action: 'create', visible: true, user:user.user }));
   }
 
 
@@ -107,7 +106,7 @@ export default function Index() {
         onSubmitEditing={handleRefresh}
         elevation={1}
         icon='filter-outline'
-        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
+        right={() => (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
 
       <View style={styles.background}>
@@ -119,7 +118,7 @@ export default function Index() {
             data={items}
             showsVerticalScrollIndicator
             keyExtractor={item => item.id}
-            renderItem={(item) => (<RenderItem data={item} />)}
+            renderItem={(item) => (<RenderItem data={item} dataUser={user.user} />)}
             contentContainerStyle={{ padding: 5, }}
             onEndReached={getNextPageData}
             onEndReachedThreshold={0}

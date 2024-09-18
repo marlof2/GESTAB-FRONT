@@ -12,9 +12,10 @@ import { setSnackbar } from '../../../store/globalSlice';
 import api from "../../../services";
 import { useNavigation } from '@react-navigation/native';
 
-export default function RenderItem({ data }) {
+export default function RenderItem({ data, dataUser }) {
     const dispatch = useDispatch();
     const item = data.item
+    const userLogged = dataUser
     const [menuVisible, setMenuVisible] = useState(false);
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
@@ -52,70 +53,80 @@ export default function RenderItem({ data }) {
         }
     }
 
+    function permissioActionsOnlyResponsable() {
+        if (item.responsible_id == userLogged.id) {
+            return true
+        }
+        return false
+    }
 
     return (
         <Card style={styles.card} >
             <Card.Title title={item.name} titleStyle={styles.titleCard}
                 right={(props) => (
-                    <Menu
-                        visible={menuVisible}
-                        onDismiss={closeMenu}
-                        anchor={
-                            <IconButton
-                                {...props}
-                                icon={MORE_ICON}
-                                onPress={openMenu}
+                    permissioActionsOnlyResponsable() ?
+
+                        <Menu
+                            visible={menuVisible}
+                            onDismiss={closeMenu}
+                            anchor={
+                                <IconButton
+                                    {...props}
+                                    icon={MORE_ICON}
+                                    onPress={openMenu}
+                                />
+                            }
+                        >
+                            <Menu.Item
+                                title="Profissionais"
+                                onPress={() => navigateToAssociateProfessional(item)}
+                                leadingIcon={(props) => <Icon name="account-group" color={theme.colors.action.association} size={26} />}
                             />
-                        }
-                    >
-                        <Menu.Item
-                            title="Profissionais"
-                            onPress={() => navigateToAssociateProfessional(item)}
-                            leadingIcon={(props) => <Icon name="account-group" color={theme.colors.action.association} size={26} />}
-                        />
-                        <Divider />
-                        <Menu.Item
-                            title="Serviços"
-                            onPress={() => navigateToAssociateService(item)}
-                            leadingIcon={(props) => <Icon name="cogs" color={theme.colors.action.service} size={26} />}
-                        />
-                        <Divider />
-                        <Menu.Item
-                            title="Editar"
-                            onPress={() => openModalEdit(item)}
-                            leadingIcon={(props) => <Icon name="pencil" color={theme.colors.action.edit} size={26} />}
-                        />
+                            <Divider />
+                            <Menu.Item
+                                title="Serviços"
+                                onPress={() => navigateToAssociateService(item)}
+                                leadingIcon={(props) => <Icon name="cogs" color={theme.colors.action.service} size={26} />}
+                            />
+                            <Divider />
+                            <Menu.Item
+                                title="Editar"
+                                onPress={() => openModalEdit(item)}
+                                leadingIcon={(props) => <Icon name="pencil" color={theme.colors.action.edit} size={26} />}
+                            />
 
-                        <Divider />
-                        {
-                            item.deleted_at ?
-                                (
+                            <Divider />
+                            {
+                                item.deleted_at ?
+                                    (
 
-                                    <Menu.Item
-                                        title="Ativar"
-                                        onPress={() => activeItem(item.id)}
-                                        leadingIcon={(props) => <Icon name="check-circle-outline" color={theme.colors.action.active} size={26} />}
-                                    />
+                                        <Menu.Item
+                                            title="Ativar"
+                                            onPress={() => activeItem(item.id)}
+                                            leadingIcon={(props) => <Icon name="check-circle-outline" color={theme.colors.action.active} size={26} />}
+                                        />
 
-                                )
+                                    )
 
-                                :
-                                (
-                                    <Menu.Item
-                                        title="Inativar"
-                                        onPress={() => openModalDelete(item.id)}
-                                        leadingIcon={(props) => <Icon name="close-circle-outline" color={theme.colors.action.inactive} size={26} />}
-                                    />
-                                )
-                        }
+                                    :
+                                    (
+                                        <Menu.Item
+                                            title="Inativar"
+                                            onPress={() => openModalDelete(item.id)}
+                                            leadingIcon={(props) => <Icon name="close-circle-outline" color={theme.colors.action.inactive} size={26} />}
+                                        />
+                                    )
+                            }
 
 
-                    </Menu>
+                        </Menu>
+                        :
+                        null
                 )}
             />
             <Card.Content style={styles.contentCard}>
                 <View style={styles.iconText}>
-                    <Paragraph > <Text style={styles.titleCardContent}> Responsável: </Text>{item.responsible}</Paragraph>
+                    <Paragraph > <Text style={styles.titleCardContent}> Responsável: </Text>{item.responsible.name}</Paragraph>
                 </View>
 
                 <View style={styles.iconText}>
@@ -129,7 +140,7 @@ export default function RenderItem({ data }) {
                 <View style={styles.iconText}>
                     <Paragraph > <Text style={styles.titleCardContent}> Tipo de pessoa: </Text>{item.tipo_pessoa.name}</Paragraph>
                 </View>
-                
+
                 <View style={styles.iconText}>
                     <Paragraph > <Text style={styles.titleCardContent}> Ativo: </Text>{item.deleted_at ? 'Não' : 'Sim'}</Paragraph>
                 </View>

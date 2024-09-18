@@ -40,7 +40,44 @@ const styles = StyleSheet.create({
     titleCardContent: {
         fontWeight: '900',
         fontSize: 15
-    }
+    },
+    //dropdown
+    containerDropdown: {
+        marginBottom: 10,
+    },
+    dropdown: {
+        marginBottom: 10,
+        height: 43,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 13,
+        top: 15,
+        backgroundColor: 'white',
+    },
+    icon: {
+        marginRight: 5,
+    },
+    label: {
+        position: 'absolute',
+        backgroundColor: 'white',
+        left: 15,
+        top: 4,
+        zIndex: 999,
+        paddingHorizontal: 8,
+        fontSize: 12,
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+        marginLeft: 8,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+    },
 })
 
 export default styles

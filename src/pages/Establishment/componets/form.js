@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button, TextInput, Text, Card, RadioButton, IconButton } from 'react-native-paper';
 import styles from '../styles';
@@ -10,33 +10,51 @@ import api from "../../../services";
 import { useDispatch, useSelector } from 'react-redux';
 import { infoModal, reloadItemsCard } from '../reducer';
 import { setSnackbar } from '../../../store/globalSlice';
+import { Dropdown } from 'react-native-element-dropdown';
+import { useIsFocused } from '@react-navigation/native'
 
 
 export default function Form() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const modalForm = useSelector((state) => state.establishment.modal);
+  const [itemsResponsable, setItemsResponsable] = useState([])
+  const isFocused = useIsFocused()
+  const [isFocus, setIsFocus] = useState(false);
 
 
   const validationSchema = Yup.object().shape({
     type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
-    responsible: Yup.string().required('Campo obrigatório'),
+    responsible_id: Yup.number().required('Campo obrigatório'),
     cpf: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 1, 
+      is: (value) => value === 1,
       then: (schema) => schema
         .required('Campo obrigatório')
         .matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido'),
       otherwise: (schema) => schema.notRequired(),
     }),
     cnpj: Yup.string().when('type_of_person_id', {
-      is: (value) => value === 2, 
+      is: (value) => value === 2,
       then: (schema) => schema
         .required('Campo obrigatório')
         .matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'CNPJ inválido'),
       otherwise: (schema) => schema.notRequired(),
     }),
   });
+
+
+
+  useEffect(() => {
+    if (isFocused) {
+      getResponsible()
+    }
+
+    return () => {
+
+    }
+
+  }, [isFocused])
 
   function closeModal() {
     dispatch(infoModal({ action: 'create', visible: false }));
@@ -82,7 +100,36 @@ export default function Form() {
   }
 
   const titleForm = () => {
-   return modalForm.action == 'edit' ? 'Editar Estabelecimento' : 'Novo Estabelecimento'
+    return modalForm.action == 'edit' ? 'Editar Estabelecimento' : 'Novo Estabelecimento'
+  }
+
+
+  const renderLabelResponsible = () => {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
+          Responsável
+        </Text>
+      );
+  };
+
+
+  const getResponsible = async () => {
+    if (modalForm.action == 'create') {
+      setItemsResponsable([{
+        id: modalForm.user.id,
+        name: modalForm.user.name
+      }]);
+    } else {
+      const response = await api.get(`/combo/professionalByEstablishment/${modalForm.data.id}`)
+
+      if (response.status == 200) {
+        const formattedData = response.data.map(item => ({
+          id: item.user.id,
+          name: item.user.name,
+        }));
+        setItemsResponsable(formattedData);
+      }
+    }
   }
 
   return (
@@ -102,7 +149,7 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible: '',  }}
+              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible_id: null, }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 saveForm(values);
@@ -117,6 +164,7 @@ export default function Form() {
                     setFieldValue('cpf', helper.maskCpf(modalForm.data.cpf));
                     setFieldValue('cnpj', helper.maskCnpj(modalForm.data.cnpj));
                     setFieldValue('phone', helper.maskPhone(modalForm.data.phone));
+                    setFieldValue('responsible_id', modalForm.data.responsible_id);
                   }
 
                 }, [modalForm.action]);
@@ -156,19 +204,6 @@ export default function Form() {
                       error={touched.name && Boolean(errors.name)}
                     />
                     {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-                    <TextInput
-                      outlineStyle={{ borderRadius: 10 }}
-                      style={styles.input}
-                      onChangeText={handleChange('responsible')}
-                      onBlur={handleBlur('responsible')}
-                      value={values.responsible}
-                      mode="outlined"
-                      label="Responsável"
-                      dense
-                      error={touched.responsible && Boolean(errors.responsible)}
-                    />
-                    {touched.responsible && errors.responsible && <Text style={styles.errorText}>{errors.responsible}</Text>}
 
                     {values?.type_of_person_id == 1 ? (
                       <View>
@@ -220,6 +255,33 @@ export default function Form() {
                       maxLength={15}
                     />
                     {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+
+
+                    <View style={styles.containerDropdown}>
+                      {renderLabelResponsible()}
+                      <Dropdown
+                        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={itemsResponsable}
+                        search
+                        maxHeight={300}
+                        valueField="id"
+                        labelField="name"
+                        placeholder={'Selecione o responsável'}
+                        searchPlaceholder="Pesquisar..."
+                        value={values.responsible_id}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={item => {
+                          setFieldValue('responsible_id', item.id);
+                          setIsFocus(false);
+                        }}
+
+                      />
+                    </View>
+                    {touched.responsible_id && errors.responsible_id && <Text style={styles.errorText}>{errors.responsible_id}</Text>}
 
                     <Button
                       style={styles.button}

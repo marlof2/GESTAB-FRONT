@@ -24,7 +24,7 @@ export default function RenderItem({ data }) {
                 )}
             />
             <Card.Content>
-                <Paragraph>{`Responsalvel: ${item.responsible}`}</Paragraph>
+                <Paragraph>{`Responsalvel: ${item.responsible.name}`}</Paragraph>
                 <Paragraph>{`Telefone: ${helper.maskPhone(item.phone)}`}</Paragraph>
             </Card.Content>
         </Card>

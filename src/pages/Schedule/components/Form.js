@@ -67,11 +67,11 @@ export default function Form() {
     obj = { ...obj, ...modalForm.data }
     setLoading(true);
     try {
-      const { status } = modalForm?.data?.id == null
+      const response = modalForm?.data?.id == null
         ? await api.post('/list', obj)
         : await api.put(`/list/${modalForm.data.id}`, obj);
-
-      if (status == 201 || status == 200) {
+        
+      if (response.status == 201 || response.status == 200) {
         dispatch(reloadItemsCard(true));
         closeModal();
         dispatch(setSnackbar({ visible: true, title: modalForm?.data?.id == null ? 'Adicionado com sucesso!' : 'Alterado com sucesso!' }));

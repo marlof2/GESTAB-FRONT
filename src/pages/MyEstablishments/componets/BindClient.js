@@ -14,7 +14,7 @@ import { setSnackbar } from '../../../store/globalSlice';
 import Overlay from '../../../components/Ui/Overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Index({route}) {
+export default function Index({ route }) {
   const dispatch = useDispatch();
   const { user_id } = route.params;
   // const isFocused = useIsFocused()
@@ -41,7 +41,7 @@ export default function Index({route}) {
     if (loading) return;
 
     setLoading(true);
-    const response = await api.get(`/establishments/listEstablishimentByUser`, { params: search ? { search: search, user_id:user_id} : {user_id:user_id} })
+    const response = await api.get(`/establishments/listEstablishimentByUser`, { params: search ? { search: search, user_id: user_id } : { user_id: user_id } })
 
     if (response.status == 200) {
       setItems(response.data.data);
@@ -86,33 +86,36 @@ export default function Index({route}) {
 
 
   async function addProfessionals() {
-    setLoadingBindEstablishment(true);
-    try {
-      const data = {
-        created_by_functionality:'ME',
-        establishment_ids: establishimentsToBind,
-        user_id: user_id
-      }
-      const { status } = await api.post('/establishment_user/associationClientAndEstablishment', data);
+    if (establishimentsToBind.length > 0) {
 
-      if (status == 201) {
-        handleRefresh()
-        dispatch(setSnackbar({ visible: true, title: 'Vinculado com sucesso!' }));
-        dispatch(resetArrayEstablishments());
+      setLoadingBindEstablishment(true);
+      try {
+        const data = {
+          created_by_functionality: 'ME',
+          establishment_ids: establishimentsToBind,
+          user_id: user_id
+        }
+        const { status } = await api.post('/establishment_user/associationClientAndEstablishment', data);
 
+        if (status == 201) {
+          handleRefresh()
+          dispatch(setSnackbar({ visible: true, title: 'Vinculado com sucesso!' }));
+          dispatch(resetArrayEstablishments());
+
+          setLoadingBindEstablishment(false);
+        }
+
+      } catch (error) {
+        console.log('erro ao vincular estabelecimento', error)
         setLoadingBindEstablishment(false);
       }
-
-    } catch (error) {
-      console.log('erro ao vincular estabelecimento', error)
-      setLoadingBindEstablishment(false);
     }
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loadingBindEstablishment} />
-      <Header title={'Vincular Estabelecimento '}  />
+      <Header title={'Vincular Estabelecimento '} />
 
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}
@@ -122,7 +125,7 @@ export default function Index({route}) {
         onSubmitEditing={handleRefresh}
         elevation={1}
         icon='filter-outline'
-        right={() =>  (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
+        right={() => (<Icon name="magnify" style={{ paddingRight: 15 }} onPress={handleRefresh} size={26} />)}
       />
 
 

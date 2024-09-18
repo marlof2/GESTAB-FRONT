@@ -208,9 +208,10 @@ const styles = StyleSheet.create({
   },
   calendar: {
     borderRadius: 15, // Para bordas arredondadas
-    marginBottom: 10
+    marginBottom: 10,
   },
   calendarContainer: {
+    marginTop: 30,
     borderWidth: 2,
     borderColor: 'rgb(0, 104, 116)',
     borderRadius: 15, // Para bordas arredondadas
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
 
   //dropdown
   containerDropdown: {
-    marginBottom: 30
+    marginBottom: 10
   },
   dropdown: {
     height: 50,

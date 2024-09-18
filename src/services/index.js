@@ -51,11 +51,16 @@ const handleError = async (response) => {
 
 
             if (data.error) {
+                const plural = data.error.length > 1
+
                 Object.keys(data.error).forEach((item) => {
-                    bodyMessage += `${data.error[item]}, `;
+                    if (plural)
+                        bodyMessage += `${data.error[item]}, `;
+                    else
+                        bodyMessage += `${data.error[item]} `;
                 });
 
-                AlertModal('Atenção', bodyMessage)
+                AlertModal('Atenção!', bodyMessage)
             }
             break;
         case 404:
