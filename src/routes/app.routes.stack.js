@@ -7,6 +7,9 @@ import MyEstablishments from "../pages/MyEstablishments";
 import MyEstablishmentUserBindCliente from "../pages/MyEstablishments/componets/BindClient";
 import ListScheduleDay from "../pages/Schedule/components/ListScheduleDay";
 import FormSchedule from "../pages/Schedule/components/Form";
+import ListProfile from '../pages/Profile/';
+import FormProfile from '../pages/Profile/componets/Form';
+import FomPasswordChange from '../pages/Profile/componets/FomPasswordChange';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import TabRoutes from '../routes/app.routes.tab'
@@ -77,6 +80,29 @@ function Routes() {
                 options={{
                     headerShown: false
                 }} />
+
+            <Stack.Screen
+                name="ListProfile"
+                component={ListProfile}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="FormProfile"
+                component={FormProfile}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name="FomPasswordChange"
+                component={FomPasswordChange}
+                options={{
+                    headerShown: false
+                }}
+            />
 
         </Stack.Navigator>
     );

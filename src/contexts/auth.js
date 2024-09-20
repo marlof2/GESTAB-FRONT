@@ -20,11 +20,27 @@ function AuthProvider({ children }) {
 
 
     async function signOut() {
+        setLoadingAuth(true);
 
-        await AsyncStorage.clear()
-            .then(() => {
-                setUser(null)
-            })
+        try {
+            const { status, data } = await api.post('/logout');
+
+            if (status) {
+                if (status == 200) {
+                    await AsyncStorage.clear()
+                        .then(() => {
+                            setUser(null)
+                        })
+                    setLoadingAuth(false);
+                }
+            }
+
+
+        } catch (error) {
+            console.log('erro ao logar', error)
+            setLoadingAuth(false);
+        }
+
     }
 
     async function loadStorage() {
@@ -101,7 +117,7 @@ function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, signOut, loadingAuth, loading }}>
+        <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, signOut, loadStorage, loadingAuth, loading }}>
             {children}
         </AuthContext.Provider>
     );
