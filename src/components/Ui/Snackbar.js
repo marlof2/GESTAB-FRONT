@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Snackbar } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSnackbar } from '../../store/globalSlice';
@@ -9,25 +9,22 @@ function AlertSnackbar() {
     const dispatch = useDispatch();
 
     const onDismissSnackBar = () => {
-        dispatch(setSnackbar({ visible: false }))
-    }
+        dispatch(setSnackbar({ visible: false }));
+    };
 
     return (
         <Snackbar
-        style={{backgroundColor:'green'}}
+            // style={{ backgroundColor: 'green' }}
             visible={visible}
             onDismiss={onDismissSnackBar}
+            duration={2000} // Duração em milissegundos (3 segundos)
             action={{
-                textColor:'white',
+                textColor: 'white',
                 label: 'Fechar',
-                // onPress: () => {
-                // Do something
-                // },
             }}>
             {title}
         </Snackbar>
     );
-};
-
+}
 
 export default AlertSnackbar;

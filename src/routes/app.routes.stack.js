@@ -10,6 +10,7 @@ import FormSchedule from "../pages/Schedule/components/Form";
 import ListProfile from '../pages/Profile/';
 import FormProfile from '../pages/Profile/componets/Form';
 import FomPasswordChange from '../pages/Profile/componets/FomPasswordChange';
+import FinancialReport from '../pages/FinancialReport';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import TabRoutes from '../routes/app.routes.tab'
@@ -99,6 +100,14 @@ function Routes() {
             <Stack.Screen
                 name="FomPasswordChange"
                 component={FomPasswordChange}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="FinancialReport"
+                component={FinancialReport}
                 options={{
                     headerShown: false
                 }}

@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    backgroundColor: '#6200ee',
   },
   errorText: {
     color: 'red',
