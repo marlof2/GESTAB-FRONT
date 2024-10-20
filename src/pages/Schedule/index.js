@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
 
   //dropdown
   containerDropdown: {
-    marginBottom: 10
+    marginBottom: 20
   },
   dropdown: {
     height: 50,
