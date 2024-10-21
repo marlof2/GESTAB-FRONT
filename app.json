@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Gerênciamento de fila de estabelecimento",
-    "slug": "gfe",
+    "name": "Gestab",
+    "slug": "gestab",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo1.png",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/images/logo1.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.marlof2.gfe"
+      "package": "com.marlof2.gestab"
     },
     "web": {
       "bundler": "metro",

@@ -5,23 +5,15 @@ import Header from '../../components/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
-import { LocaleConfig } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import api from '../../services';
 import { useIsFocused } from '@react-navigation/native'
 import { AuthContext } from '../../contexts/auth';
+import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 
-LocaleConfig.locales['pt'] = {
-  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-  monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-  today: 'Hoje'
-};
-
-LocaleConfig.defaultLocale = 'pt';
+LocaleConfigPt
 
 const AppointmentsScreen = () => {
   const navigation = useNavigation();

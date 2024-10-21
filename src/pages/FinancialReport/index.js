@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, View, StyleSheet, Alert, FlatList } from 'react-native';
+import { SafeAreaView, View, StyleSheet, Alert, FlatList, Platform } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Header from '../../components/Header';
 import Overlay from '../../components/Ui/Overlay';
 import api from '../../services';
 
-import { LocaleConfig } from 'react-native-calendars';
+
 import { useNavigation } from '@react-navigation/native';
 import { Text, Button, Card, Icon, Divider } from 'react-native-paper'; // Importação do Button
 import { Dropdown } from 'react-native-element-dropdown';
@@ -14,45 +14,14 @@ import { AuthContext } from '../../contexts/auth';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import RenderItem from './components/RenderItem';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as IntentLauncher from 'expo-intent-launcher';
+import moment from 'moment';
+import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 
-LocaleConfig.locales['pt'] = {
-  monthNames: [
-    'Janeiro',
-    'Fevereiro',
-    'Março',
-    'Abril',
-    'Maio',
-    'Junho',
-    'Julho',
-    'Agosto',
-    'Setembro',
-    'Outubro',
-    'Novembro',
-    'Dezembro',
-  ],
-  monthNamesShort: [
-    'Jan',
-    'Fev',
-    'Mar',
-    'Abr',
-    'Mai',
-    'Jun',
-    'Jul',
-    'Ago',
-    'Set',
-    'Out',
-    'Nov',
-    'Dez',
-  ],
-  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-  today: 'Hoje',
-};
-
-LocaleConfig.defaultLocale = 'pt';
+LocaleConfigPt
 
 const AppointmentsScreen = () => {
   const navigation = useNavigation();
@@ -78,6 +47,7 @@ const AppointmentsScreen = () => {
   const [itemsCount, setItemsCount] = useState(null);
   const [dataSendExport, setDataSendExport] = useState({});
   const [totalAmount, setTotalAmount] = useState(null);
+  const [hiddeArrowBack, setHiddeArrowBack] = useState(true);
 
   const handleDatePress = day => {
     if (establishimentId != null) {
@@ -316,6 +286,7 @@ const AppointmentsScreen = () => {
 
   const handleGenerateReport = async () => {
     setShowReport(true);
+    setHiddeArrowBack(false);
 
     const data = {
       establishment_id: establishimentId,
@@ -327,6 +298,13 @@ const AppointmentsScreen = () => {
     setDataSendExport(data)
     await getExport(data)
   };
+
+  const goBackFilterReport = async () => {
+    setShowReport(false)
+    setHiddeArrowBack(true);
+
+  };
+
 
 
 
@@ -341,7 +319,7 @@ const AppointmentsScreen = () => {
       service_id,
       initial_date,
       final_date
-    } = dataSendExport
+    } = dataSendExport;
 
     // Montar a URL com os parâmetros via query string
     const queryString = `?establishment_id=${establishment_id}&professional_id=${professional_id}&service_id=${service_id}&initial_date=${initial_date}&final_date=${final_date}`;
@@ -351,30 +329,37 @@ const AppointmentsScreen = () => {
       const url = `http://192.168.0.26:8000/api/list/exportReportDownload${queryString}`; // Adicionar a query string
 
       // Caminho onde o arquivo será salvo
-      const fileUri = FileSystem.documentDirectory + 'relatorio.pdf';
-
+      const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY').toString()}.pdf`; // Definir caminho do arquivo
       // Realizar o download do PDF
       const response = await FileSystem.downloadAsync(url, fileUri, {
         headers: {
-          // Adicionar os cabeçalhos necessários, como o token de autenticação
           'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.status === 200) {
-        console.log('Download completo:', response.uri);
+        console.log(response);
 
-        // Verificar se o dispositivo pode compartilhar o arquivo (opcional, para iOS)
-        if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(response.uri);
-        } else {
-          Alert.alert('Erro', 'Compartilhamento de arquivos não disponível no seu dispositivo.');
+        if (Platform.OS === 'android') {
+          // Para Android, use IntentLauncher para abrir o arquivo com o aplicativo padrão de PDF
+          FileSystem.getContentUriAsync(response.uri).then(uri => {
+            IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+              data: uri,
+              flags: 1,
+            });
+          });
+        } else if (Platform.OS === 'ios') {
+          // Para iOS, compartilhe o arquivo ou abra-o diretamente
+          if (await Sharing.isAvailableAsync()) {
+            await Sharing.shareAsync(response.uri);
+          } else {
+            Alert.alert('Erro', 'Abertura de arquivos não disponível no seu dispositivo.');
+          }
         }
       } else {
         Alert.alert('Erro', 'Falha ao baixar o PDF');
       }
     } catch (error) {
-      console.log('Erro ao baixar o relatório:', error);
       Alert.alert('Erro', 'Falha ao baixar o relatório');
     } finally {
       setLoading(false);
@@ -382,12 +367,10 @@ const AppointmentsScreen = () => {
   };
 
 
-
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loading} />
-      <Header title={'Relatório de Faturamento'} />
+      <Header title={'Relatório de Faturamento'} showBack={hiddeArrowBack} />
       <View style={styles.container}>
         {!showReport ? (
           <>
@@ -485,7 +468,7 @@ const AppointmentsScreen = () => {
 
 
             <View style={styles.backButtonContainer}>
-              <Button mode="contained" onPress={() => setShowReport(false)}>
+              <Button mode="contained" onPress={goBackFilterReport}>
                 Voltar
               </Button>
             </View>

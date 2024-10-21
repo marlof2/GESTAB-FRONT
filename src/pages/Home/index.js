@@ -4,6 +4,7 @@ import { Card, Button, List } from "react-native-paper";
 import Header from "../../components/Header";
 import { useIsFocused } from '@react-navigation/native';
 import api from "../../services";
+import clearFiles from '../../system/deleteOldFiles'
 
 export default function Home({ navigation }) {
   const isFocused = useIsFocused();
@@ -26,6 +27,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     if (isFocused) {
       me();
+      clearFiles()
     }
   }, [isFocused]);
 
@@ -47,21 +49,21 @@ export default function Home({ navigation }) {
               <List.Item
                 titleStyle={{ fontWeight: 'bold' }}
                 title="Estabelecimentos"
-                description="Gerênciar estabelecimentos"
+                description="Gerênciar estabelecimentos."
                 left={props => <List.Icon {...props} icon="store" />}
                 onPress={() => navigation.navigate('Establishment')}
               />
               <List.Item
                 titleStyle={{ fontWeight: 'bold' }}
                 title="Meus Estabelecimentos"
-                description="Visualizar e associar estabelecimentos"
+                description="Visualizar e associar estabelecimentos."
                 left={props => <List.Icon {...props} icon="storefront" />}
                 onPress={() => navigation.navigate('MyEstablishments')}
               />
               <List.Item
                 titleStyle={{ fontWeight: 'bold' }}
-                title="Feedback"
-                description="Envie sugestões ou reporte problemas"
+                title="Fale Conosco"
+                description="Envie feedback, sugestões, melhorias ou reporte um problema."
                 left={props => <List.Icon {...props} icon="message" />}
               />
             </List.Section>
