@@ -14,10 +14,9 @@ function AlertSnackbar() {
 
     return (
         <Snackbar
-            // style={{ backgroundColor: 'green' }}
             visible={visible}
             onDismiss={onDismissSnackBar}
-            duration={2000} // Duração em milissegundos (3 segundos)
+            duration={2000} 
             action={{
                 textColor: 'white',
                 label: 'Fechar',

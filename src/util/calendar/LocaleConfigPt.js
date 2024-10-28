@@ -34,7 +34,7 @@ LocaleConfig.locales['pt'] = {
     today: 'Hoje',
 };
 
-// LocaleConfig.defaultLocale = 'pt';
+LocaleConfig.defaultLocale = 'pt';
 
 
 export default LocaleConfig;

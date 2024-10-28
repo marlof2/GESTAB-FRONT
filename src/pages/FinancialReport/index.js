@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { SafeAreaView, View, StyleSheet, Alert, FlatList, Platform } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Header from '../../components/Header';
@@ -6,9 +6,7 @@ import Overlay from '../../components/Ui/Overlay';
 import api from '../../services';
 
 
-import { useNavigation } from '@react-navigation/native';
 import { Text, Button, Card, Icon, Divider } from 'react-native-paper'; // Importação do Button
-import { Dropdown } from 'react-native-element-dropdown';
 import { useIsFocused } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
@@ -20,12 +18,11 @@ import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
 import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
+import Dropdown from '../../components/Ui/Input/Dropdown';
 
 LocaleConfigPt
 
 const AppointmentsScreen = () => {
-  const navigation = useNavigation();
-  const [isFocus, setIsFocus] = useState(false);
   const [itemsEstablishment, setItemsEstablishment] = useState([]);
   const [itemsProfessional, setItemsProfessional] = useState([]);
   const [itemsService, setItemsService] = useState([]);
@@ -48,6 +45,25 @@ const AppointmentsScreen = () => {
   const [dataSendExport, setDataSendExport] = useState({});
   const [totalAmount, setTotalAmount] = useState(null);
   const [hiddeArrowBack, setHiddeArrowBack] = useState(true);
+
+
+  // const handleDatePress = useCallback((day) => {
+
+  //   if (!startDate || (startDate && endDate)) {
+  //     setStartDate(day.dateString);
+  //     setEndDate(null);
+  //     setMarkedDates({ [day.dateString]: { selected: true, startingDay: true, color: 'rgb(0, 104, 116)' } });
+  //   } else if (!endDate && day.dateString >= startDate) {
+  //     setEndDate(day.dateString);
+  //     const range = getDateRange(startDate, day.dateString);
+  //     const newMarkedDates = range.reduce((acc, date) => {
+  //       acc[date] = { selected: true, color: '#66B3BA' };
+  //       return acc;
+  //     }, {});
+  //     console.log(startDate, endDate)
+  //     setMarkedDates(newMarkedDates);
+  //   }
+  // }, [establishimentId, startDate, endDate]);
 
   const handleDatePress = day => {
     if (establishimentId != null) {
@@ -115,101 +131,59 @@ const AppointmentsScreen = () => {
     return range;
   };
 
-  const renderLabelEstablishment = () => {
-    if (establishimentId || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Estabelecimento
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const renderLabelProfessional = () => {
-    if (professionalId || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Profissional
-        </Text>
-      );
-    }
-    return null;
-  };
-
   const clearDropDown = () => {
     setEstablishimentId(null);
     setProfessionalId(null);
+    setServiceId(null);
     setItemsEstablishment([]);
     setItemsProfessional([]);
+    setItemsService([]);
   };
 
   const visibleDropdownProfissional = () => {
     if (responsibleId != null && responsibleId == dataUser.id) {
       return (
-        <View style={styles.containerDropdown}>
-          {renderLabelProfessional()}
-          <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsProfessional}
-            search
-            maxHeight={300}
-            labelField="user.name"
-            valueField="user.id"
-            placeholder={'Selecione o profissional'}
-            searchPlaceholder="Pesquisar..."
-            value={professionalId}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
+        <Dropdown
+          label="Profissional"
+          data={itemsProfessional}
+          placeholder="Selecione o profissional"
+          value={professionalId}
+          onChange={(item) => {
+            if (item) {
               setProfessionalId(item.user_id);
-              setIsFocus(false);
-              setStartDate(null); // Limpa a data de início selecionada
-              setEndDate(null); // Limpa a data de fim selecionada
-            }}
-          />
-        </View>
+              setStartDate(null);
+              setEndDate(null);
+            } else {
+              setProfessionalId(null);
+            }
+          }}
+          labelField="user.name"
+          valueField="user.id"
+        />
       );
     }
   };
 
-  const renderLabelService = () => {
-    if (serviceId || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>Serviço</Text>
-      );
-    }
-    return null;
-  };
 
   const DropdownServices = () => {
     return (
-      <View style={styles.containerDropdown}>
-        {renderLabelService()}
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          data={itemsService}
-          search
-          maxHeight={300}
-          labelField="name"
-          valueField="id"
-          placeholder={'Selecione o serviço'}
-          searchPlaceholder="Pesquisar..."
-          value={serviceId}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
+
+      <Dropdown
+        label="Serviço"
+        data={itemsService}
+        placeholder="Selecione o serviço"
+        value={serviceId}
+        onChange={(item) => {
+          if (item) {
             setServiceId(item.id);
-            setIsFocus(false);
-          }}
-        />
-      </View>
+          } else {
+            setServiceId(null);
+          }
+        }}
+        labelField="name"
+        valueField="id"
+      />
+
     );
   };
 
@@ -321,15 +295,25 @@ const AppointmentsScreen = () => {
       final_date
     } = dataSendExport;
 
-    // Montar a URL com os parâmetros via query string
-    const queryString = `?establishment_id=${establishment_id}&professional_id=${professional_id}&service_id=${service_id}&initial_date=${initial_date}&final_date=${final_date}`;
+    // Criação da query string apenas com os parâmetros que não são nulos ou indefinidos
+    const queryParams = [];
+
+    if (establishment_id) queryParams.push(`establishment_id=${encodeURIComponent(establishment_id)}`);
+    if (professional_id) queryParams.push(`professional_id=${encodeURIComponent(professional_id)}`);
+    if (service_id) queryParams.push(`service_id=${encodeURIComponent(service_id)}`);
+    if (initial_date) queryParams.push(`initial_date=${encodeURIComponent(initial_date)}`);
+    if (final_date) queryParams.push(`final_date=${encodeURIComponent(final_date)}`);
+
+    // Juntar todos os parâmetros que foram adicionados
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
 
     try {
       // URL para a qual você está fazendo a requisição para o backend gerar o PDF
       const url = `http://192.168.0.26:8000/api/list/exportReportDownload${queryString}`; // Adicionar a query string
 
       // Caminho onde o arquivo será salvo
-      const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY').toString()}.pdf`; // Definir caminho do arquivo
+      const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY')}.pdf`; // Definir caminho do arquivo
+
       // Realizar o download do PDF
       const response = await FileSystem.downloadAsync(url, fileUri, {
         headers: {
@@ -338,8 +322,6 @@ const AppointmentsScreen = () => {
       });
 
       if (response.status === 200) {
-        console.log(response);
-
         if (Platform.OS === 'android') {
           // Para Android, use IntentLauncher para abrir o arquivo com o aplicativo padrão de PDF
           FileSystem.getContentUriAsync(response.uri).then(uri => {
@@ -367,6 +349,7 @@ const AppointmentsScreen = () => {
   };
 
 
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loading} />
@@ -374,59 +357,59 @@ const AppointmentsScreen = () => {
       <View style={styles.container}>
         {!showReport ? (
           <>
-            <View style={styles.containerDropdown}>
-              {renderLabelEstablishment()}
-              <Dropdown
-                style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                data={itemsEstablishment}
-                search
-                maxHeight={300}
-                labelField="establishments.name"
-                valueField="establishments.id"
-                placeholder={'Selecione o estabelecimento'}
-                searchPlaceholder="Pesquisar..."
-                value={establishimentId}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={item => {
-                  setResponsibleId(item.establishments.responsible_id);
-                  getServices(item.establishment_id);
-                  setEstablishimentId(item.establishment_id);
-                  setIsFocus(false);
-                  setStartDate(null); // Limpa a data de início
-                  setEndDate(null); // Limpa a data de fim
-                  if (
-                    item.establishments.responsible_id != null &&
-                    item.establishments.responsible_id == dataUser.id
-                  ) {
-                    getProfessionalByEstablishment(item.establishment_id);
-                  }
-                }}
-              />
-            </View>
-            {visibleDropdownProfissional()}
-            {DropdownServices()}
-            <View style={styles.calendarContainer}>
-              <Calendar
-                onDayPress={handleDatePress}
-                markedDates={markedDates}
-                markingType={'period'}
-                firstDay={1}
-                style={styles.calendar}
-              />
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button
-                mode="contained"
-                onPress={handleGenerateReport}
-                disabled={!establishimentId || !startDate || !endDate}
-              >
-                Gerar Relatório
-              </Button>
-            </View>
+            <Card style={{ padding: 10 }}>
+              <View style={styles.containerDropdown}>
+                <Dropdown
+                  label="Estabelecimento"
+                  data={itemsEstablishment}
+                  placeholder="Selecione o estabelecimento"
+                  value={establishimentId}
+                  onChange={(item) => {
+                    if (item != null) {
+                      if (
+                        item.establishments?.responsible_id != null &&
+                        item.establishments?.responsible_id == dataUser.id
+                      ) {
+                        getProfessionalByEstablishment(item.establishment_id);
+                        getServices(item.establishment_id);
+                        setEstablishimentId(item.establishment_id);
+                        setResponsibleId(item.establishments.responsible_id);
+                        setStartDate(null);
+                        setEndDate(null);
+                      }
+                    } else {
+                      setEstablishimentId(null);
+                    }
+                  }}
+                  labelField="establishments.name"
+                  valueField="establishments.id"
+                />
+
+                {visibleDropdownProfissional()}
+
+                {DropdownServices()}
+
+
+              </View>
+              <View style={styles.calendarContainer}>
+                <Calendar
+                  onDayPress={handleDatePress}
+                  markedDates={markedDates}
+                  markingType={'period'}
+                  firstDay={1}
+                  style={styles.calendar}
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Button
+                  mode="contained"
+                  onPress={handleGenerateReport}
+                  disabled={!establishimentId || !startDate || !endDate}
+                >
+                  Gerar Relatório
+                </Button>
+              </View>
+            </Card>
           </>
         ) : (
           // Aqui você pode renderizar o resultado do relatório
@@ -485,7 +468,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
+    justifyContent:'center'
   },
   calendar: {
     borderRadius: 15,
@@ -493,46 +477,15 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginTop: 30,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'rgb(0, 104, 116)',
     borderRadius: 15,
     backgroundColor: '#fff',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: 'rgb(0, 104, 116)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-  },
-  containerDropdown: {
-    marginBottom: 20,
-  },
-  dropdown: {
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 13,
-    top: 15,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 15,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
   },
   buttonContainer: {
     marginTop: 20,
@@ -542,11 +495,6 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: 'center',
     // alignItems: 'center',
-  },
-  reportText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   backButtonContainer: {
     marginTop: 20,

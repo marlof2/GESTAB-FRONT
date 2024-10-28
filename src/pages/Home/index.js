@@ -59,12 +59,13 @@ export default function Home({ navigation }) {
                 description="Visualizar e associar estabelecimentos."
                 left={props => <List.Icon {...props} icon="storefront" />}
                 onPress={() => navigation.navigate('MyEstablishments')}
-              />
+                />
               <List.Item
                 titleStyle={{ fontWeight: 'bold' }}
                 title="Fale Conosco"
                 description="Envie feedback, sugestões, melhorias ou reporte um problema."
                 left={props => <List.Icon {...props} icon="message" />}
+                onPress={() => navigation.navigate('Feedbacks')}
               />
             </List.Section>
           </Card.Content>

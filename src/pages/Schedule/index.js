@@ -2,16 +2,15 @@ import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Header from '../../components/Header';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 import { useNavigation } from '@react-navigation/native';
-import { Text } from 'react-native-paper';
-import { Dropdown } from 'react-native-element-dropdown';
 import api from '../../services';
 import { useIsFocused } from '@react-navigation/native'
 import { AuthContext } from '../../contexts/auth';
+import Dropdown from '../../components/Ui/Input/Dropdown';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
+import { Card } from 'react-native-paper';
 
 LocaleConfigPt
 
@@ -53,29 +52,6 @@ const AppointmentsScreen = () => {
     }
 
 
-  };
-
-
-  const renderLabelEstablishment = () => {
-    if (establishimentId || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Estabelecimento
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const renderLabelProfessional = () => {
-    if (professionalId || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Profissional
-        </Text>
-      );
-    }
-    return null;
   };
 
 
@@ -121,61 +97,48 @@ const AppointmentsScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header title={'Filtro de Agenda'} showBack={false} />
       <View style={styles.container}>
-        {/* <View style={styles.iconContainer}>
-          <Icon name="information-outline" size={30} color="orange" />
-          <Text style={styles.iconText}>Escolha o estabelecimento e o dia desejado.</Text>
-        </View> */}
-        <View style={styles.containerDropdown}>
-          {renderLabelEstablishment()}
-          <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsEstablishment}
-            search
-            maxHeight={300}
-            labelField="establishments.name"
-            valueField="establishments.id"
-            placeholder={'Selecione o estabelecimento'}
-            searchPlaceholder="Pesquisar..."
-            value={establishimentId}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
-              setEstablishimentId(item.establishment_id);
-              getProfessionalByEstablishment(item.establishment_id)
-              setIsFocus(false);
-              setSelectedDate(null); // Limpa a data selecionada
-            }}
-          />
-        </View>
-        <View style={styles.containerDropdown}>
-          {renderLabelProfessional()}
-          <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsProfessional}
-            search
-            maxHeight={300}
-            labelField="user.name"
-            valueField="user.id"
-            placeholder={'Selecione o profissional'}
-            searchPlaceholder="Pesquisar..."
-            value={professionalId}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
-              setProfessionalId(item.user_id);
-              setTypeSchedule(item.user.type_schedule);
-              setIsFocus(false);
-              setSelectedDate(null); // Limpa a data selecionada
-            }}
-          />
-        </View>
-        <View style={styles.calendarContainer}>
+        <Card style={{ padding: 10 }}>
+          <View style={styles.containerDropdown}>
+            <Dropdown
+              label="Estabelecimento"
+              data={itemsEstablishment}
+              placeholder="Selecione o estabelecimento"
+              value={establishimentId}
+              onChange={(item) => {
+                if (item) {
+                  setEstablishimentId(item.establishment_id);
+                  getProfessionalByEstablishment(item.establishment_id);
+                  setSelectedDate(null);
+                } else {
+                  setEstablishimentId(null);
+                }
+              }}
+              labelField="establishments.name"
+              valueField="establishments.id"
+            />
+
+            <Dropdown
+              label="Profissional"
+              data={itemsProfessional}
+              placeholder="Selecione o profissional"
+              value={professionalId}
+              onChange={(item) => {
+                if (item) {
+                  setProfessionalId(item.user_id);
+                  setTypeSchedule(item.user.type_schedule);
+                  setIsFocus(false);
+                  setSelectedDate(null);
+                } else {
+                  setProfessionalId(null);
+                }
+              }}
+              labelField="user.name"
+              valueField="user.id"
+            />
+
+          </View>
+
+          <View style={styles.calendarContainer}>
             <Calendar
               onDayPress={handleDatePress}
               markedDates={{
@@ -185,6 +148,7 @@ const AppointmentsScreen = () => {
               style={styles.calendar}
             />
           </View>
+        </Card>
       </View>
     </SafeAreaView>
   );
@@ -196,7 +160,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
+    justifyContent:'center'
   },
   calendar: {
     borderRadius: 15, // Para bordas arredondadas
@@ -204,15 +169,15 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginTop: 30,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'rgb(0, 104, 116)',
-    borderRadius: 15, // Para bordas arredondadas
-    backgroundColor: '#fff', // Necessário para que a sombra seja visível
-    elevation: 5, // Elevação para Android
-    shadowColor: '#000', // Cor da sombra para iOS
-    shadowOffset: { width: 0, height: 2 }, // Deslocamento da sombra para iOS
-    shadowOpacity: 0.25, // Opacidade da sombra para iOS
-    shadowRadius: 3.84, // Raio da sombra para iOS
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    elevation: 5,
+    shadowColor: 'rgb(0, 104, 116)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   iconContainer: {
     flexDirection: 'row',
@@ -225,42 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-
-  //dropdown
-  containerDropdown: {
-    marginBottom: 20
-  },
-  dropdown: {
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 13,
-    top: 15
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 15,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
 });
 
 export default AppointmentsScreen;

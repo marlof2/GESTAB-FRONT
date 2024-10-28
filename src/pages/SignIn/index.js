@@ -33,8 +33,8 @@ export default function SignIn() {
   return (
     <View style={styles.background}>
       <Overlay isVisible={loadingAuth} />
-      <Image style={styles.logo} source={require('../../assets/logo1.png')} />
-      <Text style={{marginBottom: 20, fontWeight: 'bold', fontSize: 18, textAlign:'center' }}>Gerênciamento de estabelecimentos.</Text>
+      {/* <Text style={{marginBottom: 20, fontWeight: 'bold', fontSize: 18, textAlign:'center' }}>Gerênciamento de estabelecimentos.</Text> */}
+      <Image style={styles.logo} source={require('../../assets/gestab2.jpg')} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled

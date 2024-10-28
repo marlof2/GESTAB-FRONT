@@ -4,7 +4,9 @@ const styles = StyleSheet.create({
     background: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f4ff'
+        backgroundColor: 'rgb(220, 220, 220)',
+        flex:1
+
     },
     container: {
         width: '90%',
@@ -14,10 +16,10 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     logo: {
-        width: 150,
-        height: 150,
-        marginBottom:5,
-        marginTop:'30%'
+        width: 120,
+        height: 120,
+        borderRadius:50,
+        alignContent:'center',
     },
     button: {
         marginTop: 10,

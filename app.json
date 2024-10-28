@@ -4,7 +4,7 @@
     "slug": "gestab",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo1.png",
+    "icon": "./assets/images/logo/gestab.webp",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo1.png",
+        "foregroundImage": "./assets/images/logo/gestab.webp",
         "backgroundColor": "#ffffff"
       },
       "package": "com.marlof2.gestab"
