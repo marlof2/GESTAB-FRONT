@@ -1,14 +1,17 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { Button, Text, Card, TextInput } from 'react-native-paper';
 import styles from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Overlay from '../../components/Ui/Overlay';
+import { useIsFocused } from '@react-navigation/native';
 
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth';
 import InputCpf from '../../components/Ui/Input/inputCpf';
+import { StatusBar } from 'react-native';
+import theme from '../../../src/themes/theme.json'
 
 
 
@@ -16,6 +19,7 @@ import InputCpf from '../../components/Ui/Input/inputCpf';
 export default function SignIn() {
   const navigation = useNavigation();
   const { signIn, loadingAuth } = useContext(AuthContext);
+  const isFocused = useIsFocused();
 
   function handleLogin(value) {
     signIn(value)
@@ -30,11 +34,17 @@ export default function SignIn() {
       .required('Campo obrigatório'),
   });
 
+  useEffect(() => {
+    if (isFocused) {
+      StatusBar.setBackgroundColor(theme.colors.primary);
+    }
+  }, [isFocused]);
+
   return (
     <View style={styles.background}>
       <Overlay isVisible={loadingAuth} />
       {/* <Text style={{marginBottom: 20, fontWeight: 'bold', fontSize: 18, textAlign:'center' }}>Gerênciamento de estabelecimentos.</Text> */}
-      <Image style={styles.logo} source={require('../../assets/gestab2.jpg')} />
+      <Image style={styles.logo} source={require('../../assets/gestab.jpg')} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}
         enabled

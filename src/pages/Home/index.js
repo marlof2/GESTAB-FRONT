@@ -5,6 +5,9 @@ import Header from "../../components/Header";
 import { useIsFocused } from '@react-navigation/native';
 import api from "../../services";
 import clearFiles from '../../system/deleteOldFiles'
+import { StatusBar } from 'react-native';
+import theme from '../../../src/themes/theme.json'
+
 
 export default function Home({ navigation }) {
   const isFocused = useIsFocused();
@@ -26,6 +29,7 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     if (isFocused) {
+      StatusBar.setBackgroundColor(theme.colors.primary);
       me();
       clearFiles()
     }

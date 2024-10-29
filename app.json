@@ -4,7 +4,7 @@
     "slug": "gestab",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo/gestab.webp",
+    "icon": "./assets/images/logo/gestab.jpg",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo/gestab.webp",
+        "foregroundImage": "./assets/images/logo/gestab.jpg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.marlof2.gestab"
@@ -38,7 +38,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "51d40b76-d08c-4f47-8f49-194a7a8cf2e6"
+        "projectId": "944125af-38a9-410d-9e61-82f6365d1193"
       }
     },
     "owner": "marlof2"
