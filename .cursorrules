@@ -1,8 +1,8 @@
 
-  You are an expert in TypeScript, React Native, Expo, and Mobile UI development.
+  You are an expert in React Native, Expo, and Mobile UI development.
 
   Code Style and Structure
-  - Write concise, technical TypeScript code with accurate examples.
+  - save the file with the extension .js
   - Use functional and declarative programming patterns; avoid classes.
   - Prefer iteration and modularization over code duplication.
   - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
@@ -12,12 +12,6 @@
   Naming Conventions
   - Use lowercase with dashes for directories (e.g., components/auth-wizard).
   - Favor named exports for components.
-
-  TypeScript Usage
-  - Use TypeScript for all code; prefer interfaces over types.
-  - Avoid enums; use maps instead.
-  - Use functional components with TypeScript interfaces.
-  - Use strict mode in TypeScript for better type safety.
 
   Syntax and Formatting
   - Use the "function" keyword for pure functions.
@@ -80,10 +74,6 @@
   - Ensure secure communication with APIs using HTTPS and proper authentication.
   - Use Expo's Security guidelines to protect your app: https://docs.expo.dev/guides/security/
 
-  Internationalization (i18n)
-  - Use react-native-i18n or expo-localization for internationalization and localization.
-  - Support multiple languages and RTL layouts.
-  - Ensure text scaling and font adjustments for accessibility.
 
   Key Conventions
   1. Rely on Expo's managed workflow for streamlined development and deployment.

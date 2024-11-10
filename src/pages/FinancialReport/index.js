@@ -19,7 +19,6 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import Dropdown from '../../components/Ui/Input/Dropdown';
-import { API_URL } from '@env';
 
 LocaleConfigPt
 
@@ -310,8 +309,7 @@ const AppointmentsScreen = () => {
 
     try {
       // URL para a qual você está fazendo a requisição para o backend gerar o PDF
-      // const url = `${API_URL}/list/exportReportDownload${queryString}`; 
-      const url = `${API_URL}/list/exportReportDownload${queryString}`; 
+      const url = `${process.env.EXPO_PUBLIC_API_URL}/list/exportReportDownload${queryString}`; 
 
       // Caminho onde o arquivo será salvo
       const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY')}.pdf`; // Definir caminho do arquivo

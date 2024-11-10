@@ -1,11 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 import { Alert } from 'react-native';
-import { API_URL } from '@env';
 
 
 const api = axios.create({
-    baseURL: API_URL
+    baseURL:  process.env.EXPO_PUBLIC_API_URL
 })
 
 
