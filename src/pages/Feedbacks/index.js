@@ -81,21 +81,19 @@ export default function Form() {
               }) => {
                 return (
                   <View>
-                    <View style={styles.containerDropdown}>
-                      <Dropdown
-                        label="Categoria"
-                        data={ItemCategories}
-                        placeholder="Selecione a categoria"
-                        value={values.category_id}
-                        onChange={(value) => setFieldValue('category_id', value)}
-                        labelField="name"
-                        valueField="id"
-                      />
+                    <Dropdown
+                      label="Categoria"
+                      data={ItemCategories}
+                      placeholder="Selecione a categoria"
+                      value={values.category_id}
+                      onChange={(value) => setFieldValue('category_id', value)}
+                      labelField="name"
+                      valueField="id"
+                    />
 
-                      {touched.category_id && errors.category_id && (
-                        <Text style={styles.errorText}>{errors.category_id}</Text>
-                      )}
-                    </View>
+                    {touched.category_id && errors.category_id && (
+                      <Text style={styles.errorText}>{errors.category_id}</Text>
+                    )}
 
                     <TextInput
                       outlineStyle={{ borderRadius: 10 }}

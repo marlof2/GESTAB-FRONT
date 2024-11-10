@@ -10,8 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { infoModal, reloadItemsCard } from '../reducer';
 import { setSnackbar } from '../../../store/globalSlice';
 import TimePickerField from '../../../components/Ui/Input/TimePickerField';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useIsFocused } from '@react-navigation/native';
+import Dropdown from '../../../components/Ui/Input/DropdownFormik';
 
 export default function Form() {
   const dispatch = useDispatch();
@@ -27,11 +27,11 @@ export default function Form() {
   const typeSchedule = modalForm?.data?.typeSchedule;
 
   const validationSchema = Yup.object().shape({
-    time: typeSchedule == 'HM' ? Yup.string().required('Campo obrigatório') :  Yup.string() ,
+    time: typeSchedule == 'HM' ? Yup.string().required('Campo obrigatório') : Yup.string(),
     service_id: Yup.string().required('Campo obrigatório'),
     user_id: Yup.string().required('Campo obrigatório'),
   });
-  
+
 
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function Form() {
       const response = modalForm?.data?.id == null
         ? await api.post('/list', obj)
         : await api.put(`/list/${modalForm.data.id}`, obj);
-        
+
       if (response.status == 201 || response.status == 200) {
         dispatch(reloadItemsCard(true));
         closeModal();
@@ -139,58 +139,34 @@ export default function Form() {
 
                 return (
                   <View>
-                    <View style={styles.containerDropdown}>
-                      {renderLabelUser()}
-                      <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsUsers}
-                        search
-                        maxHeight={300}
-                        labelField="name"
-                        valueField="id"
-                        placeholder={'Selecione a pessoa'}
-                        searchPlaceholder="Pesquisar..."
-                        value={values.user_id}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setFieldValue('user_id', item.id);
-                          setUserId(item.id);
-                          setIsFocus(false);
-                        }}
-                      />
-                      {touched.user_id && errors.user_id && <Text style={styles.errorText}>{errors.user_id}</Text>}
-                    </View>
 
-                    <View style={[styles.containerDropdown, { marginBottom: 30 }]}>
-                      {renderLabel()}
-                      <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsService}
-                        search
-                        maxHeight={300}
-                        labelField="name"
-                        valueField="id"
-                        placeholder={'Selecione o serviço'}
-                        searchPlaceholder="Pesquisar..."
-                        value={values.service_id}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setFieldValue('service_id', item.id);
-                          setServiceId(item.id);
-                          setIsFocus(false);
-                        }}
-                      />
-                      {touched.service_id && errors.service_id && <Text style={styles.errorText}>{errors.service_id}</Text>}
-                    </View>
+                    <Dropdown
+                      label="Pessoa"
+                      data={itemsUsers}
+                      placeholder="Selecione a pessoa"
+                      value={values.user_id}
+                      onChange={(value) => setFieldValue('user_id', value)}
+                      labelField="name"
+                      valueField="id"
+                    />
 
+                    {touched.user_id && errors.user_id && (
+                      <Text style={styles.errorText}>{errors.user_id}</Text>
+                    )}
+
+                    <Dropdown
+                      label="Serviço"
+                      data={itemsService}
+                      placeholder="Selecione o serviço"
+                      value={values.service_id}
+                      onChange={(value) => setFieldValue('service_id', value)}
+                      labelField="name"
+                      valueField="id"
+                    />
+
+                    {touched.service_id && errors.service_id && (
+                      <Text style={styles.errorText}>{errors.service_id}</Text>
+                    )}
 
                     {
                       typeSchedule == 'HM' && (
@@ -256,7 +232,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 13,
     top: 15,
-    backgroundColor:'white'
+    backgroundColor: 'white'
   },
   icon: {
     marginRight: 5,

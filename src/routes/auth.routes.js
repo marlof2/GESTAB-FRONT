@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
+import { ForgotPassword } from '../pages/ForgotPassword';
 import string from '../strings';
 
 import { Appbar } from 'react-native-paper';
@@ -27,9 +28,20 @@ function AuthRoutes() {
         name="SignUp"
         component={SignUp}
         options={{
-          headerTitle: string.btnVoltar,
+          headerShown: false
         }}
       />
+
+      <AuthStack.Screen
+        name="ForgotPassword"
+        component={ForgotPassword}
+        options={{
+          title: 'Recuperar Senha',
+          headerShown: true,
+        }}
+      />
+
+
     </AuthStack.Navigator>
   )
 }
@@ -37,7 +49,7 @@ function AuthRoutes() {
 export default AuthRoutes;
 
 
-function CustomNavigationBar({navigation, route, options, back }) {
+function CustomNavigationBar({ navigation, route, options, back }) {
   const title = getHeaderTitle(options, route.name);
   return (
     <Appbar.Header>

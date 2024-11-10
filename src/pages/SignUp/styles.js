@@ -5,10 +5,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f4ff'
+        // backgroundColor: '#f0f4ff'
     },
     container: {
-        width: '90%',
+        width: '95%',
         maxWidth: 400,
     },
     input: {

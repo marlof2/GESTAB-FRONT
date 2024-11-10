@@ -5,7 +5,6 @@ const styles = StyleSheet.create({
     background: { flex: 1,},
     card: {
         margin: 8,
-        backgroundColor: '#ffffff',
     },
     titleCard: {
         fontSize: 17,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button, TextInput, Text, Card } from 'react-native-paper';
+import { Button, TextInput, Text, Card, RadioButton } from 'react-native-paper';
 import styles from '../styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -11,14 +11,21 @@ import api from '../../../services';
 
 export default function UserProfileEdit({ navigation, route }) {
   const [loading, setLoading] = useState(false)
-  const { 
+  const {
     id,
     name,
     email,
-    phone, } = route.params.user;
+    phone,
+    profile_id,
+    type_schedule } = route.params.user;
 
 
-
+  const isProfileAdminOrProfessional = () => {
+    if (profile_id == 1 || profile_id == 3) {
+      return true
+    }
+    return false
+  }
   async function saveForm(obj) {
     setLoading(true);
 
@@ -43,6 +50,12 @@ export default function UserProfileEdit({ navigation, route }) {
     phone: Yup.string()
       .required('Campo obrigatório')
       .matches(/^\(\d{2}\) \d{4,5}-\d{4}$/, 'Número de telefone inválido'),
+    type_schedule: Yup.string().when('profile_id', {
+      is: (value) => value === 3,
+      then: (schema) => schema
+        .required('Campo obrigatório'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   });
 
   return (
@@ -58,15 +71,9 @@ export default function UserProfileEdit({ navigation, route }) {
           <Card.Title title="👤 Dados do Usuário" titleStyle={styles.titleCard} />
           <Card.Content>
             <Formik
-              initialValues={{
-                name: name || '',
-                email: email || '',
-                phone: helper.maskPhone(phone) || '',
-              }}
+              initialValues={{ name: name || '', email: email || '', phone: helper.maskPhone(phone) || '', type_schedule: type_schedule, }}
               validationSchema={validationSchema}
-              onSubmit={(values) => {
-                saveForm(values);
-              }}
+              onSubmit={(values) => { saveForm(values); }}
             >
               {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                 <View>
@@ -114,6 +121,37 @@ export default function UserProfileEdit({ navigation, route }) {
                     maxLength={15}
                   />
                   {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+
+                  <View style={{margin:10}}>
+
+                    {profile_id == 3 && (
+                      <>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+                          Tipo de agenda
+                        </Text>
+                        <RadioButton.Group
+                          onValueChange={(value) => setFieldValue('type_schedule', value)}
+                          value={values.type_schedule}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
+                              <RadioButton value={'HM'} />
+                              <Text>Horário marcado</Text>
+                            </View>
+                          </View>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                              <RadioButton value={'OC'} />
+                              <Text>Ordem de chegada</Text>
+                            </View>
+                          </View>
+                        </RadioButton.Group>
+                        {touched.type_schedule && errors.type_schedule && (
+                          <Text style={styles.errorText}>{errors.type_schedule}</Text>
+                        )}
+                      </>
+                    )}
+                  </View>
 
                   <Button
                     style={styles.button}

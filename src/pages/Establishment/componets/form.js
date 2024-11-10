@@ -10,8 +10,8 @@ import api from "../../../services";
 import { useDispatch, useSelector } from 'react-redux';
 import { infoModal, reloadItemsCard } from '../reducer';
 import { setSnackbar } from '../../../store/globalSlice';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useIsFocused } from '@react-navigation/native'
+import Dropdown from '../../../components/Ui/Input/DropdownFormik';
 
 
 export default function Form() {
@@ -20,7 +20,6 @@ export default function Form() {
   const modalForm = useSelector((state) => state.establishment.modal);
   const [itemsResponsable, setItemsResponsable] = useState([])
   const isFocused = useIsFocused()
-  const [isFocus, setIsFocus] = useState(false);
 
 
   const validationSchema = Yup.object().shape({
@@ -104,15 +103,6 @@ export default function Form() {
   }
 
 
-  const renderLabelResponsible = () => {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Responsável
-        </Text>
-      );
-  };
-
-
   const getResponsible = async () => {
     if (modalForm.action == 'create') {
       setItemsResponsable([{
@@ -176,7 +166,7 @@ export default function Form() {
                       onValueChange={(value) => setFieldValue('type_of_person_id', value)}
                       value={values.type_of_person_id}
                     >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
                           <RadioButton value={1} />
                           <Text>Pessoa Física</Text>
@@ -257,31 +247,19 @@ export default function Form() {
                     {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
 
 
-                    <View style={styles.containerDropdown}>
-                      {renderLabelResponsible()}
-                      <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsResponsable}
-                        search
-                        maxHeight={300}
-                        valueField="id"
-                        labelField="name"
-                        placeholder={'Selecione o responsável'}
-                        searchPlaceholder="Pesquisar..."
-                        value={values.responsible_id}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={item => {
-                          setFieldValue('responsible_id', item.id);
-                          setIsFocus(false);
-                        }}
+                    <Dropdown
+                      label="Responsável"
+                      data={itemsResponsable}
+                      valueField="id"
+                      labelField="name"
+                      placeholder={'Selecione o responsável'}
+                      value={values.responsible_id}
+                      onChange={(value) => setFieldValue('responsible_id', value)}
+                    />
 
-                      />
-                    </View>
-                    {touched.responsible_id && errors.responsible_id && <Text style={styles.errorText}>{errors.responsible_id}</Text>}
+                    {touched.responsible_id && errors.responsible_id && (
+                      <Text style={styles.errorText}>{errors.responsible_id}</Text>
+                    )}
 
                     <Button
                       style={styles.button}

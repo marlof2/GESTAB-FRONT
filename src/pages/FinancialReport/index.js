@@ -19,6 +19,7 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import Dropdown from '../../components/Ui/Input/Dropdown';
+import { API_URL } from '@env';
 
 LocaleConfigPt
 
@@ -309,7 +310,8 @@ const AppointmentsScreen = () => {
 
     try {
       // URL para a qual você está fazendo a requisição para o backend gerar o PDF
-      const url = `http://192.168.0.26:8000/api/list/exportReportDownload${queryString}`; // Adicionar a query string
+      // const url = `${API_URL}/list/exportReportDownload${queryString}`; 
+      const url = `${API_URL}/list/exportReportDownload${queryString}`; 
 
       // Caminho onde o arquivo será salvo
       const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY')}.pdf`; // Definir caminho do arquivo
@@ -429,7 +431,7 @@ const AppointmentsScreen = () => {
                 <View style={{ alignItems: 'center', marginVertical: 15 }}>
                   <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 5 }}>{`PDF`}</Text>
 
-                  <Button style={{ width: 70 }} mode="elevated" onPress={downloadPDF}>
+                  <Button style={{ width: 70 }} mode="elevated" onPress={downloadPDF} disabled={totalAmount == "0,00"}>
                     <FontAwesome name="file-pdf-o" color={'red'} size={20} />
                   </Button>
                 </View>

@@ -12,6 +12,7 @@ import { AuthContext } from '../../contexts/auth';
 import InputCpf from '../../components/Ui/Input/inputCpf';
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
+import Snackbar from '../../components/Ui/Snackbar';
 
 
 
@@ -100,12 +101,23 @@ export default function SignIn() {
               >
                 Crie seu acesso.
               </Button>
+              
+              <View style={styles.divider} />
+              
+              <Button
+                // onPress={() => navigation.navigate('HomeScreenAds')}
+                onPress={() => navigation.navigate('ForgotPassword')}
+                mode="text"
+                compact
+              >
+                Esqueci minha senha
+              </Button>
             </View>
 
           </Card.Content>
         </Card>
-
       </KeyboardAvoidingView>
+      <Snackbar />
     </View>
   )
 }

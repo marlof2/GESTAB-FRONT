@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect } from "react";
 import api from "../services";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { setSnackbar } from '../store/globalSlice';
+import { useDispatch } from 'react-redux';
 
 export const AuthContext = createContext({});
 
@@ -10,6 +12,7 @@ function AuthProvider({ children }) {
     const [loadingAuth, setLoadingAuth] = useState(false);
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
 
 
 
@@ -105,6 +108,8 @@ function AuthProvider({ children }) {
 
             const response = await api.post('/register', obj);
             if (response.status == 201) {
+                dispatch(setSnackbar({ visible: true, title: 'Acesso criado com sucesso!' }));
+
                 navigation.navigate('SignIn')
                 setLoadingAuth(false);
             }

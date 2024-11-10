@@ -31,6 +31,7 @@
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
     "expo": "~51.0.2",
+    "expo-ads-admob": "^13.0.0",
     "expo-constants": "~16.0.1",
     "expo-dev-client": "~4.0.25",
     "expo-file-system": "^17.0.1",
@@ -52,6 +53,7 @@
     "react-native": "0.74.1",
     "react-native-animatable": "^1.4.0",
     "react-native-calendars": "^1.1305.0",
+    "react-native-dotenv": "^3.4.11",
     "react-native-element-dropdown": "^2.12.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-linear-gradient": "^2.8.3",
@@ -64,7 +66,8 @@
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
     "rn-fetch-blob": "^0.12.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-modules-core": "~1.12.26"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
     background: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgb(220, 220, 220)',
+        // backgroundColor: 'rgb(220, 220, 220)',
         flex:1
 
     },
@@ -44,6 +44,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         fontWeight:'bold'
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#e0e0e0',
+        marginVertical: 10,
+        width: '100%',
     },
 })
 

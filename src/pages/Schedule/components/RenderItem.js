@@ -181,7 +181,7 @@ export default function RenderItem({ data }) {
                 <View style={styles.iconText}>
                     <FontAwesome name="info-circle" size={16} style={styles.icon} />
                     <Paragraph style={styles.titleCardContent}> Situação: </Paragraph>
-                    <Chip style={{ backgroundColor: getStatusColor(item.status.id), }}>{`${item.status.name}`}</Chip>
+                    <Chip style={{ backgroundColor: getStatusColor(item.status.id), }}><Text style={{color:'white'}}>{`${item.status.name}`}</Text></Chip>
                 </View>
             </Card.Content>
         </Card>

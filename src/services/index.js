@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 import { Alert } from 'react-native';
+import { API_URL } from '@env';
 
 
 const api = axios.create({
-    baseURL: 'https://orange-manatee-370597.hostingersite.com/api'
-    // baseURL: 'http://192.168.0.26:8000/api',
+    baseURL: API_URL
 })
 
 
