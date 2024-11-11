@@ -13,7 +13,6 @@ import InputCpf from '../../components/Ui/Input/inputCpf';
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import Snackbar from '../../components/Ui/Snackbar';
-import { BannerAd } from '../../components/Ads/BannerAd';
 
 
 
