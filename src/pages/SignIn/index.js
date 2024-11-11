@@ -13,6 +13,7 @@ import InputCpf from '../../components/Ui/Input/inputCpf';
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import Snackbar from '../../components/Ui/Snackbar';
+import { BannerAd } from '../../components/Ads/BannerAd';
 
 
 
@@ -44,7 +45,6 @@ export default function SignIn() {
   return (
     <View style={styles.background}>
       <Overlay isVisible={loadingAuth} />
-      {/* <Text style={{marginBottom: 20, fontWeight: 'bold', fontSize: 18, textAlign:'center' }}>Gerênciamento de estabelecimentos.</Text> */}
       <Image style={styles.logo} source={require('../../assets/gestab.jpg')} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : ''}

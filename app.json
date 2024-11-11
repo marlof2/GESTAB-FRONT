@@ -23,6 +23,8 @@
         "foregroundImage": "./assets/images/logo/gestab.jpg",
         "backgroundColor": "#ffffff"
       },
+      "versionCode": 1,
+      "userTrackingPermission": false,
       "package": "com.marlof2.gestab",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
