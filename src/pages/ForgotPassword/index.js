@@ -62,8 +62,10 @@ export function ForgotPassword() {
     const handleStepOneSubmit = async (values, { setSubmitting }) => {
         try {
             const result = await api.post('/forgot-password', values);
-            if (result.status == 200) {
-                setCurrentStep(2);
+            if (result) {
+                if (result.status == 200) {
+                    setCurrentStep(2);
+                }
             }
         } catch (error) {
             console.error(error);
