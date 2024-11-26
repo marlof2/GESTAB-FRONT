@@ -19,6 +19,8 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import Dropdown from '../../components/Ui/Input/Dropdown';
+import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
+import { useRewardedAd } from '../../components/AdsMob/hooks/useRewardedAd';
 
 LocaleConfigPt
 
@@ -45,25 +47,9 @@ const AppointmentsScreen = () => {
   const [dataSendExport, setDataSendExport] = useState({});
   const [totalAmount, setTotalAmount] = useState(null);
   const [hiddeArrowBack, setHiddeArrowBack] = useState(true);
+  const { showAd, isLoading } = useRewardedAd();
 
 
-  // const handleDatePress = useCallback((day) => {
-
-  //   if (!startDate || (startDate && endDate)) {
-  //     setStartDate(day.dateString);
-  //     setEndDate(null);
-  //     setMarkedDates({ [day.dateString]: { selected: true, startingDay: true, color: 'rgb(0, 104, 116)' } });
-  //   } else if (!endDate && day.dateString >= startDate) {
-  //     setEndDate(day.dateString);
-  //     const range = getDateRange(startDate, day.dateString);
-  //     const newMarkedDates = range.reduce((acc, date) => {
-  //       acc[date] = { selected: true, color: '#66B3BA' };
-  //       return acc;
-  //     }, {});
-  //     console.log(startDate, endDate)
-  //     setMarkedDates(newMarkedDates);
-  //   }
-  // }, [establishimentId, startDate, endDate]);
 
   const handleDatePress = day => {
     if (establishimentId != null) {
@@ -258,6 +244,12 @@ const AppointmentsScreen = () => {
     }
   };
 
+  const handleShowRewardedAd = async () => {
+    if (!isLoading) {
+      await showAd();
+    }
+  };
+
   const handleGenerateReport = async () => {
     setShowReport(true);
     setHiddeArrowBack(false);
@@ -270,6 +262,7 @@ const AppointmentsScreen = () => {
       final_date: endDate,
     }
     setDataSendExport(data)
+    handleShowRewardedAd();
     await getExport(data)
   };
 
@@ -410,6 +403,7 @@ const AppointmentsScreen = () => {
                 </Button>
               </View>
             </Card>
+            <BannerAdComponent />
           </>
         ) : (
           // Aqui você pode renderizar o resultado do relatório
@@ -489,6 +483,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+    marginBottom: 20,
     alignItems: 'center',
   },
   reportContainer: {

@@ -1,56 +1,111 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+import theme from '../../themes/theme.json';
 
-const styles = StyleSheet.create({
-    background: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        // backgroundColor: 'rgb(220, 220, 220)',
-        flex:1
+const { width } = Dimensions.get('window');
 
-    },
-    container: {
-        width: '90%',
-        maxWidth: 400,
-    },
-    input: {
-        marginBottom: 5,
-    },
-    logo: {
-        width: 120,
-        height: 120,
-        borderRadius:50,
-        alignContent:'center',
-    },
-    button: {
-        marginTop: 10,
-        borderRadius: 10
-    },
-    errorText: {
-        color: 'red',
-        marginLeft: 20,
-        marginBottom: 8
-    },
-    footer: {
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    card: {
-        padding: 10,
-        borderRadius: 15,
-        elevation: 5,
-        marginTop:20
-    },
-    titleCard: {
-        textAlign: 'center',
-        fontSize: 20,
-        fontWeight:'bold'
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#e0e0e0',
-        marginVertical: 10,
-        width: '100%',
-    },
-})
-
-export default styles
+export default StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'space-between',
+  },
+  header: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  logo: {
+    width: width * 0.35,
+    height: width * 0.35,
+    marginBottom: 24,
+    borderRadius: 50,
+  },
+  welcomeText: {
+    color: theme.colors.primary,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  subtitleText: {
+    color: '#666',
+    marginBottom: 32,
+  },
+  form: {
+    gap: 16,
+  },
+  inputContainer: {
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    overflow: 'hidden',
+  },
+  input: {
+    backgroundColor: 'transparent',
+    height: 56,
+  },
+  inputContent: {
+    backgroundColor: 'transparent',
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: -8,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    color: theme.colors.primary,
+  },
+  loginButton: {
+    marginTop: 16,
+    borderRadius: 12,
+    height: 56,
+  },
+  buttonContent: {
+    height: 56,
+  },
+  footer: {
+    marginTop: 32,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#666',
+    fontSize: 14,
+  },
+  socialButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 24,
+  },
+  socialButton: {
+    backgroundColor: '#F5F5F5',
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signUpText: {
+    color: '#666',
+  },
+  signUpButtonText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
+  },
+  errorText: {
+    color: theme.colors.error,
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 12,
+  },
+});

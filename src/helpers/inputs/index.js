@@ -95,6 +95,11 @@ const formatTime = (input) => {
    return formattedInput
 };
 
+const formatTypeSchedule = (input) => {
+    if (!input) return input;
+    return input == 'HM' ? 'Horário marcado' : 'Ordem de chegada'
+};
+
 
 
 export const helper = {
@@ -105,5 +110,6 @@ export const helper = {
     maskCnpj,
     formatMoney,
     formatMoneyRemoveCaracters,
-    formatTime
+    formatTime,
+    formatTypeSchedule
 };

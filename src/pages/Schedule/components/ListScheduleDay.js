@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
-import { ActivityIndicator, Divider, FAB, Modal, Portal, Searchbar, Text, Chip } from 'react-native-paper';
+import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
 import styles from '../styles'
 import Header from '../../../components/Header';
 import api from "../../../services";
@@ -12,10 +12,10 @@ import { infoModal, reloadItemsCard } from '../reducer';
 import EmptyListMessage from '../../../components/Ui/EmptyListMessage';
 import ModalDelete from '../components/ModalDelete'
 import { useIsFocused } from '@react-navigation/native'
-import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 import Form from './Form';
+import { helper } from '../../../helpers/inputs';
 
 export default function Index({ route }) {
     const { date, establishment_id, professional_id, professional_name, typeSchedule } = route.params;
@@ -23,7 +23,6 @@ export default function Index({ route }) {
         date, establishment_id, professional_id
     }
     const dispatch = useDispatch();
-    const navigation = useNavigation();
     const isFocused = useIsFocused()
 
     const [items, setItems] = useState([])
@@ -52,7 +51,7 @@ export default function Index({ route }) {
 
         setLoading(true);
 
-        const response = await api.get(`/list`, { params: search ? { search: search, ...dataParams } : dataParams })
+        const response = await api.get(`/list`, { params: search ? { search: search, ...dataParams, typeSchedule } : { ...dataParams, typeSchedule } })
 
         if (response.status == 200) {
             setItems(response.data.data);
@@ -69,7 +68,7 @@ export default function Index({ route }) {
 
         setLoadingMore(true);
         try {
-            const res = await api.get(nextPageUrl, { params: search ? { search: search } : null });
+            const res = await api.get(nextPageUrl, { params: search ? { search: search, ...dataParams, typeSchedule } : { ...dataParams, typeSchedule } });
             setItems([...items, ...res.data.data]);
             setNextPageUrl(res.data.next_page_url);
         } catch (error) {
@@ -131,7 +130,7 @@ export default function Index({ route }) {
     }
 
     const description = () => {
-        return `📒 Tipo de agenda: ${typeSchedule == 'HM' ? 'Horário marcado' : 'Ordem de chegada'}`
+        return `📒 Tipo de agenda: ${helper.formatTypeSchedule(typeSchedule)}`
     }
 
 

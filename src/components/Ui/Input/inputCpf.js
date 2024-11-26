@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useField } from 'formik';
 
-const Input = ({ label, ...props }) => {
+const Input = ({ label, mode = 'outlined', leftColor = 'black', ...props }) => {
     const [field, meta, helpers] = useField(props.name);
 
     const handleChange = (text) => {
@@ -29,14 +29,14 @@ const Input = ({ label, ...props }) => {
             <TextInput
                 outlineStyle={{ borderRadius: 10 }}
                 style={styles.input}
-                mode="outlined"
+                mode={mode}
                 label={label}
                 value={field.value}
                 onChangeText={handleChange}
                 onBlur={() => helpers.setTouched(true)}
                 dense
                 error={meta.touched && Boolean(meta.error)}
-                left={<TextInput.Icon icon="card-account-details-outline" />}
+                left={<TextInput.Icon icon="card-account-details-outline" color={leftColor} />}
                 maxLength={14}
                 keyboardType='numeric'
             />
@@ -48,11 +48,12 @@ const Input = ({ label, ...props }) => {
 const styles = StyleSheet.create({
     input: {
         marginBottom: 5,
+        backgroundColor: 'transparent',
     },
     errorText: {
-        color: 'red',
-        marginLeft: 20,
-        marginBottom: 8
+        color: '#B00020',
+        fontSize: 12,
+        marginTop: 4,
     },
 });
 

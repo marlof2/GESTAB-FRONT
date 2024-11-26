@@ -33,7 +33,7 @@ export default function RenderItem({ data }) {
             />
             <Card.Content>
                 <View style={{ marginLeft: 50 }}>
-                    <Paragraph > <Text style={{fontWeight: 'bold'}}> Tipo de agenda: </Text>{item.type_schedule == 'HM' ? 'Horário marcado' : 'Ordem de chegada'}</Paragraph>
+                    <Paragraph > <Text style={{fontWeight: 'bold'}}> Tipo de agenda: </Text>{helper.formatTypeSchedule(item.type_schedule) || 'Carregando...'}</Paragraph>
                 </View>
             </Card.Content>
         </Card>

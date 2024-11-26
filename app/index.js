@@ -8,7 +8,9 @@ import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper
 import {store} from '../src/store';
 import { Provider as StoreProvider } from 'react-redux';
 import theme from '../src/themes/theme.json'
+import { initializeAdMob } from '../src/components/AdsMob/config/initialize';
 
+initializeAdMob();
 
 
 export default function App() {

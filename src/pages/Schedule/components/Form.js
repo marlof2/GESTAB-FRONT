@@ -4,7 +4,6 @@ import { Button, Text, Card, IconButton } from 'react-native-paper';
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import Overlay from '../../../components/Ui/Overlay';
-import { helper } from '../../../helpers/inputs';
 import api from "../../../services";
 import { useDispatch, useSelector } from 'react-redux';
 import { infoModal, reloadItemsCard } from '../reducer';
@@ -12,18 +11,16 @@ import { setSnackbar } from '../../../store/globalSlice';
 import TimePickerField from '../../../components/Ui/Input/TimePickerField';
 import { useIsFocused } from '@react-navigation/native';
 import Dropdown from '../../../components/Ui/Input/DropdownFormik';
+import { useRewardedAd } from '../../../components/AdsMob/hooks/useRewardedAd';
 
 export default function Form() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [serviceId, setServiceId] = useState(null);
-  const [userId, setUserId] = useState(null);
   const isFocused = useIsFocused();
-  const [isFocus, setIsFocus] = useState(false);
   const [itemsService, setItemsService] = useState([]);
   const [itemsUsers, setItemsUsers] = useState([]);
   const modalForm = useSelector((state) => state.schedule.modal);
-
+  const { showAd, isLoading } = useRewardedAd();
   const typeSchedule = modalForm?.data?.typeSchedule;
 
   const validationSchema = Yup.object().shape({
@@ -33,6 +30,12 @@ export default function Form() {
   });
 
 
+
+  const handleShowRewardedAd = async () => {
+    if (!isLoading) {
+      await showAd();
+    }
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -70,11 +73,11 @@ export default function Form() {
       const response = modalForm?.data?.id == null
         ? await api.post('/list', obj)
         : await api.put(`/list/${modalForm.data.id}`, obj);
-
       if (response.status == 201 || response.status == 200) {
+        handleShowRewardedAd();
         dispatch(reloadItemsCard(true));
         closeModal();
-        dispatch(setSnackbar({ visible: true, title: modalForm?.data?.id == null ? 'Adicionado com sucesso!' : 'Alterado com sucesso!' }));
+        dispatch(setSnackbar({ visible: true, title: 'Agendado com sucesso!' }));
       }
     } catch (error) {
       console.log('erro ao salvar estabelecimento', error);
@@ -83,36 +86,13 @@ export default function Form() {
     }
   }
 
-  const titleForm = () => (modalForm.action === 'edit' ? 'Editar Agendamento' : 'Novo Agendamento');
-
-  const renderLabel = () => {
-    if (serviceId && isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Serviço
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const renderLabelUser = () => {
-    if (userId && isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'rgb(0, 104, 116)' }]}>
-          Pessoa
-        </Text>
-      );
-    }
-    return null;
-  };
 
   return (
     <View>
       <Overlay isVisible={loading} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
         <Card style={styles.card}>
-          <Card.Title title={titleForm()} titleStyle={styles.titleCard}
+          <Card.Title title={"Agendamento"} titleStyle={styles.titleCard}
             right={(props) => (
               <IconButton
                 {...props}
@@ -130,12 +110,7 @@ export default function Form() {
                 saveForm(values);
               }}
             >
-              {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => {
-                useEffect(() => {
-                  if (modalForm.action == 'edit') {
-                    setFieldValue('time', helper.formatTime(modalForm.data.time));
-                  }
-                }, [modalForm.action]);
+              {({ handleSubmit, setFieldValue, values, errors, touched }) => {
 
                 return (
                   <View>
@@ -185,7 +160,7 @@ export default function Form() {
                       icon="content-save"
                       onPress={handleSubmit}
                     >
-                      Salvar
+                      Agendar
                     </Button>
                   </View>
                 );

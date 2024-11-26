@@ -11,6 +11,8 @@ import { AuthContext } from '../../contexts/auth';
 import Dropdown from '../../components/Ui/Input/Dropdown';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import { Card } from 'react-native-paper';
+import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
+import { useRewardedAd } from '../../components/AdsMob/hooks/useRewardedAd';
 
 LocaleConfigPt
 
@@ -25,9 +27,18 @@ const AppointmentsScreen = () => {
   const isFocused = useIsFocused()
   const { user } = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState(null);
+  const { showAd, isLoading } = useRewardedAd();
+
+
+  const handleShowRewardedAd = async () => {
+    if (!isLoading) {
+      await showAd();
+    }
+  };
 
   const handleDatePress = (day) => {
     if (establishimentId != null && professionalId != null) {
+      handleShowRewardedAd();
       setSelectedDate(day.dateString);
       let professional = itemsProfessional.find(el => el.user.id == professionalId)
 
@@ -97,8 +108,8 @@ const AppointmentsScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header title={'Filtro de Agenda'} showBack={false} />
       <View style={styles.container}>
-        <Card style={{ padding: 10 }}>
-          <View style={styles.containerDropdown}>
+        <Card style={styles.card}>
+          <View style={styles.formContainer}>
             <Dropdown
               label="Estabelecimento"
               data={itemsEstablishment}
@@ -118,6 +129,7 @@ const AppointmentsScreen = () => {
             />
 
             <Dropdown
+              style={styles.dropdown}
               label="Profissional"
               data={itemsProfessional}
               placeholder="Selecione o profissional"
@@ -135,7 +147,6 @@ const AppointmentsScreen = () => {
               labelField="user.name"
               valueField="user.id"
             />
-
           </View>
 
           <View style={styles.calendarContainer}>
@@ -146,10 +157,21 @@ const AppointmentsScreen = () => {
               }}
               firstDay={1}
               style={styles.calendar}
+              theme={{
+                backgroundColor: '#ffffff',
+                calendarBackground: '#ffffff',
+                textSectionTitleColor: 'rgb(0, 104, 116)',
+                selectedDayBackgroundColor: 'rgb(0, 104, 116)',
+                selectedDayTextColor: '#ffffff',
+                todayTextColor: 'rgb(0, 104, 116)',
+                dayTextColor: '#2d4150',
+                arrowColor: 'rgb(0, 104, 116)',
+              }}
             />
           </View>
         </Card>
       </View>
+      <BannerAdComponent />
     </SafeAreaView>
   );
 };
@@ -157,39 +179,38 @@ const AppointmentsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
   },
   container: {
     flex: 1,
-    padding: 10,
-    justifyContent:'center'
+    padding: 16,
   },
-  calendar: {
-    borderRadius: 15, // Para bordas arredondadas
-    marginBottom: 10,
+  card: {
+    padding: 16,
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  formContainer: {
+    gap: 16,
+    marginBottom: 24,
   },
   calendarContainer: {
-    marginTop: 30,
-    borderWidth: 1,
-    borderColor: 'rgb(0, 104, 116)',
-    borderRadius: 15,
+    borderRadius: 16,
+    overflow: 'hidden',
     backgroundColor: '#fff',
-    elevation: 5,
-    shadowColor: 'rgb(0, 104, 116)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
+  calendar: {
+    borderRadius: 16,
   },
-  iconText: {
-    marginLeft: 10,
-    fontSize: 16,
-  },
-
 });
 
 export default AppointmentsScreen;

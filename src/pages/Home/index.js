@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
-import { Card, Button, List } from "react-native-paper";
+import { View, Text, StyleSheet, useWindowDimensions, Platform } from "react-native";
+import { Card, List } from "react-native-paper";
+import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from "../../components/Header";
 import { useIsFocused } from '@react-navigation/native';
 import api from "../../services";
 import clearFiles from '../../system/deleteOldFiles'
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
+import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 
 
 export default function Home({ navigation }) {
+  const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const [user, setUser] = useState(null);
 
@@ -27,6 +31,8 @@ export default function Home({ navigation }) {
     }
   }
 
+  
+
   useEffect(() => {
     if (isFocused) {
       StatusBar.setBackgroundColor(theme.colors.primary);
@@ -35,46 +41,77 @@ export default function Home({ navigation }) {
     }
   }, [isFocused]);
 
+  const menuItems = [
+    {
+      title: "Estabelecimentos",
+      description: "Gerênciar estabelecimentos.",
+      icon: "store",
+      onPress: () => navigation.navigate('Establishment'),
+    },
+    {
+      title: "Meus Estabelecimentos",
+      description: "Visualizar e associar estabelecimentos.",
+      icon: "storefront",
+      onPress: () => navigation.navigate('MyEstablishments'),
+    },
+    {
+      title: "Fale Conosco",
+      description: "Envie feedback, sugestões, melhorias ou reporte um problema.",
+      icon: "message",
+      onPress: () => navigation.navigate('Feedbacks'),
+    },
+  ];
+
   return (
-    <SafeAreaView style={styles.background}>
+    <SafeAreaView style={styles.background} edges={['left', 'right']}>
       <Header title="Home" showBack={false} showMenu={false} />
 
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.welcomeContainer}>
+      <Animated.ScrollView 
+        entering={FadeInUp}
+        contentContainerStyle={[
+          styles.scrollViewContent,
+          { paddingHorizontal: width * 0.05 }
+        ]}
+      >
+        <Animated.View 
+          entering={FadeInDown.delay(300)}
+          style={styles.welcomeContainer}
+        >
           <Text style={styles.welcomeText}>Bem-vindo!</Text>
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.subtitle}>O que você gostaria de fazer hoje?</Text>
-        </View>
+        </Animated.View>
 
-        {/* Card único com as opções */}
         <Card style={styles.card}>
           <Card.Content>
             <List.Section>
-              <List.Item
-                titleStyle={{ fontWeight: 'bold' }}
-                title="Estabelecimentos"
-                description="Gerênciar estabelecimentos."
-                left={props => <List.Icon {...props} icon="store" />}
-                onPress={() => navigation.navigate('Establishment')}
-              />
-              <List.Item
-                titleStyle={{ fontWeight: 'bold' }}
-                title="Meus Estabelecimentos"
-                description="Visualizar e associar estabelecimentos."
-                left={props => <List.Icon {...props} icon="storefront" />}
-                onPress={() => navigation.navigate('MyEstablishments')}
-                />
-              <List.Item
-                titleStyle={{ fontWeight: 'bold' }}
-                title="Fale Conosco"
-                description="Envie feedback, sugestões, melhorias ou reporte um problema."
-                left={props => <List.Icon {...props} icon="message" />}
-                onPress={() => navigation.navigate('Feedbacks')}
-              />
+              {menuItems.map((item, index) => (
+                <Animated.View
+                  key={item.title}
+                  entering={FadeInUp.delay(400 + index * 100)}
+                >
+                  <List.Item
+                    titleStyle={styles.listItemTitle}
+                    descriptionStyle={styles.listItemDescription}
+                    title={item.title}
+                    description={item.description}
+                    left={props => (
+                      <List.Icon 
+                        {...props} 
+                        icon={item.icon}
+                        color={theme.colors.primary}
+                      />
+                    )}
+                    onPress={item.onPress}
+                    style={styles.listItem}
+                  />
+                </Animated.View>
+              ))}
             </List.Section>
           </Card.Content>
         </Card>
-      </ScrollView>
+      </Animated.ScrollView>
+      <BannerAdComponent />
     </SafeAreaView>
   );
 }
@@ -82,37 +119,63 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
   },
   scrollViewContent: {
-    padding: 10,
-    alignItems: 'center',
+    flexGrow: 1,
+    paddingVertical: 20,
   },
   welcomeContainer: {
-    padding: 20,
+    marginBottom: 24,
     alignItems: 'center',
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginVertical: 5,
-    textAlign: 'center',
+    color: theme.colors.primary,
+    marginBottom: 8,
   },
   userName: {
-    fontSize: 21,
-    fontWeight: 'bold',
-    marginVertical: 5,
-    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     color: '#6c757d',
-    marginVertical: 5,
+    textAlign: 'center',
   },
   card: {
-    width: '95%',
-    marginVertical: 10,
-    borderRadius: 10,
-    elevation: 4,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+    backgroundColor: '#fff',
+  },
+  listItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  listItemTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  listItemDescription: {
+    fontSize: 14,
+    color: '#6c757d',
+    lineHeight: 20,
   },
 });
 
