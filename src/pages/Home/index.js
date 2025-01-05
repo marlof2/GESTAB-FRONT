@@ -11,7 +11,6 @@ import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 
-
 export default function Home({ navigation }) {
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
@@ -31,7 +30,7 @@ export default function Home({ navigation }) {
     }
   }
 
-  
+
 
   useEffect(() => {
     if (isFocused) {
@@ -66,14 +65,14 @@ export default function Home({ navigation }) {
     <SafeAreaView style={styles.background} edges={['left', 'right']}>
       <Header title="Home" showBack={false} showMenu={false} />
 
-      <Animated.ScrollView 
+      <Animated.ScrollView
         entering={FadeInUp}
         contentContainerStyle={[
           styles.scrollViewContent,
           { paddingHorizontal: width * 0.05 }
         ]}
       >
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(300)}
           style={styles.welcomeContainer}
         >
@@ -96,8 +95,8 @@ export default function Home({ navigation }) {
                     title={item.title}
                     description={item.description}
                     left={props => (
-                      <List.Icon 
-                        {...props} 
+                      <List.Icon
+                        {...props}
                         icon={item.icon}
                         color={theme.colors.primary}
                       />

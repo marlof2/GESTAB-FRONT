@@ -34,6 +34,10 @@ export default function RenderItem({ data, dataUser }) {
         closeMenu()
         navigation.navigate('EstablishmentUser', { establishmentId: item.id, establishmentName: item.name })
     }
+    function navigateToPlans(item) {
+        closeMenu()
+        navigation.navigate('PaymentPlans', { establishmentId: item.id, establishmentName: item.name })
+    }
     function navigateToAssociateService(item) {
         closeMenu()
         navigation.navigate('Service', { establishmentId: item.id, establishmentName: item.name })
@@ -96,6 +100,14 @@ export default function RenderItem({ data, dataUser }) {
                             />
 
                             <Divider />
+
+                            <Menu.Item
+                                title="Planos"
+                                onPress={() => navigateToPlans(item)}
+                                leadingIcon={(props) => <Icon name="currency-usd" color={'green'} size={26} />}
+                            />
+
+                            <Divider />
                             {
                                 item.deleted_at ?
                                     (
@@ -117,7 +129,6 @@ export default function RenderItem({ data, dataUser }) {
                                         />
                                     )
                             }
-
 
                         </Menu>
                         :

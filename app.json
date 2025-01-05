@@ -22,7 +22,22 @@
       },
       "versionCode": 1,
       "userTrackingPermission": false,
-      "package": "com.marlof2.gestab"
+      "package": "com.marlof2.gestab",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "gestab.app.shecme",
+              "host": "*"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

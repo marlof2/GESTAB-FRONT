@@ -13,6 +13,7 @@ import FomPasswordChange from '../pages/Profile/componets/FomPasswordChange';
 import FinancialReport from '../pages/FinancialReport';
 import Feedbacks from '../pages/Feedbacks';
 import { createStackNavigator } from '@react-navigation/stack';
+import PaymentPlans from '../pages/PaymentsPlans';
 
 import TabRoutes from '../routes/app.routes.tab'
 
@@ -121,6 +122,14 @@ function Routes() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen
+                name="PaymentPlans"
+                component={PaymentPlans}
+                options={{
+                    headerShown: false
+                }}
+            />
+
 
         </Stack.Navigator>
     );
