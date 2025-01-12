@@ -1,16 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Appbar, Divider, Menu, MD3LightTheme, Text } from 'react-native-paper';
 import { Platform, SafeAreaView, StyleSheet } from 'react-native';
-import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native'
 import { View } from 'react-native';
 // import theme from "../../themes/theme.json"
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 
-export default function Header({ title, subtitle = null, description = null, showBack = true, showMenu = false }) {
+export default function Header({ title, subtitle = null, description = null, showBack = true, showMenu = false, children }) {
     const navigation = useNavigation()
     const [menuVisible, setMenuVisible] = useState(false);
-    const { signOut } = useContext(AuthContext)
 
     const openMenu = () => setMenuVisible(true);
     const closeMenu = () => setMenuVisible(false);
@@ -22,10 +20,10 @@ export default function Header({ title, subtitle = null, description = null, sho
                     visible={menuVisible}
                     onDismiss={closeMenu}
                     anchor={<Appbar.Action icon={MORE_ICON} onPress={openMenu} />}
+                    contentStyle={styles.menuContent}
+                    anchorPosition="bottom"
                 >
-                    <Menu.Item dense leadingIcon="account" title="Perfil" />
-                    <Divider />
-                    <Menu.Item dense leadingIcon="exit-to-app" onPress={signOut} title="Sair" />
+                    {children}
                 </Menu>
             )
         }
@@ -41,15 +39,15 @@ export default function Header({ title, subtitle = null, description = null, sho
 
     return (
         <SafeAreaView>
-            <Appbar.Header elevated style={{borderBottomLeftRadius:20, borderBottomRightRadius:20}}>
+            <Appbar.Header elevated style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                 {IconBack()}
                 <View style={styles.container}>
                     <Text style={styles.title}>{title}</Text>
                     {
-                        subtitle  && (<Text style={styles.subtitle}>{subtitle}</Text>)
+                        subtitle && (<Text style={styles.subtitle}>{subtitle}</Text>)
                     }
                     {
-                        description  && (<Text style={styles.subtitle}>{description}</Text>)
+                        description && (<Text style={styles.subtitle}>{description}</Text>)
                     }
                 </View>
                 {IconMenu()}
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         paddingLeft: 10,
-        paddingBottom:10
+        paddingBottom: 10
     },
     title: {
         fontSize: 20,
@@ -73,5 +71,15 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         color: 'grey',
+    },
+    menuContent: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        marginTop: 8,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
 });

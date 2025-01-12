@@ -13,7 +13,6 @@ const Tab = createMaterialBottomTabNavigator();
 export default function AppRouteStack() {
     return (
         <Tab.Navigator
-            initialRouteName="Home"
             barStyle={{ backgroundColor: theme.colors.primary }}
             activeColor='white'
             inactiveColor='#d3d3d3'

@@ -14,14 +14,40 @@ import FinancialReport from '../pages/FinancialReport';
 import Feedbacks from '../pages/Feedbacks';
 import { createStackNavigator } from '@react-navigation/stack';
 import PaymentPlans from '../pages/PaymentsPlans';
+import Plans from '../pages/PaymentsPlans/components/Plans';
+
+import { SelectEstablishment } from '../pages/SelectEstablishment';
+
 
 import TabRoutes from '../routes/app.routes.tab'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
+async function getInitialRoute() {
+    try {
+        const establishmentIdLogged = await AsyncStorage.getItem('establishmentIdLogged')
+        return establishmentIdLogged ? 'TabRoutes' : 'SelectEstablishment'
+    } catch (error) {
+        console.error('Error reading from AsyncStorage:', error)
+        return 'SelectEstablishment'
+    }
+}
+
 function Routes() {
+    const [initialRoute, setInitialRoute] = React.useState('SelectEstablishment')
+    
+    React.useEffect(() => {
+        getInitialRoute().then(route => setInitialRoute(route))
+    }, [])
+
     return (
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName={initialRoute}>
+            <Stack.Screen
+                name="SelectEstablishment"
+                component={SelectEstablishment}
+                options={{ headerShown: false }}
+            />
             <Stack.Screen
                 name="TabRoutes"
                 component={TabRoutes}
@@ -129,7 +155,13 @@ function Routes() {
                     headerShown: false
                 }}
             />
-
+            <Stack.Screen
+                name="Plans"
+                component={Plans}
+                options={{
+                    headerShown: false
+                }}
+            />
 
         </Stack.Navigator>
     );

@@ -24,12 +24,3 @@ async function CheckoutMercadoPago({ payment_method, user_id, plan_id, establish
 
 
 export default CheckoutMercadoPago
-
-// const checkPaymentStatus = async (prefId) => {
-//     try {
-//         const response = await api.get(`/payments/getPaymentByPreference/${prefId}`);
-//         setPaymentStatus(response.data.status);
-//     } catch (error) {
-//         console.error('Error checking payment status:', error);
-//     }
-// };

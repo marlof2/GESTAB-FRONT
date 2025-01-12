@@ -12,6 +12,7 @@ const DropdownSimple = ({
   labelField,
   valueField,
   searchPlaceholder = "Pesquisar...",
+  disable = false,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -29,9 +30,20 @@ const DropdownSimple = ({
     <View style={styles.containerDropdown}>
       {renderLabel()}
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'rgb(0, 104, 116)' }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
+        disable={disable}
+        style={[
+          styles.dropdown,
+          isFocus && { borderColor: 'rgb(0, 104, 116)' },
+          disable && styles.disabledDropdown,
+        ]}
+        placeholderStyle={[
+          styles.placeholderStyle,
+          disable && styles.disabledText,
+        ]}
+        selectedTextStyle={[
+          styles.selectedTextStyle,
+          disable && styles.disabledText,
+        ]}
         inputSearchStyle={styles.inputSearchStyle}
         data={data}
         search
@@ -49,17 +61,19 @@ const DropdownSimple = ({
             setIsFocus(false);
           }
         }}
-        renderRightIcon={() =>
-          value ? (
+        renderRightIcon={() => {
+          if (disable) return null;
+          
+          return value ? (
             <IconButton
               icon="close"
               size={20}
-              onPress={() => onChange(null)}  // Limpa o valor quando clicado no "X"
+              onPress={() => onChange(null)}
             />
           ) : (
             <IconButton icon="menu-down" size={20} disabled={true} />
-          )
-        }
+          );
+        }}
       />
     </View>
   );
@@ -88,6 +102,14 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 15,
+  },
+  disabledDropdown: {
+    backgroundColor: '#f0f0f0',
+    borderColor: '#d3d3d3',
+    opacity: 0.7,
+  },
+  disabledText: {
+    color: '#999',
   },
 });
 

@@ -17,7 +17,11 @@ const TimePickerField = ({ field, form, label }) => {
       setTime(currentTime);
       form.setFieldValue(
         field.name,
-        currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        currentTime.toLocaleTimeString('pt-BR', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: false 
+        })
       );
     }
   };
@@ -32,7 +36,11 @@ const TimePickerField = ({ field, form, label }) => {
           label={label}
           value={
             time
-              ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              ? time.toLocaleTimeString('pt-BR', { 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: false 
+                })
               : ''
           }
           editable={false}

@@ -12,6 +12,7 @@ import TimePickerField from '../../../components/Ui/Input/TimePickerField';
 import { useIsFocused } from '@react-navigation/native';
 import Dropdown from '../../../components/Ui/Input/DropdownFormik';
 import { useRewardedAd } from '../../../components/AdsMob/hooks/useRewardedAd';
+import { checkEstablishmentPayment } from '../../../helpers/checkPayment';
 
 export default function Form() {
   const dispatch = useDispatch();
@@ -74,7 +75,9 @@ export default function Form() {
         ? await api.post('/list', obj)
         : await api.put(`/list/${modalForm.data.id}`, obj);
       if (response.status == 201 || response.status == 200) {
-        handleShowRewardedAd();
+        if (!await checkEstablishmentPayment()) {
+          handleShowRewardedAd();
+        }
         dispatch(reloadItemsCard(true));
         closeModal();
         dispatch(setSnackbar({ visible: true, title: 'Agendado com sucesso!' }));

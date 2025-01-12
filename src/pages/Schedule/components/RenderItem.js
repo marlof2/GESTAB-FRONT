@@ -128,6 +128,8 @@ export default function RenderItem({ data }) {
                 return theme.colors.action.active; // Em atendimento
             case 2:
                 return theme.colors.action.gray; // Aguardando atendimento
+            case 3:
+                return theme.colors.action.active; // Concluído
             default:
                 return theme.colors.action.default;
         }

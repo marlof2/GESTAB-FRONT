@@ -20,9 +20,10 @@ import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import Dropdown from '../../components/Ui/Input/Dropdown';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
-import { useRewardedAd } from '../../components/AdsMob/hooks/useRewardedAd';
-
+import { getEstablishment } from '../../helpers';
+import { usePayment } from '../../contexts/PaymentContext';
 LocaleConfigPt
+
 
 const AppointmentsScreen = () => {
   const [itemsEstablishment, setItemsEstablishment] = useState([]);
@@ -47,7 +48,8 @@ const AppointmentsScreen = () => {
   const [dataSendExport, setDataSendExport] = useState({});
   const [totalAmount, setTotalAmount] = useState(null);
   const [hiddeArrowBack, setHiddeArrowBack] = useState(true);
-  const { showAd, isLoading } = useRewardedAd();
+  const { RewardedAd } = usePayment();
+
 
 
 
@@ -173,9 +175,37 @@ const AppointmentsScreen = () => {
     );
   };
 
+  const setEstablishmentId = async () => {
+    const establishment = await getEstablishment();
+    if (establishment?.id) {
+      const establishmentItem = itemsEstablishment.find(
+        item => item.establishment_id === establishment.id
+      );
+      
+      if (establishmentItem) {
+        // Simula o onChange do dropdown
+        if (establishmentItem.establishments?.responsible_id === dataUser.id) {
+          getProfessionalByEstablishment(establishment.id);
+          getServices(establishment.id);
+          setEstablishimentId(establishment.id);
+          setResponsibleId(establishmentItem.establishments.responsible_id);
+          setStartDate(null);
+          setEndDate(null);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (itemsEstablishment.length > 0) {
+      setEstablishmentId();
+    }
+  }, [itemsEstablishment]);
+
   useEffect(() => {
     if (isFocused) {
       getEstablisiments();
+      setEstablishmentId()
     } else {
       clearDropDown();
     }
@@ -244,13 +274,9 @@ const AppointmentsScreen = () => {
     }
   };
 
-  const handleShowRewardedAd = async () => {
-    if (!isLoading) {
-      await showAd();
-    }
-  };
 
   const handleGenerateReport = async () => {
+    await RewardedAd();
     setShowReport(true);
     setHiddeArrowBack(false);
 
@@ -262,8 +288,8 @@ const AppointmentsScreen = () => {
       final_date: endDate,
     }
     setDataSendExport(data)
-    handleShowRewardedAd();
     await getExport(data)
+
   };
 
   const goBackFilterReport = async () => {
@@ -302,7 +328,7 @@ const AppointmentsScreen = () => {
 
     try {
       // URL para a qual você está fazendo a requisição para o backend gerar o PDF
-      const url = `${process.env.EXPO_PUBLIC_API_URL}/list/exportReportDownload${queryString}`; 
+      const url = `${process.env.EXPO_PUBLIC_API_URL}/list/exportReportDownload${queryString}`;
 
       // Caminho onde o arquivo será salvo
       const fileUri = FileSystem.documentDirectory + `relatorio-financeiro-${moment().format('DD-MM-YYYY')}.pdf`; // Definir caminho do arquivo
@@ -353,6 +379,7 @@ const AppointmentsScreen = () => {
             <Card style={{ padding: 10 }}>
               <View style={styles.containerDropdown}>
                 <Dropdown
+                  disable={true}
                   label="Estabelecimento"
                   data={itemsEstablishment}
                   placeholder="Selecione o estabelecimento"
@@ -463,7 +490,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   calendar: {
     borderRadius: 15,

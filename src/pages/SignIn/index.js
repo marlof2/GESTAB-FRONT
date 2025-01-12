@@ -22,7 +22,6 @@ export default function SignIn() {
   const navigation = useNavigation();
   const { signIn, loadingAuth } = useContext(AuthContext);
   const isFocused = useIsFocused();
-  const windowHeight = Dimensions.get('window').height;
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
 
   function handleLogin(value) {
@@ -66,7 +65,7 @@ export default function SignIn() {
         </View>
 
         <Formik
-          initialValues={{ cpf: '', password: '' }}
+          initialValues={{ cpf: '032.962.445-81', password: '123' }}
           validationSchema={validationSchema}
           onSubmit={handleLogin}
         >
@@ -164,7 +163,7 @@ export default function SignIn() {
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>
-              Ainda não tem uma conta?{' '}
+              Ainda não tem uma conta?
             </Text>
             <Button
               mode="text"

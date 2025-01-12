@@ -10,11 +10,16 @@ import clearFiles from '../../system/deleteOldFiles'
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { usePayment } from '../../contexts/PaymentContext';
+
 
 export default function Home({ navigation }) {
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const [user, setUser] = useState(null);
+  const [establishment, setEstablishment] = useState(null);
+  const { checkPayment } = usePayment();
 
   async function me() {
     const response = await api.get('/me');
@@ -34,9 +39,13 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     if (isFocused) {
+      AsyncStorage.getItem('establishmentIdLogged').then(async (establishmentIdLogged) => {
+        setEstablishment(JSON.parse(establishmentIdLogged))
+      })
       StatusBar.setBackgroundColor(theme.colors.primary);
       me();
-      clearFiles()
+      clearFiles();
+      checkPayment();
     }
   }, [isFocused]);
 
@@ -54,6 +63,12 @@ export default function Home({ navigation }) {
       onPress: () => navigation.navigate('MyEstablishments'),
     },
     {
+      title: "Trocar Estabelecimento",
+      description: "Selecione outro estabelecimento.",
+      icon: "swap-horizontal",
+      onPress: () => navigation.navigate('SelectEstablishment'),
+    },
+    {
       title: "Fale Conosco",
       description: "Envie feedback, sugestões, melhorias ou reporte um problema.",
       icon: "message",
@@ -61,9 +76,19 @@ export default function Home({ navigation }) {
     },
   ];
 
+  const titleHome = () => {
+    return (
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, fontWeight: '600' }}>
+          {establishment?.name}
+        </Text>
+      </View>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.background} edges={['left', 'right']}>
-      <Header title="Home" showBack={false} showMenu={false} />
+      <Header title={titleHome()} showBack={false} showMenu={false} />
 
       <Animated.ScrollView
         entering={FadeInUp}

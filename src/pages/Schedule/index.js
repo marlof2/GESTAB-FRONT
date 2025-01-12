@@ -13,6 +13,9 @@ import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import { Card } from 'react-native-paper';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 import { useRewardedAd } from '../../components/AdsMob/hooks/useRewardedAd';
+import { checkEstablishmentPayment } from '../../helpers/checkPayment';
+import { getEstablishment } from '../../helpers';
+import { usePayment } from '../../contexts/PaymentContext';
 
 LocaleConfigPt
 
@@ -27,42 +30,32 @@ const AppointmentsScreen = () => {
   const isFocused = useIsFocused()
   const { user } = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState(null);
-  const { showAd, isLoading } = useRewardedAd();
+  const { RewardedAd } = usePayment();
 
 
-  const handleShowRewardedAd = async () => {
-    if (!isLoading) {
-      await showAd();
-    }
-  };
-
-  const handleDatePress = (day) => {
-    if (establishimentId != null && professionalId != null) {
-      handleShowRewardedAd();
-      setSelectedDate(day.dateString);
-      let professional = itemsProfessional.find(el => el.user.id == professionalId)
-
-      const objParams = {
-        date: day.dateString,
-        establishment_id: establishimentId,
-        professional_id: professionalId,
-        professional_name: professional.user.name,
-        user: user.user,
-        typeSchedule
-      }
-      navigation.navigate('ListScheduleDay', objParams);
-    } else {
+  const handleDatePress = async (day) => {
+    if (!establishimentId || !professionalId) {
       return Alert.alert(
         'Atenção!',
         'Para proseguir você deve selecionar o estabelecimento e o profissional desejado.',
-        [
-          { text: 'OK' },
-        ],
-
+        [{ text: 'OK' }],
       );
     }
 
-
+    await RewardedAd();
+    setSelectedDate(day.dateString);
+    
+    const professional = itemsProfessional.find(el => el.user.id == professionalId);
+    const objParams = {
+      date: day.dateString,
+      establishment_id: establishimentId,
+      professional_id: professionalId,
+      professional_name: professional.user.name,
+      user: user.user,
+      typeSchedule
+    };
+    
+    navigation.navigate('ListScheduleDay', objParams);
   };
 
 
@@ -73,10 +66,17 @@ const AppointmentsScreen = () => {
     setItemsProfessional([])
   }
 
+  const setEstablishmentId = async () => {
+    const establishment = await getEstablishment();
+    setEstablishimentId(establishment.id);
+    getProfessionalByEstablishment(establishment.id);
+  }
+
 
   useEffect(() => {
     if (isFocused) {
       getEstablisiments()
+      setEstablishmentId()
     } else {
       clearDropDown()
     }
@@ -111,6 +111,7 @@ const AppointmentsScreen = () => {
         <Card style={styles.card}>
           <View style={styles.formContainer}>
             <Dropdown
+              disable={true}
               label="Estabelecimento"
               data={itemsEstablishment}
               placeholder="Selecione o estabelecimento"
@@ -118,7 +119,7 @@ const AppointmentsScreen = () => {
               onChange={(item) => {
                 if (item) {
                   setEstablishimentId(item.establishment_id);
-                  getProfessionalByEstablishment(item.establishment_id);
+                  // getProfessionalByEstablishment(item.establishment_id);
                   setSelectedDate(null);
                 } else {
                   setEstablishimentId(null);

@@ -46,175 +46,163 @@ export default function UserProfileView({ navigation }) {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Header title="Perfil" />
 
-      {/* Profile Header */}
+      {/* Profile Header - Simplified */}
       <Animated.View
         entering={FadeInDown.delay(100).springify()}
-        style={[styles.headerCard, { backgroundColor: theme.colors.primary }]}
+        style={[styles.headerCard]}
       >
-        <View style={styles.avatarContainer}>
-          <Avatar.Text
-            size={70}
-            label={user?.name?.[0]}
-            style={styles.avatar}
-          />
-          <View style={styles.profileInfo}>
-            <Text style={styles.userName} numberOfLines={2}>
-              {user?.name}
+        <Avatar.Text
+          size={80}
+          label={user?.name?.[0]}
+          style={styles.avatar}
+        />
+        <View style={styles.profileInfo}>
+          <Text style={styles.userName} numberOfLines={2}>
+            {user?.name}
+          </Text>
+          {user?.type_schedule && (
+            <Text style={styles.userType}>
+              {helper.formatTypeSchedule(user.type_schedule)}
             </Text>
-            {user?.type_schedule && (
-              <>
-                <Text style={[styles.label, { color: 'rgba(255,255,255,0.7)' }]}>
-                  Tipo de agenda:
-                </Text>
-                <Text style={styles.userType}>
-                  {helper.formatTypeSchedule(user.type_schedule)}
-                </Text>
-              </>
-            )}
-          </View>
+          )}
         </View>
       </Animated.View>
 
-      {/* User Info Card */}
-      <Animated.View entering={FadeInUp.delay(300).springify()}>
+      {/* User Info Card - Simplified */}
+      <Animated.View 
+        entering={FadeInUp.delay(300).springify()}
+        style={styles.infoContainer}
+      >
         <Surface style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            <List.Icon icon="card-account-details-outline" color={theme.colors.primary} />
-            <View style={styles.infoText}>
-              <Text style={styles.value}>{helper.maskCpf(user?.cpf) || 'Carregando...'}</Text>
-              <Text style={styles.label}>CPF</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoRow}>
-            <List.Icon icon="email-outline" color={theme.colors.primary} />
-            <View style={styles.infoText}>
-              <Text style={styles.value}>{user?.email || 'Carregando...'}</Text>
-              <Text style={styles.label}>E-mail</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoRow}>
-            <List.Icon icon="phone-outline" color={theme.colors.primary} />
-            <View style={styles.infoText}>
-              <Text style={styles.value}>{helper.maskPhone(user?.phone) || 'Carregando...'}</Text>
-              <Text style={styles.label}>Celular</Text>
-            </View>
-          </View>
+          <InfoRow icon="card-account-details-outline" 
+            label="CPF"
+            value={helper.maskCpf(user?.cpf) || 'Carregando...'}
+            theme={theme}
+          />
+          <InfoRow icon="email-outline" 
+            label="E-mail"
+            value={user?.email || 'Carregando...'}
+            theme={theme}
+          />
+          <InfoRow icon="phone-outline" 
+            label="Celular"
+            value={helper.maskPhone(user?.phone) || 'Carregando...'}
+            theme={theme}
+          />
         </Surface>
       </Animated.View>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Redesigned */}
       <Animated.View
         style={styles.quickActions}
         entering={FadeInUp.delay(200).springify()}
       >
-        <Pressable
-          style={styles.actionButton}
+        <ActionButton
+          icon="pencil-outline"
+          label="Editar Perfil"
           onPress={() => navigation.navigate('FormProfile', { user })}
-        >
-          <List.Icon icon="pencil-outline" color={theme.colors.primary} />
-          <Text style={[styles.actionText, { color: theme.colors.primary }]}>Editar Perfil</Text>
-        </Pressable>
-        <View style={styles.actionDivider} />
-        <Pressable
-          style={styles.actionButton}
+          theme={theme}
+        />
+        <ActionButton
+          icon="lock-outline"
+          label="Alterar Senha"
           onPress={() => navigation.navigate('FomPasswordChange', { user })}
-        >
-          <List.Icon icon="lock-outline" color={theme.colors.primary} />
-          <Text style={[styles.actionText, { color: theme.colors.primary }]}>Alterar Senha</Text>
-        </Pressable>
-        <Pressable
-          style={styles.actionButton}
+          theme={theme}
+        />
+        <ActionButton
+          icon="account-cancel-outline"
+          label="Inativar Conta"
+          isDanger
           onPress={() => navigation.navigate('FomPasswordChange', { user })}
-        >
-          <List.Icon icon="account-cancel-outline" color="#ff4444" />
-          <Text style={styles.dangerText}>Inativar Conta</Text>
-        </Pressable>
+        />
       </Animated.View>
-
 
       <BannerAdComponent />
     </SafeAreaView>
   );
 }
 
+// Subcomponents for better organization
+const InfoRow = ({ icon, label, value, theme }) => (
+  <View style={styles.infoRow}>
+    <List.Icon icon={icon} color={theme.colors.primary} />
+    <View style={styles.infoText}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.value}>{value}</Text>
+    </View>
+  </View>
+);
+
+const ActionButton = ({ icon, label, onPress, theme, isDanger }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.actionButton,
+      {
+        backgroundColor: pressed ? 'rgba(0,0,0,0.05)' : '#fff',
+        transform: [{ scale: pressed ? 0.98 : 1 }],
+      }
+    ]}
+    onPress={onPress}
+  >
+    <Surface style={[
+      styles.actionButtonCard,
+      { borderColor: isDanger ? '#ff4444' : theme?.colors.primary }
+    ]}>
+      <List.Icon 
+        icon={icon} 
+        color={isDanger ? '#ff4444' : theme?.colors.primary} 
+      />
+      <Text style={[
+        styles.actionText, 
+        { color: isDanger ? '#ff4444' : theme?.colors.primary }
+      ]}>
+        {label}
+      </Text>
+    </Surface>
+  </Pressable>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   headerCard: {
-    margin: 16,
-    borderRadius: 20,
-    overflow: 'hidden',
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  avatarContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
+    padding: 24,
+    marginBottom: 16,
   },
   avatar: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
   profileInfo: {
-    marginLeft: 16,
-    flex: 1,
+    alignItems: 'center',
+    marginTop: 12,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flexWrap: 'wrap',
+    fontSize: 24,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 4,
   },
   userType: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 4,
+    fontSize: 14,
+    color: 'rgba(0,0,0,0.6)',
   },
-  quickActions: {
-    flexDirection: 'row',
-    margin: 16,
-    marginTop: 0,
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 8,
-    elevation: 2,
-  },
-  actionButton: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 12,
-  },
-  actionDivider: {
-    width: 1,
-    backgroundColor: '#eee',
-  },
-  actionText: {
-    marginTop: 4,
-    fontSize: 12,
-    fontWeight: '600',
+  infoContainer: {
+    paddingHorizontal: 16,
   },
   infoCard: {
-    margin: 16,
-    borderRadius: 15,
+    borderRadius: 12,
     backgroundColor: '#ffffff',
     padding: 16,
-    elevation: 2,
+    elevation: 1,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   infoText: {
     marginLeft: 12,
@@ -222,23 +210,40 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(0,0,0,0.5)',
     marginTop: 2,
   },
   value: {
     fontSize: 16,
-    color: '#333',
+    color: 'rgba(0,0,0,0.8)',
     fontWeight: '500',
   },
-  dangerButton: {
+  quickActions: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-around',
     padding: 16,
+    marginTop: 16,
+    gap: 8,
   },
-  dangerText: {
-    color: '#ff4444',
-    fontWeight: '600',
-    marginLeft: 8,
+  actionButton: {
+    flex: 1,
+    borderRadius: 12,
+    maxWidth: '30%',
+  },
+  actionButtonCard: {
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: '#fff',
+    elevation: 2,
+  },
+  actionText: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
 

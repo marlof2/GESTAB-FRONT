@@ -51,16 +51,15 @@ function AuthProvider({ children }) {
         if (token != null) {
             setLoading(true)
             const response = await api.get('/me')
-            const { status } = response
 
-            if (status == 401) {
+            if (response.status == 401) {
                 setLoading(false)
                 await AsyncStorage.clear();
                 navigation.navigate('SignIn')
                 setUser(null);
             }
 
-            if (status == 200) {
+            if (response.status == 200) {
                 setUser(response.data);
                 setLoading(false)
             }

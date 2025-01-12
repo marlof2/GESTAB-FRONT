@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, FlatList, SafeAreaView } from 'react-native';
-import { ActivityIndicator, FAB, Modal, Portal, Searchbar } from 'react-native-paper';
+import { ActivityIndicator, FAB, Modal, Portal, Searchbar, Menu, Divider } from 'react-native-paper';
 import styles from '../styles'
 import Header from '../../../components/Header';
 import api from "../../../services";
@@ -45,13 +45,20 @@ export default function Index({ route }) {
 
     }, [isFocused])
 
-    const getAll = async () => {
+    const getAll = async (status = 'waiting') => {
         if (loading) return;
         handleRefreshWithOutGetAll()
 
         setLoading(true);
 
-        const response = await api.get(`/list`, { params: search ? { search: search, ...dataParams, typeSchedule } : { ...dataParams, typeSchedule } })
+        const queryParams = {
+            ...dataParams,
+            typeSchedule,
+            clientsAttended: status,
+            ...(search && { search })
+        };
+
+        const response = await api.get('/list', { params: queryParams });
 
         if (response.status == 200) {
             setItems(response.data.data);
@@ -136,8 +143,37 @@ export default function Index({ route }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-
-            <Header title={title()} subtitle={subtitle()} description={description()} />
+            <Header
+                title={title()}
+                subtitle={subtitle()}
+                description={description()}
+                showMenu={true}
+            >
+                <Menu.Item
+                    dense
+                    leadingIcon="account-group"
+                    title="Clientes Atendidos"
+                    style={styles.menuItem}
+                    titleStyle={styles.menuItemText}
+                    rippleColor="rgba(0, 0, 0, .08)"
+                    onPress={() => {
+                        getAll('attended')
+                    }}
+                />
+                <Divider />
+                <Menu.Item
+                    dense
+                    leadingIcon="account-clock"
+                    title="Clientes em Espera"
+                    style={styles.menuItem}
+                    titleStyle={styles.menuItemText}
+                    rippleColor="rgba(0, 0, 0, .08)"
+                    onPress={() => {
+                        getAll()
+                    }}
+                    
+                />
+            </Header>
 
             <Searchbar
                 style={{ margin: 10, borderRadius: 15 }}
@@ -197,3 +233,4 @@ export default function Index({ route }) {
         </SafeAreaView>
     )
 }
+

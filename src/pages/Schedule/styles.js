@@ -20,7 +20,23 @@ const styles = StyleSheet.create({
     titleEstablishment: {
         fontSize: 16,
         fontWeight: 'bold',
-    }
+    },
+    menuItem: {
+        height: 44,
+        paddingHorizontal: 16,
+        borderRadius: 4,
+        marginHorizontal: 4,
+        marginVertical: 2,
+    },
+    menuItemText: {
+        fontSize: 16,
+        letterSpacing: 0.15,
+    },
+    divider: {
+        height: 1,
+        marginHorizontal: 8,
+        backgroundColor: 'rgba(0, 0, 0, 0.08)'
+    },
 })
 
 export default styles

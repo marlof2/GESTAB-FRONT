@@ -9,6 +9,7 @@ import {store} from '../src/store';
 import { Provider as StoreProvider } from 'react-redux';
 import theme from '../src/themes/theme.json'
 import { initializeAdMob } from '../src/components/AdsMob/config/initialize';
+import { PaymentProvider } from '../src/contexts/PaymentContext';
 
 initializeAdMob();
 
@@ -19,8 +20,10 @@ export default function App() {
       <NavigationContainer independent={true}>
         <PaperProvider theme={theme}>
           <AuthProvider>
-            <StatusBar backgroundColor={theme.colors.primary} barStyle='light-content' />
-            <Routes />
+            <PaymentProvider>
+              <StatusBar backgroundColor={theme.colors.primary} barStyle='light-content' />
+              <Routes />
+            </PaymentProvider>
           </AuthProvider>
         </PaperProvider>
       </NavigationContainer>

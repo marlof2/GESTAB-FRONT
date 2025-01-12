@@ -1,146 +1,266 @@
-import { useContext, useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import CheckoutMercadoPago from '../../services/paymentService/checkoutMercadoPago';
-import { AuthContext } from '../../contexts/auth';
 import Header from '../../components/Header';
 import api from "../../services";
+import { Button, Card, SegmentedButtons } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+import { format, isBefore, endOfDay } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-export default function PaymentPlans({ route }) {
+export default function EstablishmentInfo({ route }) {
+  const [activeSegment, setActiveSegment] = useState('active');
   const navigation = useNavigation();
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState(null);
-  const { user } = useContext(AuthContext)
-
+  const [establishmentInfo, setEstablishmentInfo] = useState(null);
   const { establishmentId, establishmentName } = route.params;
-  const plans = [
-    {
-      id: 1,
-      title: 'Plano Mensal',
-      pixPrice: 'R$ 29,99',
-      creditPrice: 'R$ 31,50',
-      features: ['Acesso ilimitado', 'Suporte prioritário', 'Sem anúncios'],
-    },
-    {
-      id: 2,
-      title: 'Plano Anual',
-      pixPrice: 'R$ 299,99',
-      creditPrice: 'R$ 397,99',
-      features: ['Acesso ilimitado', 'Suporte prioritário', 'Sem anúncios', '2 meses grátis'],
-    },
-  ];
 
-  function handleSelectPlan(planId) {
-    setSelectedPlan(planId);
-  }
-
-  async function checkActivePayment(establishmentId, userId) {
-    try {
-      const response = await api.get(`/payments/hasActivePayment/${establishmentId}`);
-      return response.data.isActive;
-    } catch (error) {
-      console.error('Error checking active payment:', error);
-      Alert.alert('Erro', 'Não foi possível verificar o status do pagamento.');
-      return false;
-    }
-  }
-
-  async function handlePayment() {
-    if (!selectedPlan || !paymentMethod) {
-      Alert.alert('Atenção', 'Por favor, selecione um plano e método de pagamento para continuar.');
-      return;
+  useEffect(() => {
+    async function loadEstablishmentInfo() {
+      try {
+        const response = await api.get(`/establishments/${establishmentId}`);
+        setEstablishmentInfo(response.data);
+      } catch (error) {
+        console.error('Error loading establishment info:', error);
+      }
     }
 
-    // Check for active payment before proceeding
-    const hasActive = await checkActivePayment(establishmentId, user.user.id);
-    if (hasActive) {
-      Alert.alert('Atenção', 'Você já possui um plano ativo para este estabelecimento.');
-      return;
-    }
+    loadEstablishmentInfo();
+  }, [establishmentId]);
 
-    // Proceed with checkout if no active payment
-    await CheckoutMercadoPago({
-      payment_method: paymentMethod,
-      user_id: user.user.id,
-      plan_id: selectedPlan,
-      establishment_id: establishmentId
+  const handleSubscribe = () => {
+    navigation.navigate('Plans', {
+      establishmentId,
+      establishmentName,
     });
-  }
+  };
+
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  };
+
+  const renderPaymentStatus = (payment) => {
+    if (!payment) return null;
+
+    const isExpired = isBefore(endOfDay(new Date(payment.subscription_end)), new Date());
+
+    return (
+      <Card style={styles.paymentCard}>
+        <Card.Content>
+          <View style={styles.statusHeader}>
+            <MaterialIcons 
+              name={isExpired ? "error" : "check-circle"} 
+              size={24} 
+              color={isExpired ? "#dc3545" : "#28a745"} 
+            />
+            <Text style={[
+              styles.statusText,
+              { color: isExpired ? "#dc3545" : "#28a745" }
+            ]}>
+              {isExpired ? 'Assinatura Vencida' : 'Assinatura Ativa'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Plano:</Text>
+            <Text style={styles.value}>
+              {payment.plan_id === 1 ? 'Mensal' : 'Anual'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Método:</Text>
+            <Text style={styles.value}>
+              {payment.payment_method === 'pix' ? 'PIX' : 'Cartão de Crédito'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Valor:</Text>
+            <Text style={styles.value}>
+              R$ {parseFloat(payment.amount).toFixed(2).replace('.', ',')}
+            </Text>
+          </View>
+
+          <View style={styles.dateContainer}>
+            <View style={styles.dateRow}>
+              <MaterialIcons name="event" size={20} color="#666" />
+              <Text style={styles.dateLabel}>Início:</Text>
+              <Text style={styles.dateValue}>
+                {formatDate(payment.subscription_start)}
+              </Text>
+            </View>
+            <View style={styles.dateRow}>
+              <MaterialIcons name="event" size={20} color="#666" />
+              <Text style={styles.dateLabel}>Término:</Text>
+              <Text style={styles.dateValue}>
+                {formatDate(payment.subscription_end)}
+              </Text>
+            </View>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
+
+  const renderNoSubscriptionWarning = () => (
+    <Card style={styles.warningCard}>
+      <Card.Content>
+        <View style={styles.warningHeader}>
+          <MaterialIcons 
+            name="warning" 
+            size={24} 
+            color="#ffc107" 
+          />
+          <Text style={styles.warningTitle}>Sem assinatura ativa</Text>
+        </View>
+        <Text style={styles.warningText}>
+          Você ainda não possui uma assinatura para este estabelecimento. 
+          Assine agora para ter acesso a todos os recursos!
+        </Text>
+        <Button
+          style={styles.button}
+          mode="contained"
+          icon="credit-card"
+          onPress={handleSubscribe}
+        >
+          Assinar Plano
+        </Button>
+      </Card.Content>
+    </Card>
+  );
+
+  const renderPaymentHistoryItem = (payment) => {
+    const isExpired = isBefore(endOfDay(new Date(payment.subscription_end)), new Date());
+
+    return (
+      <Card style={styles.historyCard} key={payment.id}>
+        <Card.Content>
+          <View style={styles.historyHeader}>
+            <MaterialIcons 
+              name={isExpired ? "error" : "check-circle"} 
+              size={24} 
+              color={isExpired ? "#dc3545" : "#28a745"} 
+            />
+            <Text style={[
+              styles.statusText,
+              { color: isExpired ? "#dc3545" : "#28a745" }
+            ]}>
+              {isExpired ? 'Assinatura Vencida' : 'Assinatura Ativa'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Plano:</Text>
+            <Text style={styles.value}>
+              {payment.plan_id === 1 ? 'Mensal' : 'Anual'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Método:</Text>
+            <Text style={styles.value}>
+              {payment.payment_method === 'pix' ? 'PIX' : 'Cartão de Crédito'}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Valor:</Text>
+            <Text style={styles.value}>
+              R$ {parseFloat(payment.amount).toFixed(2).replace('.', ',')}
+            </Text>
+          </View>
+
+          <View style={styles.dateContainer}>
+            <View style={styles.dateRow}>
+              <MaterialIcons name="event" size={20} color="#666" />
+              <Text style={styles.dateLabel}>Início:</Text>
+              <Text style={styles.dateValue}>
+                {formatDate(payment.subscription_start)}
+              </Text>
+            </View>
+            <View style={styles.dateRow}>
+              <MaterialIcons name="event" size={20} color="#666" />
+              <Text style={styles.dateLabel}>Término:</Text>
+              <Text style={styles.dateValue}>
+                {formatDate(payment.subscription_end)}
+              </Text>
+            </View>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
+
+  const ActivePlanTab = () => (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {establishmentInfo && (
+        <View style={styles.container}>
+          {establishmentInfo.payment ? (
+            renderPaymentStatus(establishmentInfo.payment)
+          ) : (
+            renderNoSubscriptionWarning()
+          )}
+        </View>
+      )}
+    </ScrollView>
+  );
+
+  const PaymentHistoryTab = () => (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {establishmentInfo?.payments?.length > 0 ? (
+          establishmentInfo.payments.map(payment => renderPaymentHistoryItem(payment))
+        ) : (
+          <Card style={styles.warningCard}>
+            <Card.Content>
+              <View style={styles.warningHeader}>
+                <MaterialIcons name="info" size={24} color="#666" />
+                <Text style={[styles.warningTitle, { color: '#666' }]}>
+                  Nenhum histórico encontrado
+                </Text>
+              </View>
+              <Text style={styles.warningText}>
+                Não há histórico de pagamentos para este estabelecimento.
+              </Text>
+            </Card.Content>
+          </Card>
+        )}
+      </View>
+    </ScrollView>
+  );
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
-      <Header title={'Escolha seu plano'} description={`Estabelecimento: ${establishmentName}`} />
+      <Header 
+        title='Informações do plano'
+        description={establishmentName}  
+      />
+      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Desbloqueie todos os recursos premium</Text>
+        <View style={styles.container}>
+          <SegmentedButtons
+            style={styles.segmentedButtons}
+            value={activeSegment}
+            onValueChange={setActiveSegment}
+            buttons={[
+              {
+                value: 'active',
+                label: 'Plano Ativo',
+                icon: 'credit-card',
+                style: { borderRadius: 10 }
+              },
+              {
+                value: 'history',
+                label: 'Histórico',
+                icon: 'history',
+                style: { borderRadius: 10 }
+              },
+            ]}
+          />
+          
+          {activeSegment === 'active' ? <ActivePlanTab /> : <PaymentHistoryTab />}
         </View>
-
-        <View style={styles.paymentMethodsContainer}>
-          <Text style={styles.paymentMethodTitle}>Método de Pagamento</Text>
-          <View style={styles.paymentOptions}>
-            <TouchableOpacity
-              style={[
-                styles.paymentMethodCard,
-                paymentMethod === 'pix' && styles.selectedPaymentMethod,
-              ]}
-              onPress={() => setPaymentMethod('pix')}
-            >
-              <MaterialIcons name="qr-code" size={24} color={paymentMethod === 'pix' ? '#007AFF' : '#000'} />
-              <Text style={styles.paymentMethodText}>PIX</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.paymentMethodCard,
-                paymentMethod === 'credit_card' && styles.selectedPaymentMethod,
-              ]}
-              onPress={() => setPaymentMethod('credit_card')}
-            >
-              <MaterialIcons name="credit-card" size={24} color={paymentMethod === 'credit_card' ? '#007AFF' : '#000'} />
-              <Text style={styles.paymentMethodText}>Cartão de Crédito</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.plansContainer}>
-          {plans.map((plan) => (
-            <TouchableOpacity
-              key={plan.id}
-              style={[
-                styles.planCard,
-                selectedPlan === plan.id && styles.selectedPlan,
-              ]}
-              onPress={() => handleSelectPlan(plan.id)}
-            >
-              <Text style={styles.planTitle}>{plan.title}</Text>
-              <Text style={styles.planPrice}>
-                {paymentMethod === 'credit_card' ? plan.creditPrice : plan.pixPrice}
-                {paymentMethod === 'pix' && <Text style={styles.pixDiscount}> (PIX)</Text>}
-              </Text>
-              <View style={styles.featuresContainer}>
-                {plan.features.map((feature, index) => (
-                  <View key={index} style={styles.featureRow}>
-                    <MaterialIcons name="check-circle" size={20} color="#007AFF" />
-                    <Text style={styles.featureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.paymentButton,
-            (!selectedPlan || !paymentMethod) && styles.paymentButtonDisabled,
-          ]}
-          onPress={handlePayment}
-          disabled={!selectedPlan || !paymentMethod}
-        >
-          <Text style={styles.paymentButtonText}>Continuar</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -149,121 +269,109 @@ export default function PaymentPlans({ route }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    // paddingTop: 0,
   },
   scrollContainer: {
     flexGrow: 1,
   },
-  header: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8,
-  },
-  plansContainer: {
+  container: {
     padding: 16,
   },
-  planCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 24,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+  button: {
+    marginTop: 20,
+    marginHorizontal: 16,
   },
-  selectedPlan: {
-    borderColor: '#007AFF',
-  },
-  planTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  planPrice: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 16,
-  },
-  featuresContainer: {
-    gap: 8,
-  },
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  featureText: {
-    fontSize: 14,
-    color: '#000000',
-  },
-  paymentButton: {
-    backgroundColor: '#007AFF',
-    padding: 14,
-    borderRadius: 8,
-    margin: 10,
-    alignItems: 'center',
-  },
-  paymentButtonDisabled: {
-    backgroundColor: '#CCCCCC',
-  },
-  paymentButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  paymentMethodsContainer: {
-    padding: 16,
-    paddingTop: 0,
-  },
-  paymentMethodTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  paymentOptions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  paymentMethodCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+  paymentCard: {
     elevation: 2,
   },
-  selectedPaymentMethod: {
-    borderColor: '#007AFF',
+  statusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
   },
-  paymentMethodText: {
-    marginTop: 4,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  pixDiscount: {
-    fontSize: 14,
+  statusText: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#28a745',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  label: {
+    fontSize: 16,
+    color: '#666',
+    width: 80,
+  },
+  value: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
+  },
+  dateContainer: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 16,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  dateLabel: {
+    fontSize: 14,
+    color: '#666',
+    width: 60,
+  },
+  dateValue: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  warningCard: {
+    elevation: 2,
+    backgroundColor: '#fff8e1',
+  },
+  warningHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffc107',
+  },
+  warningText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  tabBar: {
+    backgroundColor: '#fff',
+    elevation: 4,
+  },
+  tabView: {
+    flex: 1,
+  },
+  historyCard: {
+    marginBottom: 16,
+    elevation: 2,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  segmentedButtons: {
+    marginBottom: 16,
+    marginHorizontal: 16,
   },
 });

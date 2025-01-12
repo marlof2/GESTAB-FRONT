@@ -25,6 +25,13 @@ const getMenuItems = (navigation, isProfessional) => [
     onPress: () => navigation.navigate('MyEstablishments'),
   },
   {
+    key: 'switchEstablishment',
+    title: 'Trocar Estabelecimento',
+    description: 'Selecionar outro estabelecimento',
+    icon: 'swap-horizontal',
+    onPress: () => navigation.navigate('SelectEstablishment'),
+  },
+  {
     key: 'profile',
     title: 'Perfil',
     description: 'Dados do usuário',
