@@ -4,15 +4,12 @@ import { Avatar, Surface, useTheme, List, Text } from 'react-native-paper';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import Header from '../../components/Header';
 import { helper } from '../../helpers/inputs';
-// import { AuthContext } from '../../contexts/auth';
 import { useIsFocused } from '@react-navigation/native'
 import api from '../../services';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 
 
 export default function UserProfileView({ navigation }) {
-  // const { name, cpf, email, phone } = route.params.dataUser;
-  // const { loadStorage } = useContext(AuthContext)
   const isFocused = useIsFocused()
   const [user, setUser] = useState(null)
   const theme = useTheme();

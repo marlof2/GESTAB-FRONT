@@ -10,7 +10,13 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "app-bundle",
+        "releaseChannel": "production",
+        "gradleCommand": ":app:bundleRelease"
+      }
+    }
   },
   "submit": {
     "production": {}

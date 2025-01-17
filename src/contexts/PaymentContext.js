@@ -30,7 +30,7 @@ export function PaymentProvider({ children }) {
     }
   };
 
-  const handlePaymentFlow = async () => {
+  const RewardedAd = async () => {
     const hasValidPayment = await checkPayment();
     if (!hasValidPayment && !isAdLoading) {
       await showAd();
@@ -64,7 +64,7 @@ export function PaymentProvider({ children }) {
         isPaymentActive, 
         isLoading, 
         checkPayment,
-        handlePaymentFlow
+        RewardedAd
       }}
     >
       {children}

@@ -27,4 +27,12 @@ export default StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  explanationText: {
+    textAlign: 'center',
+    marginVertical: 16,
+  },
+  instructionText: {
+    marginVertical: 8,
+    paddingLeft: 16,
+  },
 }); 

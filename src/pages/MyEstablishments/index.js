@@ -110,7 +110,8 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.safeArea}>
 
-      <Header title={'Estabelecimentos Vinculados '} />
+      <Header title={'Estabelecimentos Vinculados '} subtitle={'Estabelecimentos vinculados a sua conta.'} />
+
 
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}

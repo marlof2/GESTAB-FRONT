@@ -115,7 +115,7 @@ export default function Index({ route }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Overlay isVisible={loadingBindEstablishment} />
-      <Header title={'Vincular Estabelecimento '} />
+      <Header title={'Vincular Estabelecimento '} subtitle={'Selecione os estabelecimentos que deseja vincular a sua conta.'} />
 
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}

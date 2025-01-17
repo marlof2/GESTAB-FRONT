@@ -1,15 +1,28 @@
-import React, { useContext } from "react";
-
+import React, { useContext, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import { ActivityIndicator, View } from "react-native";
 import AuthRoutes from "./auth.routes";
 import AppRoutes from "./app.routes.stack";
 import { AuthContext } from "../contexts/auth";
+import { setSessionExpired } from '../store/globalSlice';
 
 
 
 function Routes() {
 
-    const { signed, loading } = useContext(AuthContext)
+    const { signed, loading, signOut } = useContext(AuthContext)
+    const dispatch = useDispatch();
+    const isSessionExpired = useSelector(state => state.global.auth.isSessionExpired);
+
+    useEffect(() => {
+        if (isSessionExpired) {
+            signOut();
+            dispatch(setSessionExpired(false));
+        }
+
+
+
+    }, [isSessionExpired]);
 
     if (loading) {
         return (

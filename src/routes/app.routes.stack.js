@@ -15,31 +15,43 @@ import Feedbacks from '../pages/Feedbacks';
 import { createStackNavigator } from '@react-navigation/stack';
 import PaymentPlans from '../pages/PaymentsPlans';
 import Plans from '../pages/PaymentsPlans/components/Plans';
-
 import { SelectEstablishment } from '../pages/SelectEstablishment';
-
-
+import { getEstablishment } from "../helpers";
 import TabRoutes from '../routes/app.routes.tab'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
-async function getInitialRoute() {
-    try {
-        const establishmentIdLogged = await AsyncStorage.getItem('establishmentIdLogged')
-        return establishmentIdLogged ? 'TabRoutes' : 'SelectEstablishment'
-    } catch (error) {
-        console.error('Error reading from AsyncStorage:', error)
-        return 'SelectEstablishment'
-    }
-}
 
 function Routes() {
-    const [initialRoute, setInitialRoute] = React.useState('SelectEstablishment')
-    
+    const [initialRoute, setInitialRoute] = React.useState(null);
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    async function verifyEstablishmentLogged() {
+        try {
+            const estabelecimentoLogado = await getEstablishment();
+            if (estabelecimentoLogado) {
+                if (estabelecimentoLogado.id) {
+                    setInitialRoute('TabRoutes');
+                }
+            } else {
+                setInitialRoute('SelectEstablishment');
+            }
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Erro ao verificar estabelecimento:', error);
+            setInitialRoute('SelectEstablishment');
+            setIsLoading(false);
+        }
+
+    }
+
     React.useEffect(() => {
-        getInitialRoute().then(route => setInitialRoute(route))
-    }, [])
+        verifyEstablishmentLogged();
+    }, []);
+
+    if (isLoading) {
+        return null;
+    }
 
     return (
         <Stack.Navigator initialRouteName={initialRoute}>

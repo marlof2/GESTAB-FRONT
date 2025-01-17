@@ -23,6 +23,12 @@ export default function RenderItem({ data }) {
                     <Text style={styles.value}>{item.professional.name}</Text>
                 </View>
                 <View style={styles.row}>
+                    <Text style={styles.label}>Valor:</Text>
+                    <Text style={styles.value}>
+                        {helper.formatMoney(item.service.amount)}
+                    </Text>
+                </View>
+                <View style={styles.row}>
                     <Text style={styles.label}>Situação:</Text>
                     <Chip
                         style={[
@@ -33,12 +39,6 @@ export default function RenderItem({ data }) {
                     >
                         {item.status.name}
                     </Chip>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.label}>Valor:</Text>
-                    <Text style={styles.value}>
-                        {helper.formatMoney(item.service.amount)}
-                    </Text>
                 </View>
             </Card.Content>
         </Card>

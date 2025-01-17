@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 import { Alert } from 'react-native';
+import { store } from '../store';
+import { setSessionExpired } from '../store/globalSlice';
 
 
 const api = axios.create({
@@ -27,13 +29,8 @@ api.interceptors.request.use(
 
 
 api.interceptors.response.use(
-    response => {
-        // Qualquer código específico para tratar dados de resposta bem-sucedidos
-        return response;
-    },
-    error => {
-        return handleError(error.response)
-    }
+    response => response,
+    error => handleError(error.response)
 );
 
 
@@ -42,6 +39,9 @@ const handleError = async (response) => {
     let bodyMessage = "";
 
     switch (status) {
+        case 401:
+            store.dispatch(setSessionExpired(true));
+            return Promise.reject(response);
         case 406:
             if (data.message == "Usuário ou Senha Inválido.") {
                 return AlertModal('Atenção!', data.message)

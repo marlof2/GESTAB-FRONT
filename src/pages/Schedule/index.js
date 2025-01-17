@@ -12,8 +12,6 @@ import Dropdown from '../../components/Ui/Input/Dropdown';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import { Card } from 'react-native-paper';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
-import { useRewardedAd } from '../../components/AdsMob/hooks/useRewardedAd';
-import { checkEstablishmentPayment } from '../../helpers/checkPayment';
 import { getEstablishment } from '../../helpers';
 import { usePayment } from '../../contexts/PaymentContext';
 

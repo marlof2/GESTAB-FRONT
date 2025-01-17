@@ -26,23 +26,25 @@ function AuthProvider({ children }) {
         setLoadingAuth(true);
 
         try {
-            const { status, data } = await api.post('/logout');
 
-            if (status) {
-                if (status == 200) {
-                    await AsyncStorage.clear()
-                        .then(() => {
-                            setUser(null)
-                        })
-                    setLoadingAuth(false);
-                }
-            }
+            await AsyncStorage.clear()
+                .then(() => {
+                    setUser(null)
+                })
+            setLoadingAuth(false);
 
+
+            // const response = await api.post('/logout');
+
+            // if (response.status == 200) {
+            //     setLoadingAuth(false);
+            // }
 
         } catch (error) {
             console.log('erro ao logar', error)
             setLoadingAuth(false);
         }
+
 
     }
 
@@ -55,7 +57,6 @@ function AuthProvider({ children }) {
             if (response.status == 401) {
                 setLoading(false)
                 await AsyncStorage.clear();
-                navigation.navigate('SignIn')
                 setUser(null);
             }
 
@@ -63,6 +64,10 @@ function AuthProvider({ children }) {
                 setUser(response.data);
                 setLoading(false)
             }
+        } else {
+            setUser(null)
+            setLoading(false)
+            await AsyncStorage.clear();
         }
 
 

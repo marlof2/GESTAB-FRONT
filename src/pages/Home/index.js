@@ -1,50 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, useWindowDimensions, Platform } from "react-native";
 import { Card, List } from "react-native-paper";
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from "../../components/Header";
 import { useIsFocused } from '@react-navigation/native';
-import api from "../../services";
 import clearFiles from '../../system/deleteOldFiles'
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePayment } from '../../contexts/PaymentContext';
+import { AuthContext } from '../../contexts/auth';
+
 
 
 export default function Home({ navigation }) {
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [establishment, setEstablishment] = useState(null);
   const { checkPayment } = usePayment();
-
-  async function me() {
-    const response = await api.get('/me');
-
-    if (response.status == 401) {
-      await AsyncStorage.clear();
-      navigation.navigate('SignIn');
-      setUser(null);
-    }
-
-    if (response.status == 200) {
-      setUser(response.data.user);
-    }
-  }
-
+  const { signed, user } = useContext(AuthContext);
 
 
   useEffect(() => {
     if (isFocused) {
+      StatusBar.setBackgroundColor(theme.colors.primary);
       AsyncStorage.getItem('establishmentIdLogged').then(async (establishmentIdLogged) => {
         setEstablishment(JSON.parse(establishmentIdLogged))
+
       })
-      StatusBar.setBackgroundColor(theme.colors.primary);
-      me();
-      clearFiles();
+      // loadStorage();
+      // clearFiles();
       checkPayment();
     }
   }, [isFocused]);
@@ -63,7 +51,7 @@ export default function Home({ navigation }) {
       onPress: () => navigation.navigate('MyEstablishments'),
     },
     {
-      title: "Trocar Estabelecimento",
+      title: "Trocar de Estabelecimento",
       description: "Selecione outro estabelecimento.",
       icon: "swap-horizontal",
       onPress: () => navigation.navigate('SelectEstablishment'),
@@ -102,7 +90,7 @@ export default function Home({ navigation }) {
           style={styles.welcomeContainer}
         >
           <Text style={styles.welcomeText}>Bem-vindo!</Text>
-          <Text style={styles.userName}>{user?.name}</Text>
+          <Text style={styles.userName}>{user.user?.name}</Text>
           <Text style={styles.subtitle}>O que você gostaria de fazer hoje?</Text>
         </Animated.View>
 
