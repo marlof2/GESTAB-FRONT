@@ -96,7 +96,7 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.safeArea}>
 
-      <Header title={'Estabelecimentos'} />
+      <Header title={'Estabelecimentos'} subtitle={'Gerencie os estabelecimentos cadastrados'} />
 
       <Searchbar
         style={{ margin: 10, borderRadius: 15 }}

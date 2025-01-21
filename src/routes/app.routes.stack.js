@@ -18,6 +18,7 @@ import Plans from '../pages/PaymentsPlans/components/Plans';
 import { SelectEstablishment } from '../pages/SelectEstablishment';
 import { getEstablishment } from "../helpers";
 import TabRoutes from '../routes/app.routes.tab'
+import { SchedulingHistory } from '../pages/SchedulingHistory';
 
 const Stack = createStackNavigator();
 
@@ -170,6 +171,14 @@ function Routes() {
             <Stack.Screen
                 name="Plans"
                 component={Plans}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="SchedulingHistory"
+                component={SchedulingHistory}
                 options={{
                     headerShown: false
                 }}

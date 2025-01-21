@@ -29,7 +29,8 @@ const AppointmentsScreen = () => {
   const { user } = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState(null);
   const { RewardedAd } = usePayment();
-
+  
+  const today = new Date().toISOString().split('T')[0];
 
   const handleDatePress = async (day) => {
     if (!establishimentId || !professionalId) {
@@ -104,7 +105,7 @@ const AppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header title={'Filtro de Agenda'} showBack={false} />
+      <Header title={'📅 Agenda'}  subtitle={'        Filtra a agenda pelo estabelecimento e profissional'} showBack={false} />
       <View style={styles.container}>
         <Card style={styles.card}>
           <View style={styles.formContainer}>
@@ -153,6 +154,7 @@ const AppointmentsScreen = () => {
               onDayPress={handleDatePress}
               markedDates={{
                 [selectedDate]: { selected: true, marked: true, selectedColor: 'rgb(0, 104, 116)' },
+                [today]: { marked: true, selected: true }
               }}
               firstDay={1}
               style={styles.calendar}
