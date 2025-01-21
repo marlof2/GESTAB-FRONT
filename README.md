@@ -1,5 +1,9 @@
 # Welcome to your Expo app 👋
 
+1. React Native version: 0.74.1
+2. Expo version: 51.0.0
+
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started
