@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 import api from "../../services";
 import RenderItem from './componets/RenderItem'
 import theme from '../../themes/theme.json'
-import Form from './componets/Form';
+import Form from './componets/form';
 import Snackbar from '../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { infoModal, reloadItemsCard } from './reducer';
