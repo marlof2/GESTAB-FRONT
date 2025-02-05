@@ -20,7 +20,7 @@ import moment from 'moment';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import Dropdown from '../../components/Ui/Input/Dropdown';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
-import { getEstablishment } from '../../helpers';
+import { getEstablishmentStorage } from '../../helpers';
 import { usePayment } from '../../contexts/PaymentContext';
 LocaleConfigPt
 
@@ -176,7 +176,7 @@ const AppointmentsScreen = () => {
   };
 
   const setEstablishmentId = async () => {
-    const establishment = await getEstablishment();
+    const establishment = await getEstablishmentStorage();
     if (establishment?.id) {
       const establishmentItem = itemsEstablishment.find(
         item => item.establishment_id === establishment.id

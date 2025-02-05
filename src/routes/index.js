@@ -14,6 +14,7 @@ function Routes() {
     const dispatch = useDispatch();
     const isSessionExpired = useSelector(state => state.global.auth.isSessionExpired);
 
+    
     useEffect(() => {
         if (isSessionExpired) {
             signOut();

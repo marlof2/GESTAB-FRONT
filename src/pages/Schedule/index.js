@@ -12,7 +12,7 @@ import Dropdown from '../../components/Ui/Input/Dropdown';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
 import { Card } from 'react-native-paper';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
-import { getEstablishment } from '../../helpers';
+import { getEstablishmentStorage } from '../../helpers';
 import { usePayment } from '../../contexts/PaymentContext';
 
 LocaleConfigPt
@@ -66,7 +66,7 @@ const AppointmentsScreen = () => {
   }
 
   const setEstablishmentId = async () => {
-    const establishment = await getEstablishment();
+    const establishment = await getEstablishmentStorage();
     setEstablishimentId(establishment.id);
     getProfessionalByEstablishment(establishment.id);
   }

@@ -1,5 +1,5 @@
 import api from "../../services";
-import { getEstablishment } from "../../helpers";
+import { getEstablishmentStorage } from "../../helpers";
 
 /**
  * Verifica se o estabelecimento está com o pagamento ativo
@@ -9,7 +9,7 @@ import { getEstablishment } from "../../helpers";
 export async function checkEstablishmentPayment() {
   try {
     // Busca o ID do estabelecimento no AsyncStorage
-    const establishment = await getEstablishment()
+    const establishment = await getEstablishmentStorage()
 
     if (!establishment) {
       return false;

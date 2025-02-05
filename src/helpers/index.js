@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
- const getEstablishment = async () => {
+ const getEstablishmentStorage = async () => {
     const establishmentIdLogged = await AsyncStorage.getItem('establishmentIdLogged');
     const establishment = JSON.parse(establishmentIdLogged);  
 
@@ -11,4 +11,4 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
     return null;
   }
 
-  export { getEstablishment };
+  export { getEstablishmentStorage };

@@ -32,11 +32,11 @@ const getMenuItems = (navigation, isProfessional) => [
     onPress: () => navigation.navigate('SelectEstablishment'),
   },
   ...(isProfessional ? [{
-    key: 'scheduleBlock',
+    key: 'blockCalendar',
     title: 'Bloqueio de Agenda',
     description: 'Gerenciar bloqueios na agenda',
     icon: 'calendar-lock',
-    onPress: () => navigation.navigate('ScheduleBlock'),
+    onPress: () => navigation.navigate('BlockCalendarTabs'),
   }] : []),
   {
     key: 'profile',

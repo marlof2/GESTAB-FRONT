@@ -9,6 +9,7 @@ import Header from '../../components/Header';
 import api from '../../services';
 import { AuthContext } from '../../contexts/auth'
 import RenderItem from './components/RenderItem';
+import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 
 export function SchedulingHistory({ route }) {
     const [startDate, setStartDate] = useState(startOfMonth(new Date()));
@@ -46,16 +47,22 @@ export function SchedulingHistory({ route }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView 
+            style={{ flex: 1 }}
+            edges={['right', 'left', 'bottom']}
+        >
             <Header title="Histórico de Agendamentos" subtitle={establishment_name} />
 
-            <View style={{ flex: 1, padding: 16 }}>
+            <View style={{ padding: 16 }}>
                 <View style={{ gap: 16, marginBottom: 16 }}>
                     <TextInput
                         label="Data Início"
                         value={formatDate(startDate)}
                         onPressIn={() => setShowStartPicker(true)}
                         right={<TextInput.Icon icon="calendar" />}
+                        mode="outlined"
+                        dense
+                        outlineStyle={{ borderRadius: 10 }}
                     />
 
                     {showStartPicker && (
@@ -75,6 +82,9 @@ export function SchedulingHistory({ route }) {
                         value={formatDate(endDate)}
                         onPressIn={() => setShowEndPicker(true)}
                         right={<TextInput.Icon icon="calendar" />}
+                        mode="outlined"
+                        dense
+                        outlineStyle={{ borderRadius: 10 }}
                     />
 
                     {showEndPicker && (
@@ -98,19 +108,25 @@ export function SchedulingHistory({ route }) {
                     </Button>
                 </View>
 
-                <View style={{ flex: 1 }}>
+                <View>
                     <FlatList
                         data={schedules}
                         renderItem={(item) => <RenderItem data={item} />}
                         keyExtractor={(item) => item.id.toString()}
                         contentContainerStyle={{ padding: 8 }}
+                        ListEmptyComponent={
+                            <EmptyListMessage 
+                                count={schedules.length} 
+                                message="Nenhum agendamento encontrado para esta data." 
+                            />
+                        }
                     />
                     
-                    {schedules.length === 0 && !isLoading && (
+                    {/* {schedules.length === 0 && !isLoading && (
                         <Text style={{ textAlign: 'center', marginTop: 16 }}>
                             Nenhum agendamento encontrado
                         </Text>
-                    )}
+                    )} */}
                 </View>
             </View>
         </SafeAreaView>
