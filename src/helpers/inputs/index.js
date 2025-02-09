@@ -100,6 +100,15 @@ const formatTypeSchedule = (input) => {
     return input == 'HM' ? 'Horário marcado' : 'Ordem de chegada'
 };
 
+const formatDate = (input) => {
+    // Verifica se a entrada é válida
+    if (!input) return input;
+    
+    // Converte a data do formato ISO (YYYY-MM-DD) para o formato brasileiro (DD/MM/YYYY)
+    const [ano, mes, dia] = input.split('-');
+    return `${dia}/${mes}/${ano}`;
+};
+
 
 
 export const helper = {
@@ -111,5 +120,6 @@ export const helper = {
     formatMoney,
     formatMoneyRemoveCaracters,
     formatTime,
-    formatTypeSchedule
+    formatTypeSchedule,
+    formatDate
 };

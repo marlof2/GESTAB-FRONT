@@ -27,18 +27,17 @@ function AuthProvider({ children }) {
 
         try {
 
-            await AsyncStorage.clear()
-                .then(() => {
-                    setUser(null)
-                })
-            setLoadingAuth(false);
+            const response = await api.post('/logout');
 
+            if (response.status == 401 || response.status == 200) {
 
-            // const response = await api.post('/logout');
+                await AsyncStorage.clear()
+                    .then(() => {
+                        setUser(null)
+                    })
+                setLoadingAuth(false);
+            } 
 
-            // if (response.status == 200) {
-            //     setLoadingAuth(false);
-            // }
 
         } catch (error) {
             console.log('erro ao logar', error)
@@ -56,8 +55,8 @@ function AuthProvider({ children }) {
 
             if (response.status == 401) {
                 setLoading(false)
-                await AsyncStorage.clear();
                 setUser(null);
+                await AsyncStorage.clear();
             }
 
             if (response.status == 200) {

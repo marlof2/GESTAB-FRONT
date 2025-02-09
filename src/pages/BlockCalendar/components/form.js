@@ -16,33 +16,20 @@ export default function BlockCalendar() {
   const dispatch = useDispatch();
   const { user } = useContext(AuthContext);
   const [selectedDates, setSelectedDates] = useState({});
+  const [establishment, setEstablishment] = useState(null);
   const [period, setPeriod] = useState('allday');
   const [timeStart, setTimeStart] = useState('');
   const [timeEnd, setTimeEnd] = useState('');
-  const [establishment, setEstablishment] = useState(null);
-  const [blocks, setBlocks] = useState([]);
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
 
   useEffect(() => {
     async function loadEstablishment() {
       const establishmentData = await getEstablishmentStorage();
       setEstablishment(establishmentData);
-      loadBlocks();
     }
     loadEstablishment();
   }, []);
 
-  useEffect(() => {
-  }, [timeStart, timeEnd]);
-
-  async function loadBlocks() {
-    try {
-      const response = await api.get('/blockcalendars');
-      setBlocks(response.data);
-    } catch (error) {
-      console.error('Erro ao carregar bloqueios:', error);
-    }
-  }
 
   const handleDayPress = (day) => {
     const updatedDates = { ...selectedDates };
@@ -58,14 +45,19 @@ export default function BlockCalendar() {
   };
 
   const handleSaveBlock = async () => {
+    if (!timeStart || !timeEnd) {
+      dispatch(setSnackbar({ visible: true, title: 'Selecione o horário do bloqueio!' }));
+      return;
+    }
+
     const dates = Object.keys(selectedDates);
     const blocks = dates.map(date => ({
       establishment_id: establishment?.id,
       user_id: user?.user.id,
       date,
       period,
-      time_start: period === 'personalized' ? timeStart : null,
-      time_end: period === 'personalized' ? timeEnd : null,
+      time_start: timeStart,
+      time_end: timeEnd,
     }));
 
     try {
@@ -76,7 +68,6 @@ export default function BlockCalendar() {
         setPeriod('allday');
         setTimeStart('');
         setTimeEnd('');
-        loadBlocks();
       }
     } catch (error) {
       dispatch(setSnackbar({ visible: true, title: 'Erro ao salvar bloqueio!' }));
@@ -138,12 +129,6 @@ export default function BlockCalendar() {
                   },
                 ]}
                 style={styles.segmentedPair}
-                theme={{
-                  colors: {
-                    primary: '#2196F3',
-                    secondaryContainer: '#E3F2FD',
-                  },
-                }}
               />
             </View>
             <View style={styles.segmentedRow}>
@@ -165,26 +150,10 @@ export default function BlockCalendar() {
                   },
                 ]}
                 style={styles.segmentedPair}
-                theme={{
-                  colors: {
-                    primary: '#2196F3',
-                    secondaryContainer: '#E3F2FD',
-                  },
-                }}
               />
             </View>
-            <Button
-              mode={period === 'personalized' ? 'contained' : 'outlined'}
-              onPress={() => setPeriod('personalized')}
-              icon="clock-edit-outline"
-              style={styles.personalizedButton}
-            >
-              Personalizado
-            </Button>
           </View>
-        </View>
-
-        {period === 'personalized' && (
+          
           <View style={styles.timeContainer}>
             <Button 
               mode="outlined" 
@@ -196,7 +165,7 @@ export default function BlockCalendar() {
                 : 'Selecionar Horário'}
             </Button>
           </View>
-        )}
+        </View>
 
         <Button 
           mode="contained" 
@@ -379,11 +348,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-  },
-  personalizedButton: {
-    marginTop: 5,
-    borderRadius: 20,
-    width: '100%',
   },
   timeContainer: {
     padding: 16,

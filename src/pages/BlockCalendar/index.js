@@ -13,23 +13,29 @@ import { setSnackbar } from '../../store/globalSlice';
 import ModalDelete from './components/modalDelete';
 import { useIsFocused } from '@react-navigation/native';
 import { getEstablishmentStorage } from '../../helpers';
+import { AuthContext } from '../../contexts/auth';
+import { helper } from '../../helpers/inputs';
 
 function BlockItem({ item, onDelete }) {
   const formatTime = (timeString) => {
-    if (!timeString) return '';
+    if (!timeString) return '00:00';
     const [hours, minutes] = timeString.split(':');
     return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
   };
 
   const getPeriodLabel = (period) => {
-    const labels = {
+    const periodTranslation = {
       allday: 'Dia Todo',
       morning: 'Manhã',
       afternoon: 'Tarde',
-      night: 'Noite',
-      personalized: `${formatTime(item.time_start)} - ${formatTime(item.time_end)}`
+      night: 'Noite'
     };
-    return labels[period] || period;
+
+    const formattedStartTime = formatTime(item.time_start);
+    const formattedEndTime = formatTime(item.time_end);
+    const timeRange = `${formattedStartTime} - ${formattedEndTime}`;
+
+    return `${periodTranslation[period] || period} (${timeRange})`;
   };
 
   return (
@@ -56,6 +62,7 @@ function BlockItem({ item, onDelete }) {
 }
 
 export default function ListBlockCalendar() {
+  const { user } = useContext(AuthContext);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [blocks, setBlocks] = useState([]);
@@ -91,7 +98,7 @@ export default function ListBlockCalendar() {
     }
   };
 
-  const loadBlocks = async (pageUrl = null) => {
+  const loadBlocks = async (pageUrl = null, establishmentId = null) => {
     if (loading) return;
 
     setLoading(true);
@@ -102,7 +109,9 @@ export default function ListBlockCalendar() {
       const response = await api.get(url, {
         params: { 
           start_date: formattedStartDate,
-          end_date: formattedEndDate
+          end_date: formattedEndDate,
+          establishment_id: establishmentId || establishment?.id,
+          user_id: user.user?.id
         }
       });
 
@@ -121,20 +130,25 @@ export default function ListBlockCalendar() {
   };
 
   useEffect(() => {
-    async function loadEstablishment() {
-      const establishmentData = await getEstablishmentStorage();
-      setEstablishment(establishmentData);
+    async function initializeData() {
+      if (isFocused) {
+        try {
+          const establishmentData = await getEstablishmentStorage();
+          setEstablishment(establishmentData);
+          await loadBlocks(null, establishmentData.id);
+        } catch (error) {
+          console.error('Erro ao inicializar dados:', error);
+        }
+      }
     }
-    loadEstablishment();
-  }, []);
 
-  useEffect(() => {
-    if (isFocused) {
+    initializeData();
+
+    return () => {
       setBlocks([]);
       setNextPageUrl(null);
-      loadBlocks();
     }
-  }, [isFocused]); // Executa quando o foco da tela muda
+  }, [isFocused]);
 
   const handleLoadMore = () => {
     if (nextPageUrl) {

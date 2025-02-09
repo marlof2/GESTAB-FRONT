@@ -5,7 +5,7 @@ import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from "../../components/Header";
 import { useIsFocused } from '@react-navigation/native';
-import clearFiles from '../../system/deleteOldFiles'
+// import clearFiles from '../../system/deleteOldFiles'
 import { StatusBar } from 'react-native';
 import theme from '../../../src/themes/theme.json'
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
@@ -15,13 +15,13 @@ import { AuthContext } from '../../contexts/auth';
 
 
 
+
 export default function Home({ navigation }) {
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
-  // const [user, setUser] = useState(null);
   const [establishment, setEstablishment] = useState(null);
   const { checkPayment } = usePayment();
-  const { signed, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
 
   useEffect(() => {
@@ -31,7 +31,6 @@ export default function Home({ navigation }) {
         setEstablishment(JSON.parse(establishmentIdLogged))
 
       })
-      // loadStorage();
       // clearFiles();
       checkPayment();
     }
@@ -77,6 +76,7 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView style={styles.background} edges={['left', 'right']}>
       <Header title={titleHome()} showBack={false} showMenu={false} />
+
 
       <Animated.ScrollView
         entering={FadeInUp}

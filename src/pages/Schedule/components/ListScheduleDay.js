@@ -18,7 +18,7 @@ import Form from './Form';
 import { helper } from '../../../helpers/inputs';
 
 export default function Index({ route }) {
-    const { date, establishment_id, professional_id, professional_name, typeSchedule } = route.params;
+    const { date, establishment_id, professional_id, professional_name, typeSchedule, block_calendar_id } = route.params;
     const dataParams = {
         date, establishment_id, professional_id
     }
@@ -123,7 +123,8 @@ export default function Index({ route }) {
                     establishment_id,
                     date,
                     professional_id,
-                    typeSchedule
+                    typeSchedule,
+                    block_calendar_id
                 }
             }));
     }

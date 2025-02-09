@@ -15,9 +15,9 @@ export const global = createSlice({
         setSnackbar: (state, action) => {
             state.snackbar = action.payload;
         },
-        setSessionExpired: (state, action) => {
-            state.auth.isSessionExpired = action.payload;
-        }
+        // setSessionExpired: (state, action) => {
+        //     state.auth.isSessionExpired = action.payload;
+        // }
     },
 });
 

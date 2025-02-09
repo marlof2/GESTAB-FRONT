@@ -376,8 +376,7 @@ const AppointmentsScreen = () => {
       <View style={styles.container}>
         {!showReport ? (
           <>
-            <Card style={{ padding: 10 }}>
-              <View style={styles.containerDropdown}>
+            <Card style={{ padding: 15 }}>
                 <Dropdown
                   disable={true}
                   label="Estabelecimento"
@@ -409,8 +408,6 @@ const AppointmentsScreen = () => {
 
                 {DropdownServices()}
 
-
-              </View>
               <View style={styles.calendarContainer}>
                 <Calendar
                   onDayPress={handleDatePress}
