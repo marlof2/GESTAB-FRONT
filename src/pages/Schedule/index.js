@@ -55,7 +55,7 @@ const AppointmentsScreen = () => {
       );
     }
     setSelectedDate(day.dateString);
-    
+
     // Atualiza os markedDates com a nova seleção
     const newMarkedDates = {};
     blocks.forEach(block => {
@@ -101,10 +101,10 @@ const AppointmentsScreen = () => {
 
     await RewardedAd();
     const professional = itemsProfessional.find(el => el.user.id == professionalId);
-    
+
     // Encontrar o bloco para a data selecionada
     const selectedBlock = blocks.find(block => block.date === selectedDate);
-    
+
     const objParams = {
       date: selectedDate,
       establishment_id: establishimentId,
@@ -207,7 +207,7 @@ const AppointmentsScreen = () => {
 
     if (response.status == 200) {
       setItemsProfessional(response.data);
-      
+
       // Se houver apenas um profissional, seleciona-o automaticamente
       if (response.data.length === 1) {
         const professional = response.data[0];
@@ -221,131 +221,133 @@ const AppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header title={'📅 Filtro de Agenda'} subtitle={'Filtra a agenda pelo estabelecimento e profissional'} showBack={false} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <Card style={styles.card}>
-            <View style={styles.formContainer}>
-              <Dropdown
-                disable={true}
-                label="Estabelecimento"
-                data={itemsEstablishment}
-                placeholder="Selecione o estabelecimento"
-                value={establishimentId}
-                onChange={(item) => {
-                  if (item) {
-                    setEstablishimentId(item.establishment_id);
-                    // getProfessionalByEstablishment(item.establishment_id);
-                    setSelectedDate(null);
-                  } else {
-                    setEstablishimentId(null);
-                  }
-                }}
-                labelField="establishments.name"
-                valueField="establishments.id"
-              />
+      <Header title={'📅 Filtro de Agenda'} subtitle={'Para proseguir, selecione o profissional e a data para filtrar a agenda.'} showBack={false} />
+      <View style={styles.mainContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <Card style={styles.card}>
+              <View style={styles.formContainer}>
+                <Dropdown
+                  disable={true}
+                  label="Estabelecimento"
+                  data={itemsEstablishment}
+                  placeholder="Selecione o estabelecimento"
+                  value={establishimentId}
+                  onChange={(item) => {
+                    if (item) {
+                      setEstablishimentId(item.establishment_id);
+                      // getProfessionalByEstablishment(item.establishment_id);
+                      setSelectedDate(null);
+                    } else {
+                      setEstablishimentId(null);
+                    }
+                  }}
+                  labelField="establishments.name"
+                  valueField="establishments.id"
+                />
 
-              <Dropdown
-                label="Profissional"
-                data={itemsProfessional}
-                placeholder="Selecione o profissional"
-                value={professionalId}
-                onChange={(item) => {
-                  if (item) {
-                    setProfessionalId(item.user_id);
-                    getBlockCalendarByEstablishmentAndUser(establishimentId, item.user_id);
-                    setTypeSchedule(item.user.type_schedule);
-                    setSelectedDate(null);
-                  } else {
-                    setProfessionalId(null);
-                    setBlocks([]);
-                    setMarkedDates({});
-                  }
-                }}
-                labelField="user.name"
-                valueField="user.id"
-              />
-            </View>
+                <Dropdown
+                  label="Profissional"
+                  data={itemsProfessional}
+                  placeholder="Selecione o profissional"
+                  value={professionalId}
+                  onChange={(item) => {
+                    if (item) {
+                      setProfessionalId(item.user_id);
+                      getBlockCalendarByEstablishmentAndUser(establishimentId, item.user_id);
+                      setTypeSchedule(item.user.type_schedule);
+                      setSelectedDate(null);
+                    } else {
+                      setProfessionalId(null);
+                      setBlocks([]);
+                      setMarkedDates({});
+                    }
+                  }}
+                  labelField="user.name"
+                  valueField="user.id"
+                />
+              </View>
 
-            {blocks.length > 0 && (
-              <>
-                <View style={styles.blockedTimesContainer}>
-                  <Text style={styles.blockedTimesTitle}>Dias com bloqueios</Text>
-                  
-                  {blocks.map((block, index) => (
-                    <View key={index} style={styles.blockedTimeRow}>
-                      <View style={[styles.periodDot, { backgroundColor: periodColors[block.period] }]} />
-                      <Text style={styles.blockedTimeText}>
-                        {`${moment(block.date).format('DD/MM/YYYY')} - ${periodTranslation[block.period]}: ${
-                          block.time_start && block.time_end
-                            ? `${block.time_start.substring(0, 5)} - ${block.time_end.substring(0, 5)}`
-                            : ''
-                        }`}
-                      </Text>
-                    </View>
-                  ))}
+              {blocks.length > 0 && (
+                <>
+                  <View style={styles.blockedTimesContainer}>
+                    <Text style={styles.blockedTimesTitle}>Dias com bloqueios</Text>
 
-                  <Divider style={{ marginVertical: 12, marginHorizontal: 0 }} />
-                  
-                  <View style={styles.legendContainer}>
-                  <View style={styles.legendItem}>
-                      <Text style={styles.legendItem}>Legenda:</Text>
-                    </View>
-                    <View style={styles.legendItem}>
-                      <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
-                      <Text style={styles.legendText}>Dia Todo</Text>
-                    </View>
-                    <View style={styles.legendItem}>
-                      <View style={[styles.dot, { backgroundColor: '#4CAF50' }]} />
-                      <Text style={styles.legendText}>Manhã</Text>
-                    </View>
-                    <View style={styles.legendItem}>
-                      <View style={[styles.dot, { backgroundColor: '#2196F3' }]} />
-                      <Text style={styles.legendText}>Tarde</Text>
-                    </View>
-                    <View style={styles.legendItem}>
-                      <View style={[styles.dot, { backgroundColor: '#9C27B0' }]} />
-                      <Text style={styles.legendText}>Noite</Text>
+                    {blocks.map((block, index) => (
+                      <View key={index} style={styles.blockedTimeRow}>
+                        <View style={[styles.periodDot, { backgroundColor: periodColors[block.period] }]} />
+                        <Text style={styles.blockedTimeText}>
+                          {`${moment(block.date).format('DD/MM/YYYY')} - ${periodTranslation[block.period]}: ${block.time_start && block.time_end
+                              ? `${block.time_start.substring(0, 5)} - ${block.time_end.substring(0, 5)}`
+                              : ''
+                            }`}
+                        </Text>
+                      </View>
+                    ))}
+
+                    <Divider style={{ marginVertical: 12, marginHorizontal: 0 }} />
+
+                    <View style={styles.legendContainer}>
+                      <View style={styles.legendItem}>
+                        <Text style={styles.legendItem}>Legenda:</Text>
+                      </View>
+                      <View style={styles.legendItem}>
+                        <View style={[styles.dot, { backgroundColor: '#F44336' }]} />
+                        <Text style={styles.legendText}>Dia Todo</Text>
+                      </View>
+                      <View style={styles.legendItem}>
+                        <View style={[styles.dot, { backgroundColor: '#4CAF50' }]} />
+                        <Text style={styles.legendText}>Manhã</Text>
+                      </View>
+                      <View style={styles.legendItem}>
+                        <View style={[styles.dot, { backgroundColor: '#2196F3' }]} />
+                        <Text style={styles.legendText}>Tarde</Text>
+                      </View>
+                      <View style={styles.legendItem}>
+                        <View style={[styles.dot, { backgroundColor: '#9C27B0' }]} />
+                        <Text style={styles.legendText}>Noite</Text>
+                      </View>
                     </View>
                   </View>
-                </View>
+                </>
+              )}
+              <View style={styles.calendarContainer}>
+                <Calendar
+                  onDayPress={handleDatePress}
+                  markedDates={markedDates}
+                  firstDay={1}
+                  style={styles.calendar}
+                  markingType={'multi-dot'}
+                  theme={{
+                    backgroundColor: '#ffffff',
+                    calendarBackground: '#ffffff',
+                    textSectionTitleColor: 'rgb(0, 104, 116)',
+                    selectedDayBackgroundColor: 'rgb(0, 104, 116)',
+                    selectedDayTextColor: '#ffffff',
+                    todayTextColor: 'rgb(0, 104, 116)',
+                    dayTextColor: '#2d4150',
+                    arrowColor: 'rgb(0, 104, 116)',
+                  }}
+                />
+              </View>
 
-                <View style={styles.calendarContainer}>
-                  <Calendar
-                    onDayPress={handleDatePress}
-                    markedDates={markedDates}
-                    firstDay={1}
-                    style={styles.calendar}
-                    markingType={'multi-dot'}
-                    theme={{
-                      backgroundColor: '#ffffff',
-                      calendarBackground: '#ffffff',
-                      textSectionTitleColor: 'rgb(0, 104, 116)',
-                      selectedDayBackgroundColor: 'rgb(0, 104, 116)',
-                      selectedDayTextColor: '#ffffff',
-                      todayTextColor: 'rgb(0, 104, 116)',
-                      dayTextColor: '#2d4150',
-                      arrowColor: 'rgb(0, 104, 116)',
-                    }}
-                  />
-                </View>
-
-                <Card.Actions style={styles.cardActions}>
-                  <Button
-                    mode="contained"
-                    onPress={handleNavigateToSchedule}
-                    style={styles.scheduleButton}
-                    disabled={!selectedDate}
-                  >
-                    Ir para agenda
-                  </Button>
-                </Card.Actions>
-              </>
-            )}
-          </Card>
+              <Card.Actions style={styles.cardActions}>
+                <Button
+                  mode="contained"
+                  onPress={handleNavigateToSchedule}
+                  style={styles.scheduleButton}
+                  disabled={!selectedDate}
+                >
+                  Ir para agenda
+                </Button>
+              </Card.Actions>
+            </Card>
+          </View>
+        </ScrollView>
+        <View style={styles.bannerContainer}>
+          <BannerAdComponent />
         </View>
-        <BannerAdComponent />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -355,8 +357,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  mainContainer: {
+    flex: 1,
+  },
   scrollContainer: {
     flexGrow: 1,
+    paddingBottom: 60,
   },
   container: {
     flex: 1,
@@ -457,6 +463,13 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#666',
+  },
+  bannerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#f5f5f5',
   },
 });
 
