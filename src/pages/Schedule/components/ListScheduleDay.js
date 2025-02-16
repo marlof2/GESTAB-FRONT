@@ -18,7 +18,7 @@ import Form from './Form';
 import { helper } from '../../../helpers/inputs';
 
 export default function Index({ route }) {
-    const { date, establishment_id, professional_id, professional_name, typeSchedule, block_calendar_id } = route.params;
+    const { date, establishment_id, professional_id, professional_name, typeSchedule, block_calendar_id, client_can_schedule } = route.params;
     const dataParams = {
         date, establishment_id, professional_id
     }
@@ -211,13 +211,15 @@ export default function Index({ route }) {
                 </KeyboardAvoidingView>
             </View>
 
-            <FAB
-                color={theme.colors.white}
-                label='Agendar'
-                icon="calendar-account"
-                style={styles.fab}
-                onPress={openModal}
-            />
+            {client_can_schedule == 1 && (
+                <FAB
+                    color={theme.colors.white}
+                    label='Agendar'
+                    icon="calendar-account"
+                    style={styles.fab}
+                    onPress={openModal}
+                />
+            )}
 
 
             <Portal>

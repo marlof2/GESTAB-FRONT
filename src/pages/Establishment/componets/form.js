@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button, TextInput, Text, Card, RadioButton, IconButton } from 'react-native-paper';
+import { Button, TextInput, Text, Card, IconButton, SegmentedButtons } from 'react-native-paper';
 import styles from '../styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -26,6 +26,7 @@ export default function Form() {
     type_of_person_id: Yup.number().required('Campo obrigatório'),
     name: Yup.string().required('Campo obrigatório'),
     responsible_id: Yup.number().required('Campo obrigatório'),
+    client_can_schedule: Yup.boolean(),
     cpf: Yup.string().when('type_of_person_id', {
       is: (value) => value === 1,
       then: (schema) => schema
@@ -65,6 +66,7 @@ export default function Form() {
     if (modalForm?.data?.id == null) {
       setLoading(true);
       try {
+
         const { status } = await api.post('/establishments', obj);
 
         if (status == 201) {
@@ -139,7 +141,15 @@ export default function Form() {
           />
           <Card.Content>
             <Formik
-              initialValues={{ name: '', type_of_person_id: 1, phone: '', cpf: '', cnpj: '', responsible_id: null, }}
+              initialValues={{
+                name: '',
+                type_of_person_id: 1,
+                phone: '',
+                cpf: '',
+                cnpj: '',
+                responsible_id: null,
+                client_can_schedule: 0
+              }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
                 saveForm(values);
@@ -155,31 +165,37 @@ export default function Form() {
                     setFieldValue('cnpj', helper.maskCnpj(modalForm.data.cnpj));
                     setFieldValue('phone', helper.maskPhone(modalForm.data.phone));
                     setFieldValue('responsible_id', modalForm.data.responsible_id);
+                    setFieldValue('client_can_schedule', modalForm.data.client_can_schedule);
                   }
 
                 }, [modalForm.action]);
 
                 return (
                   <View>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Você é?</Text>
-                    <RadioButton.Group
-                      onValueChange={(value) => setFieldValue('type_of_person_id', value)}
-                      value={values.type_of_person_id}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
-                          <RadioButton value={1} />
-                          <Text>Pessoa Física</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RadioButton value={2} />
-                          <Text>Pessoa Jurídica</Text>
-                        </View>
-                      </View>
-                    </RadioButton.Group>
+                    <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Tipo de pessoa</Text>
+                    <SegmentedButtons
+                      value={String(values.type_of_person_id)}
+                      onValueChange={(value) => setFieldValue('type_of_person_id', parseInt(value))}
+                      buttons={[
+                        { value: '1', label: 'Pessoa Física' },
+                        { value: '2', label: 'Pessoa Jurídica' },
+                      ]}
+                      style={{ marginBottom: 15 }}
+                    />
                     {touched.type_of_person_id && errors.type_of_person_id && (
                       <Text style={styles.errorText}>{errors.type_of_person_id}</Text>
                     )}
+
+                    <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Cliente poderá fazer agendamento?</Text>
+                    <SegmentedButtons
+                      value={values.client_can_schedule}
+                      onValueChange={(value) => setFieldValue('client_can_schedule', value)}
+                      buttons={[
+                        { value: 1, label: 'Sim' },
+                        { value: 0, label: 'Não' },
+                      ]}
+                      style={{ marginBottom: 15 }}
+                    />
 
 
                     <TextInput
@@ -260,6 +276,7 @@ export default function Form() {
                     {touched.responsible_id && errors.responsible_id && (
                       <Text style={styles.errorText}>{errors.responsible_id}</Text>
                     )}
+
 
                     <Button
                       style={styles.button}

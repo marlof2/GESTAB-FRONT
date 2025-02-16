@@ -31,6 +31,7 @@ const AppointmentsScreen = () => {
   const { RewardedAd } = usePayment();
   const [blocks, setBlocks] = useState([])
   const [markedDates, setMarkedDates] = useState({});
+  const [currentMonth, setCurrentMonth] = useState(moment().format('YYYY-MM'));
 
   const periodTranslation = {
     allday: 'Dia Todo',
@@ -99,8 +100,9 @@ const AppointmentsScreen = () => {
       );
     }
 
-    await RewardedAd();
+    // await RewardedAd();
     const professional = itemsProfessional.find(el => el.user.id == professionalId);
+    const establishmentUser = itemsEstablishment.find(el => el.establishment_id == establishimentId);
 
     // Encontrar o bloco para a data selecionada
     const selectedBlock = blocks.find(block => block.date === selectedDate);
@@ -112,7 +114,8 @@ const AppointmentsScreen = () => {
       professional_name: professional.user.name,
       user: user.user,
       typeSchedule,
-      block_calendar_id: selectedBlock?.id || null
+      block_calendar_id: selectedBlock?.id || null,
+      client_can_schedule: establishmentUser.establishments.client_can_schedule
     };
 
     navigation.navigate('ListScheduleDay', objParams);
@@ -185,8 +188,21 @@ const AppointmentsScreen = () => {
     setMarkedDates(newMarkedDates);
   };
 
-  const getBlockCalendarByEstablishmentAndUser = async (establishmentId, professionalId) => {
-    const response = await api.get(`/blockcalendars/getBlockCalendarByEstablishmentAndUser/${establishmentId}/${professionalId}`);
+  const handleMonthChange = (month) => {
+    setCurrentMonth(month.dateString.substring(0, 7)); // Formato YYYY-MM
+    if (establishimentId && professionalId) {
+      getBlockCalendarByEstablishmentAndUser(establishimentId, professionalId, month.dateString.substring(0, 7));
+    }
+  };
+
+  const getBlockCalendarByEstablishmentAndUser = async (establishmentId, professionalId, month = currentMonth) => {
+    const response = await api.get('/blockcalendars/getBlockCalendarByEstablishmentAndUser', {
+      params: {
+        establishmentId,
+        professionalId,
+        month
+      }
+    });
 
     if (response.status == 200) {
       setBlocks(response.data);
@@ -271,13 +287,13 @@ const AppointmentsScreen = () => {
               {blocks.length > 0 && (
                 <>
                   <View style={styles.blockedTimesContainer}>
-                    <Text style={styles.blockedTimesTitle}>Dias com bloqueios</Text>
+                    <Text style={styles.blockedTimesTitle}>Agenda com dias bloqueados</Text>
 
                     {blocks.map((block, index) => (
                       <View key={index} style={styles.blockedTimeRow}>
                         <View style={[styles.periodDot, { backgroundColor: periodColors[block.period] }]} />
                         <Text style={styles.blockedTimeText}>
-                          {`${moment(block.date).format('DD/MM/YYYY')} - ${periodTranslation[block.period]}: ${block.time_start && block.time_end
+                          {`${periodTranslation[block.period]} - ${block.time_start && block.time_end
                               ? `${block.time_start.substring(0, 5)} - ${block.time_end.substring(0, 5)}`
                               : ''
                             }`}
@@ -285,9 +301,8 @@ const AppointmentsScreen = () => {
                       </View>
                     ))}
 
-                    <Divider style={{ marginVertical: 12, marginHorizontal: 0 }} />
 
-                    <View style={styles.legendContainer}>
+                    {/* <View style={styles.legendContainer}>
                       <View style={styles.legendItem}>
                         <Text style={styles.legendItem}>Legenda:</Text>
                       </View>
@@ -307,13 +322,14 @@ const AppointmentsScreen = () => {
                         <View style={[styles.dot, { backgroundColor: '#9C27B0' }]} />
                         <Text style={styles.legendText}>Noite</Text>
                       </View>
-                    </View>
+                    </View> */}
                   </View>
                 </>
               )}
               <View style={styles.calendarContainer}>
                 <Calendar
                   onDayPress={handleDatePress}
+                  onMonthChange={handleMonthChange}
                   markedDates={markedDates}
                   firstDay={1}
                   style={styles.calendar}
