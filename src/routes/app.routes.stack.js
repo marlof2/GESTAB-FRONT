@@ -20,7 +20,7 @@ import { getEstablishmentStorage } from "../helpers";
 import TabRoutes from '../routes/app.routes.tab'
 import { SchedulingHistory } from '../pages/SchedulingHistory';
 import BlockCalendarTabs from '../pages/BlockCalendar/routes/tabs';
-
+import CompleteProfile from '../pages/CompleteProfile';
 
 const Stack = createStackNavigator();
 
@@ -193,6 +193,12 @@ function Routes() {
                     title: 'Gerenciar Bloqueios',
                     headerShown: false
                 }}
+            />
+
+            <Stack.Screen
+                name="CompleteProfile"
+                component={CompleteProfile}
+                options={{ headerShown: false }}
             />
 
         </Stack.Navigator>

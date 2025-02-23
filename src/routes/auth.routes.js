@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import { ForgotPassword } from '../pages/ForgotPassword';
-import string from '../strings';
+
 
 import { Appbar } from 'react-native-paper';
 import { getHeaderTitle } from '@react-navigation/elements';
@@ -24,7 +24,6 @@ function AuthRoutes() {
       />
 
       <AuthStack.Screen
-
         name="SignUp"
         component={SignUp}
         options={{
@@ -40,6 +39,8 @@ function AuthRoutes() {
           headerShown: true,
         }}
       />
+
+      
 
     </AuthStack.Navigator>
   )

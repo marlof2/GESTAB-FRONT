@@ -24,19 +24,36 @@ export function SelectEstablishment() {
 
 
     useEffect(() => {
-        if (isFocused) {
+        if (isFocused && user?.user?.id) {
             loadEstablishments();
         }
-    }, [isFocused]);
+    }, [isFocused, user]);
 
 
 
     async function loadEstablishments() {
+        if (!user?.user?.id) return;
+        
         setIsLoading(true);
         try {
-            const response = await api.get(`/combo/establishimentsUser/${user.user?.id}`)
-            if (response.status == 200) {
+            const response = await api.get(`/combo/establishimentsUser/${user.user.id}`);
+            if (response.status === 200) {
                 setEstablishments(response.data);
+                
+                if (response.data.length === 1) {
+                    const establishment = response.data[0];
+                    setSelectedEstablishment(establishment.establishments?.id);
+                    setEstablishmentName(establishment.establishments?.name);
+                    
+                    await AsyncStorage.setItem(
+                        'establishmentIdLogged', 
+                        JSON.stringify({ 
+                            id: establishment.establishments?.id, 
+                            name: establishment.establishments?.name 
+                        })
+                    );
+                    navigation.navigate('TabRoutes');
+                }
             }
         } catch (error) {
             console.error('Error loading establishments:', error);
@@ -57,110 +74,105 @@ export function SelectEstablishment() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {isLoading ? (
-                <Overlay isVisible={isLoading} />
-            ) : (
+            <Overlay isVisible={isLoading} />
+            {!isLoading && establishments.length > 1 && (
                 <View style={styles.content}>
-                    {establishments.length === 0 ? (
+                    <Text variant="headlineMedium" style={styles.title}>
+                        Selecione um estabelecimento
+                    </Text>
+
+                    <Text variant="bodyLarge" style={styles.subtitle}>
+                        Escolha o estabelecimento que você deseja gerenciar
+                    </Text>
+
+                    <Dropdown
+                        label="Estabelecimento"
+                        data={establishments}
+                        placeholder="Selecione o estabelecimento"
+                        value={selectedEstablishment}
+                        onChange={(item) => {
+                            if (item) {
+                                setSelectedEstablishment(item.establishments?.id);
+                                setEstablishmentName(item.establishments?.name);
+                            } else {
+                                setSelectedEstablishment(null);
+                            }
+                        }}
+                        labelField="establishments.name"
+                        valueField="establishments.id"
+                    />
+
+                    <Button
+                        mode="contained"
+                        onPress={handleSelectEstablishment}
+                        disabled={!selectedEstablishment}
+                        style={styles.button}
+                    >
+                        Continuar
+                    </Button>
+                </View>
+            )}
+            {!isLoading && establishments.length === 0 && (
+                <View style={styles.content}>
+                    <Text variant="headlineMedium" style={styles.title}>
+                        Olá, {user.user?.name}!
+                    </Text>
+
+                    {user.user?.profile?.id === 3 ? (
                         <>
-                            <Text variant="headlineMedium" style={styles.title}>
-                                Olá, {user.user?.name}!
+                            <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
+                                Como profissional, você pode criar seu próprio estabelecimento e gerenciá-lo.
+                            </Text>
+                            <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
+                                Para começar, você precisa criar um estabelecimento e depois associá-lo à sua conta.
                             </Text>
 
-                            {user.user?.profile?.id === 3 ? (
-                                <>
-                                    <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
-                                        Como profissional, você pode criar seu próprio estabelecimento e gerenciá-lo.
-                                    </Text>
-                                    <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
-                                        Para começar, você precisa criar um estabelecimento e depois associá-lo à sua conta.
-                                    </Text>
+                            <Text variant="titleMedium" style={[styles.subtitle, styles.explanationText]}>
+                                Siga estes passos:
+                            </Text>
 
-                                    <Text variant="titleMedium" style={[styles.subtitle, styles.explanationText]}>
-                                        Siga estes passos:
-                                    </Text>
+                            <Text variant="bodyMedium" style={styles.instructionText}>
+                                1. Vá para o Menu ou Home e clique em "Estabelecimentos" e cadastre um novo.
+                            </Text>
 
-                                    <Text variant="bodyMedium" style={styles.instructionText}>
-                                        1. Vá para o Menu ou Home e clique em "Estabelecimentos" e cadastre um novo.
-                                    </Text>
+                            <Text variant="bodyMedium" style={styles.instructionText}>
+                                2. Após cadastrar, você vai em meus estabelecimentos e associa a sua conta.
+                            </Text>
 
-                                    <Text variant="bodyMedium" style={styles.instructionText}>
-                                        2. Após cadastrar, você vai em meus estabelecimentos e associa a sua conta.
-                                    </Text>
-
-                                    <Text variant="bodyMedium" style={styles.instructionText}>
-                                        3. Depois clique em trocar de estabelecimento e escolha o que você acabou de criar, e pronto!
-                                    </Text>
-                                </>
-                            ) : (
-                                <>
-                                    <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
-                                        Esta informação é mostrada quando você não tem nenhum estabelecimento associado.
-                                    </Text>
-                                    <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
-                                        Para começar, você precisa associar um estabelecimento à sua conta
-                                    </Text>
-
-                                    <Text variant="titleMedium" style={[styles.subtitle, styles.explanationText]}>
-                                        Você pode fazer isso de duas formas:
-                                    </Text>
-
-                                    <Text variant="bodyMedium" style={styles.instructionText}>
-                                        1. Vá para a Home e clique no botão "Meus estabelecimentos"
-                                    </Text>
-
-                                    <Text variant="bodyMedium" style={styles.instructionText}>
-                                        2. Vá para o Menu e clique no botão "Meus estabelecimentos"
-                                    </Text>
-                                </>
-                            )}
-
-                            <Button
-                                mode="contained"
-                                onPress={() => navigation.navigate('TabRoutes')}
-                                style={[styles.button, { marginTop: 16 }]}
-                            >
-                                Ir para Home
-                            </Button>
+                            <Text variant="bodyMedium" style={styles.instructionText}>
+                                3. Depois clique em trocar de estabelecimento e escolha o que você acabou de criar, e pronto!
+                            </Text>
                         </>
                     ) : (
                         <>
-                            <Text variant="headlineMedium" style={styles.title}>
-                                Selecione um estabelecimento
+                            <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
+                                Esta informação é mostrada quando você não tem nenhum estabelecimento associado.
+                            </Text>
+                            <Text variant="bodyLarge" style={[styles.subtitle, styles.explanationText]}>
+                                Para começar, você precisa associar um estabelecimento à sua conta
                             </Text>
 
-                            <Text variant="bodyLarge" style={styles.subtitle}>
-                                Escolha o estabelecimento que você deseja gerenciar
+                            <Text variant="titleMedium" style={[styles.subtitle, styles.explanationText]}>
+                                Você pode fazer isso de duas formas:
                             </Text>
 
-                            <Dropdown
-                                label="Estabelecimento"
-                                data={establishments}
-                                placeholder="Selecione o estabelecimento"
-                                value={selectedEstablishment}
-                                onChange={(item) => {
-                                    if (item) {
-                                        setSelectedEstablishment(item.establishments?.id);
-                                        setEstablishmentName(item.establishments?.name);
-                                    } else {
-                                        setSelectedEstablishment(null);
-                                    }
-                                }}
-                                labelField="establishments.name"
-                                valueField="establishments.id"
-                            />
+                            <Text variant="bodyMedium" style={styles.instructionText}>
+                                1. Vá para a Home e clique no botão "Meus estabelecimentos"
+                            </Text>
 
-                            <Button
-                                mode="contained"
-                                onPress={handleSelectEstablishment}
-                                disabled={!selectedEstablishment}
-                                style={styles.button}
-                            >
-                                Continuar
-                            </Button>
-
+                            <Text variant="bodyMedium" style={styles.instructionText}>
+                                2. Vá para o Menu e clique no botão "Meus estabelecimentos"
+                            </Text>
                         </>
                     )}
+
+                    <Button
+                        mode="contained"
+                        onPress={() => navigation.navigate('TabRoutes')}
+                        style={[styles.button, { marginTop: 16 }]}
+                    >
+                        Ir para Home
+                    </Button>
                 </View>
             )}
         </SafeAreaView>
