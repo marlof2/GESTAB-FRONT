@@ -14,20 +14,26 @@ import { AuthContext } from '../../contexts/auth';
 import InputCpf from '../../components/Ui/Input/inputCpf';
 import theme from '../../../src/themes/theme.json'
 import Snackbar from '../../components/Ui/Snackbar';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
+import { useDispatch } from 'react-redux';
+import { setSnackbar } from '../../store/globalSlice';
+import api from '../../services/';
 
 
 
 
 export default function SignIn() {
   const navigation = useNavigation();
-  const { signIn, loadingAuth } = useContext(AuthContext);
+  const { signIn, signInWithGoogle, loadingAuth } = useContext(AuthContext);
   const isFocused = useIsFocused();
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
 
   function handleLogin(value) {
     signIn(value)
   }
-
 
   const validationSchema = Yup.object().shape({
     cpf: Yup.string()
@@ -42,6 +48,45 @@ export default function SignIn() {
       // StatusBar.setBackgroundColor(theme.colors.primary);
     }
   }, [isFocused]);
+
+  async function handleGoogleLogin() {
+    try {
+      setIsLoading(true);
+      const redirectUrl = Linking.createURL('SignIn');
+      
+      // URL da rota de autenticação do Laravel
+      const response = await api.get('/google/auth');
+      const authUrl = response.data;
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
+      
+      if (result.type === 'success') {
+        const callbackUrl = result.url;
+        const code = new URL(callbackUrl).searchParams.get('code');
+        
+        const response = await api.get(`/google/callback?code=${code}`);
+        const data = response.data;
+        
+        // Primeiro fazemos o login em ambos os casos
+        await signInWithGoogle(data);
+        
+        // Depois verificamos se precisa completar o perfil
+        if (data.needsProfileCompletion) {
+          navigation.navigate('CompleteProfile');
+        }else{
+          navigation.navigate('Home');
+        }
+      }
+    } catch (error) {
+      console.error('Erro no login com Google:', error);
+      dispatch(setSnackbar({ 
+        visible: true, 
+        title: 'Erro ao fazer login com Google',
+        type: 'error' 
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -142,8 +187,10 @@ export default function SignIn() {
               icon="google"
               mode="contained-tonal"
               size={24}
-              onPress={() => {}}
+              onPress={handleGoogleLogin}
               style={styles.socialButton}
+              loading={isLoading}
+              disabled={isLoading}
             />
             {/* <IconButton
               icon="apple"

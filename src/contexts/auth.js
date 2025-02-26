@@ -124,8 +124,49 @@ function AuthProvider({ children }) {
         }
     }
 
+    async function signInWithGoogle(data) {
+        setLoadingAuth(true);
+        try {
+            const { token, user, needsProfileCompletion } = data;
+            
+            if (needsProfileCompletion) {
+                navigation.navigate('CompleteProfile');
+                setLoadingAuth(false);
+                return;
+            }
+
+            await AsyncStorage.setItem('token', token);
+            api.defaults.headers['Authorization'] = `Bearer ${token}`;
+            
+            setUser(user);
+            setLoadingAuth(false);
+            loadStorage();
+            
+        } catch (error) {
+            console.log('Erro no login com Google:', error);
+            dispatch(setSnackbar({ 
+                visible: true, 
+                title: 'Erro ao fazer login com Google',
+                type: 'error' 
+            }));
+            setLoadingAuth(false);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, signOut, loadStorage, loadingAuth, loading }}>
+        <AuthContext.Provider 
+            value={{ 
+                signed: !!user, 
+                user, 
+                signUp, 
+                signIn, 
+                signOut, 
+                loadStorage, 
+                loadingAuth, 
+                loading,
+                signInWithGoogle
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
