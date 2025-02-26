@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "26380853285",
+    "project_id": "gestab-31a42",
+    "storage_bucket": "gestab-31a42.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26380853285:android:4bbe61fba131b18a881fcc",
+        "android_client_info": {
+          "package_name": "com.marlof2.gestab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvV0X6p1gIKr9ZHCMqY3vDKTSw7IV0IIM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

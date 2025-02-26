@@ -14,13 +14,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.marlof2.gestab"
+      "bundleIdentifier": "com.marlof2.gestab",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo/gestab.jpg",
         "backgroundColor": "#ffffff"
       },
+      "googleServicesFile": "./google-services.json",
       "versionCode": 1,
       "userTrackingPermission": false,
       "package": "com.marlof2.gestab",
@@ -47,6 +49,7 @@
     },
     "plugins": [
       "expo-router",
+      "@react-native-google-signin/google-signin",
       [
         "react-native-google-mobile-ads",
         {

@@ -20,14 +20,23 @@ import Snackbar from '../../components/Ui/Snackbar';
 
 export default function SignIn() {
   const navigation = useNavigation();
-  const { signIn, loadingAuth } = useContext(AuthContext);
+  const { signIn, loadingAuth, handleGoogleSignIn } = useContext(AuthContext);
   const isFocused = useIsFocused();
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
   function handleLogin(value) {
     signIn(value)
   }
 
+  const handleGooglePress = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await handleGoogleSignIn();
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const validationSchema = Yup.object().shape({
     cpf: Yup.string()
@@ -142,8 +151,10 @@ export default function SignIn() {
               icon="google"
               mode="contained-tonal"
               size={24}
-              onPress={() => {}}
+              onPress={handleGooglePress}
               style={styles.socialButton}
+              loading={isGoogleLoading}
+              disabled={isGoogleLoading || loadingAuth}
             />
             {/* <IconButton
               icon="apple"
