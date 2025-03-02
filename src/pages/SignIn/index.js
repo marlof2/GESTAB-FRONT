@@ -53,35 +53,43 @@ export default function SignIn() {
     try {
       setIsLoading(true);
       const redirectUrl = Linking.createURL('SignIn');
-      
-      // URL da rota de autenticação do Laravel
-      const response = await api.get('/google/auth');
-      const authUrl = response.data;
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
-      
+
+      // Inicia o processo de autenticação
+      const { data: { auth_url } } = await api.get('/google/auth');
+
+      // Abre o navegador para autenticação
+      const result = await WebBrowser.openBrowserAsync(auth_url, redirectUrl, {
+        showTitle: true,
+        toolbarColor: theme.colors.primary,
+      });
+
       if (result.type === 'success') {
-        const callbackUrl = result.url;
-        const code = new URL(callbackUrl).searchParams.get('code');
-        
-        const response = await api.get(`/google/callback?code=${code}`);
-        const data = response.data;
-        
-        // Primeiro fazemos o login em ambos os casos
-        await signInWithGoogle(data);
-        
-        // Depois verificamos se precisa completar o perfil
-        if (data.needsProfileCompletion) {
-          navigation.navigate('CompleteProfile');
-        }else{
-          navigation.navigate('Home');
+        // Extrai o código de autorização da URL de callback
+        const code = new URL(result.url).searchParams.get('code');
+
+        // Troca o código pelo token e informações do usuário
+        const { data } = await api.get(`/google/callback?code=${code}`);
+
+        // Verifica se recebemos os dados necessários
+        if (!data || !data.token) {
+          throw new Error('Dados de autenticação inválidos');
         }
+
+        // Salva os dados do usuário no contexto
+        await signInWithGoogle(data);
+
+        dispatch(setSnackbar({
+          visible: true,
+          title: 'Login realizado com sucesso!',
+          type: 'success'
+        }));
       }
     } catch (error) {
       console.error('Erro no login com Google:', error);
-      dispatch(setSnackbar({ 
-        visible: true, 
-        title: 'Erro ao fazer login com Google',
-        type: 'error' 
+      dispatch(setSnackbar({
+        visible: true,
+        title: error.response?.data?.message || 'Erro ao fazer login com Google',
+        type: 'error'
       }));
     } finally {
       setIsLoading(false);
@@ -96,8 +104,8 @@ export default function SignIn() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Image 
-            style={styles.logo} 
+          <Image
+            style={styles.logo}
             source={require('../../assets/gestab.jpg')}
             resizeMode="contain"
           />

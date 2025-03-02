@@ -36,7 +36,7 @@ function AuthProvider({ children }) {
                         setUser(null)
                     })
                 setLoadingAuth(false);
-            } 
+            }
 
 
         } catch (error) {
@@ -128,41 +128,42 @@ function AuthProvider({ children }) {
         setLoadingAuth(true);
         try {
             const { token, user, needsProfileCompletion } = data;
-            
+
             if (needsProfileCompletion) {
-                navigation.navigate('CompleteProfile');
                 setLoadingAuth(false);
-                return;
+                navigation.navigate('CompleteProfile');
+            } else {
+                navigation.navigate('Home');
             }
 
             await AsyncStorage.setItem('token', token);
             api.defaults.headers['Authorization'] = `Bearer ${token}`;
-            
+
             setUser(user);
             setLoadingAuth(false);
             loadStorage();
-            
+
         } catch (error) {
             console.log('Erro no login com Google:', error);
-            dispatch(setSnackbar({ 
-                visible: true, 
+            dispatch(setSnackbar({
+                visible: true,
                 title: 'Erro ao fazer login com Google',
-                type: 'error' 
+                type: 'error'
             }));
             setLoadingAuth(false);
         }
     }
 
     return (
-        <AuthContext.Provider 
-            value={{ 
-                signed: !!user, 
-                user, 
-                signUp, 
-                signIn, 
-                signOut, 
-                loadStorage, 
-                loadingAuth, 
+        <AuthContext.Provider
+            value={{
+                signed: !!user,
+                user,
+                signUp,
+                signIn,
+                signOut,
+                loadStorage,
+                loadingAuth,
                 loading,
                 signInWithGoogle
             }}

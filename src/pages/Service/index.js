@@ -4,14 +4,14 @@ import { ActivityIndicator, Chip, FAB, Modal, Portal, Searchbar, Text } from 're
 import styles from './styles';
 import Header from '../../components/Header';
 import api from "../../services";
-import RenderItem from './componets/renderItem'
+import RenderItem from './componets/RenderItem'
 import theme from '../../themes/theme.json'
 import Form from './componets/form';
 import Snackbar from '../../components/Ui/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { infoModal, reloadItemsCard } from './reducer';
 import EmptyListMessage from '../../components/Ui/EmptyListMessage';
-import ModalDelete from './componets/modalDelete'
+import ModalDelete from './componets/ModalDelete'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Index({ route }) {
