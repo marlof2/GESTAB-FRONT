@@ -14,20 +14,26 @@ import { AuthContext } from '../../contexts/auth';
 import InputCpf from '../../components/Ui/Input/inputCpf';
 import theme from '../../../src/themes/theme.json'
 import Snackbar from '../../components/Ui/Snackbar';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
+import { useDispatch } from 'react-redux';
+import { setSnackbar } from '../../store/globalSlice';
+import api from '../../services/';
 
 
 
 
 export default function SignIn() {
   const navigation = useNavigation();
-  const { signIn, loadingAuth } = useContext(AuthContext);
+  const { signIn, signInWithGoogle, loadingAuth } = useContext(AuthContext);
   const isFocused = useIsFocused();
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
 
   function handleLogin(value) {
     signIn(value)
   }
-
 
   const validationSchema = Yup.object().shape({
     cpf: Yup.string()
@@ -43,6 +49,53 @@ export default function SignIn() {
     }
   }, [isFocused]);
 
+  async function handleGoogleLogin() {
+    try {
+      setIsLoading(true);
+      const redirectUrl = Linking.createURL('SignIn');
+
+      // Inicia o processo de autenticação
+      const { data: { auth_url } } = await api.get('/google/auth');
+
+      // Abre o navegador para autenticação
+      const result = await WebBrowser.openBrowserAsync(auth_url, redirectUrl, {
+        showTitle: true,
+        toolbarColor: theme.colors.primary,
+      });
+
+      if (result.type === 'success') {
+        // Extrai o código de autorização da URL de callback
+        const code = new URL(result.url).searchParams.get('code');
+
+        // Troca o código pelo token e informações do usuário
+        const { data } = await api.get(`/google/callback?code=${code}`);
+
+        // Verifica se recebemos os dados necessários
+        if (!data || !data.token) {
+          throw new Error('Dados de autenticação inválidos');
+        }
+
+        // Salva os dados do usuário no contexto
+        await signInWithGoogle(data);
+
+        dispatch(setSnackbar({
+          visible: true,
+          title: 'Login realizado com sucesso!',
+          type: 'success'
+        }));
+      }
+    } catch (error) {
+      console.error('Erro no login com Google:', error);
+      dispatch(setSnackbar({
+        visible: true,
+        title: error.response?.data?.message || 'Erro ao fazer login com Google',
+        type: 'error'
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
@@ -51,8 +104,8 @@ export default function SignIn() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <Image 
-            style={styles.logo} 
+          <Image
+            style={styles.logo}
             source={require('../../assets/gestab.jpg')}
             resizeMode="contain"
           />
@@ -142,8 +195,10 @@ export default function SignIn() {
               icon="google"
               mode="contained-tonal"
               size={24}
-              onPress={() => {}}
+              onPress={handleGoogleLogin}
               style={styles.socialButton}
+              loading={isLoading}
+              disabled={isLoading}
             />
             {/* <IconButton
               icon="apple"

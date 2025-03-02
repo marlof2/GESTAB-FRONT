@@ -2,7 +2,7 @@ import React from 'react'
 import Establishment from "../pages/Establishment";
 import EstablishmentUser from "../pages/EstablishmentUser";
 import Service from "../pages/Service/";
-import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/componets/bindProfessional";
+import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/componets/BindProfessional";
 import MyEstablishments from "../pages/MyEstablishments";
 import MyEstablishmentUserBindCliente from "../pages/MyEstablishments/componets/BindClient";
 import ListScheduleDay from "../pages/Schedule/components/ListScheduleDay";
