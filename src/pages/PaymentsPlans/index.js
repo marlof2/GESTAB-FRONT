@@ -8,12 +8,14 @@ import { Button, Card, SegmentedButtons } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { format, isBefore, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function EstablishmentInfo({ route }) {
   const [activeSegment, setActiveSegment] = useState('active');
   const navigation = useNavigation();
   const [establishmentInfo, setEstablishmentInfo] = useState(null);
   const { establishmentId, establishmentName } = route.params;
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     async function loadEstablishmentInfo() {
@@ -25,8 +27,10 @@ export default function EstablishmentInfo({ route }) {
       }
     }
 
-    loadEstablishmentInfo();
-  }, [establishmentId]);
+    if (isFocused) {
+      loadEstablishmentInfo();
+    }
+  }, [establishmentId, isFocused]);
 
   const handleSubscribe = () => {
     navigation.navigate('Plans', {
@@ -64,7 +68,7 @@ export default function EstablishmentInfo({ route }) {
           <View style={styles.infoRow}>
             <Text style={styles.label}>Plano:</Text>
             <Text style={styles.value}>
-              {payment.plan_id === 1 ? 'Mensal' : 'Anual'}
+              {payment.period === 'monthly' ? 'Mensal' : 'Anual'}
             </Text>
           </View>
 
@@ -79,6 +83,20 @@ export default function EstablishmentInfo({ route }) {
             <Text style={styles.label}>Valor:</Text>
             <Text style={styles.value}>
               R$ {parseFloat(payment.amount).toFixed(2).replace('.', ',')}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={{fontSize: 16, color: '#666'}}>Quantidade de profissionais:</Text>
+            <Text style={styles.value}>
+              {payment.quantity_professionals}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={{fontSize: 16, color: '#666'}}>Remover anúncios para clientes:</Text>
+            <Text style={styles.value}>
+              {payment.remove_ads_client ? 'Sim' : 'Não'}
             </Text>
           </View>
 
@@ -124,7 +142,7 @@ export default function EstablishmentInfo({ route }) {
           icon="credit-card"
           onPress={handleSubscribe}
         >
-          Assinar Plano
+          Ver Planos
         </Button>
       </Card.Content>
     </Card>
@@ -153,7 +171,7 @@ export default function EstablishmentInfo({ route }) {
           <View style={styles.infoRow}>
             <Text style={styles.label}>Plano:</Text>
             <Text style={styles.value}>
-              {payment.plan_id === 1 ? 'Mensal' : 'Anual'}
+              {payment.period === 'monthly' ? 'Mensal' : 'Anual'}
             </Text>
           </View>
 
@@ -170,6 +188,21 @@ export default function EstablishmentInfo({ route }) {
               R$ {parseFloat(payment.amount).toFixed(2).replace('.', ',')}
             </Text>
           </View>
+
+          <View style={styles.infoRow}>
+            <Text style={{fontSize: 16, color: '#666'}}>Quantidade de profissionais:</Text>
+            <Text style={styles.value}>
+              {payment.quantity_professionals}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={{fontSize: 16, color: '#666'}}>Remover anúncios para clientes:</Text>
+            <Text style={styles.value}>
+              {payment.remove_ads_client ? 'Sim' : 'Não'}
+            </Text>
+          </View>
+
 
           <View style={styles.dateContainer}>
             <View style={styles.dateRow}>

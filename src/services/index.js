@@ -37,8 +37,6 @@ const handleError = async (response) => {
     let bodyMessage = "";
 
     switch (status) {
-            case 401:
-                return Promise.reject(response);
         case 406:
             if (data.message == "Usuário ou Senha Inválido.") {
                 return AlertModal('Atenção!', data.message)

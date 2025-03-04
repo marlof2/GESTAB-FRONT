@@ -2,16 +2,9 @@ import { openBrowserAsync, WebBrowserPresentationStyle } from "expo-web-browser"
 import api from "../../services";
 // import { useEffect, useState } from "react";
 
-async function CheckoutMercadoPago({ payment_method, user_id, plan_id, establishment_id }) {
+async function CheckoutMercadoPago(data) {
     try {
-        const response = await api.get('/payments/createPreference', {
-            params: {
-                payment_method,
-                user_id,
-                plan_id,
-                establishment_id
-            }
-        });
+        const response = await api.post('/payments/createPreference', data);
 
         if (response.data.init_point) {
             await openBrowserAsync(response.data.init_point, {
