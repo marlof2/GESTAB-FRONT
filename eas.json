@@ -8,13 +8,17 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease"
+      }
     },
     "production": {
       "android": {
         "buildType": "app-bundle",
-        "releaseChannel": "production",
-        "gradleCommand": ":app:bundleRelease"
+        "gradleCommand": ":app:bundleRelease",
+        "releaseChannel": "production"
       }
     }
   },
