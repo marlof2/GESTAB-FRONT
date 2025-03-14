@@ -119,7 +119,7 @@ export default function PaymentPlans({ route }) {
       const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
       const priceString = removeAds
         ? (paymentPeriod === 'yearly'
-          ? (paymentMethod === 'credit_card' 
+          ? (paymentMethod === 'credit_card'
             ? selectedPlanData.withAdsRemoval.yearlyCreditPrice
             : selectedPlanData.withAdsRemoval.yearlyPixPrice)
           : (paymentMethod === 'credit_card'
@@ -167,26 +167,21 @@ export default function PaymentPlans({ route }) {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Instruções de Pagamento</Text>
-          
-          <View style={styles.warningContainer}>
-            <MaterialIcons name="warning" size={24} color="#ff9800" />
-            <Text style={styles.warningText}>ATENÇÃO!</Text>
-          </View>
-          
+
           <Text style={styles.instructionsText}>
             Para realizar o pagamento com sucesso, siga estas instruções:
           </Text>
-          
+
           <View style={styles.instructionsList}>
-            <Text style={styles.instructionItem}>1. Copie o link abaixo</Text>
-            <Text style={styles.instructionItem}>2. Abra seu navegador (Chrome, Safari, etc.)</Text>
+            <Text style={styles.instructionItem}>1. Copie o link abaixo ou abra direto no navegador</Text>
+            <Text style={[styles.instructionItem, { color: '#f44336' }]}>
+              2. Importante: Se caso o link ou o navegador redirecionar para o aplicativo do Mercado Pago, não continue pelo aplicativo pois esta com problema.
+            </Text>
+            {/* <Text style={styles.instructionItem}>2. Abra seu navegador (Chrome, Safari, etc.)</Text>
             <Text style={styles.instructionItem}>3. Cole o link e acesse</Text>
-            <Text style={styles.instructionItem}>4. Complete o pagamento no navegador</Text>
+            <Text style={styles.instructionItem}>4. Complete o pagamento no navegador</Text> */}
           </View>
 
-          <Text style={styles.warningNote}>
-            Importante: Não abra o link no aplicativo do Mercado Pago, pois isso pode causar erro no pagamento.
-          </Text>
 
           <View style={styles.linkContainer}>
             <TextInput
@@ -195,26 +190,38 @@ export default function PaymentPlans({ route }) {
               multiline
               selectTextOnFocus
             />
-            <TouchableOpacity 
-              style={styles.copyButton}
-              onPress={() => {
-                Clipboard.setString(paymentLink);
-                dispatch(setSnackbar({
-                  visible: true,
-                  title: 'Link copiado para a área de transferência!',
-                }));
-              }}
-            >
-              <MaterialIcons name="content-copy" size={20} color={theme.colors.primary} />
-              <Text style={styles.copyButtonText}>Copiar Link</Text>
-            </TouchableOpacity>
-            <Text style={styles.copyHint}>Toque e segure o texto acima para copiar</Text>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={styles.copyButton}
+                onPress={() => {
+                  Clipboard.setString(paymentLink);
+                  dispatch(setSnackbar({
+                    visible: true,
+                    title: 'Link copiado para a área de transferência!',
+                  }));
+                }}
+              >
+                <MaterialIcons name="content-copy" size={20} color={theme.colors.primary} />
+                <Text style={styles.copyButtonText}>Copiar Link</Text>
+              </TouchableOpacity>
+              
+
+              <TouchableOpacity
+                style={styles.openButton}
+                onPress={() => {
+                  Linking.openURL(paymentLink);
+                }}
+              >
+                <MaterialIcons name="open-in-browser" size={20} color={theme.colors.primary} />
+                <Text style={styles.copyButtonText}>Abrir no Navegador</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.postPaymentContainer}>
             <MaterialIcons name="info" size={24} color={theme.colors.primary} />
             <Text style={styles.postPaymentText}>
-              Após efetuar o pagamento, retorne para esta tela e atualize a página para verificar a aprovação do seu plano.
+              Após efetuar o pagamento, retorne para a tela de "Meus planos" para verificar a aprovação do pagamento.
             </Text>
           </View>
 
@@ -545,21 +552,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.primary,
   },
-  warningContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    backgroundColor: '#fff3e0',
-    padding: 12,
-    borderRadius: 8,
-  },
-  warningText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ff9800',
-    marginLeft: 8,
-  },
   instructionsText: {
     fontSize: 16,
     marginBottom: 16,
@@ -575,13 +567,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
     color: '#333',
-  },
-  warningNote: {
-    fontSize: 14,
-    color: '#f44336',
-    textAlign: 'center',
-    marginBottom: 16,
-    fontStyle: 'italic',
   },
   linkContainer: {
     marginVertical: 16,
@@ -622,12 +607,28 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 20,
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginTop: 8,
+  },
   copyButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 8,
-    marginTop: 8,
+    borderRadius: 4,
+    backgroundColor: '#f0f0f0',
+    gap: 8,
+  },
+  openButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
     borderRadius: 4,
     backgroundColor: '#f0f0f0',
     gap: 8,
