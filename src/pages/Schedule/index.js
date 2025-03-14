@@ -100,7 +100,7 @@ const AppointmentsScreen = () => {
       );
     }
 
-    // await RewardedAd();
+    await RewardedAd();
     const professional = itemsProfessional.find(el => el.user.id == professionalId);
     const establishmentUser = itemsEstablishment.find(el => el.establishment_id == establishimentId);
 
@@ -237,7 +237,7 @@ const AppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header title={'📅 Filtro de Agenda'} subtitle={'Para proseguir, selecione o profissional e a data para filtrar a agenda.'} showBack={false} />
+      <Header title={'📅 Filtro de Agenda'} subtitle={'Selecione o profissional e a data para filtrar a agenda.'} showBack={false} />
       <View style={styles.mainContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.container}>

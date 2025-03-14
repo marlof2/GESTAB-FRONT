@@ -69,7 +69,6 @@ export default function RenderItem({ data, dataUser }) {
             <Card.Title title={item.name} titleStyle={styles.titleCard}
                 right={(props) => (
                     permissioActionsOnlyResponsable() ?
-
                         <Menu
                             visible={menuVisible}
                             onDismiss={closeMenu}

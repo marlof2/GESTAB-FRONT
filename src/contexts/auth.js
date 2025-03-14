@@ -1,53 +1,55 @@
 import React, { createContext, useState, useEffect } from "react";
 import api from "../services";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import { setSnackbar } from '../store/globalSlice';
 import { useDispatch } from 'react-redux';
+import { AppState } from 'react-native';
 
 export const AuthContext = createContext({});
 
-function AuthProvider({ children }) {
+export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loadingAuth, setLoadingAuth] = useState(false);
     const navigation = useNavigation();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
-
-
 
     useEffect(() => {
         loadStorage();
-
     }, []);
 
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            if (nextAppState === 'active') {
+                loadStorage();
+            }
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
     async function signOut() {
         setLoadingAuth(true);
 
         try {
-
             const response = await api.post('/logout');
 
-            if (response.status == 401 || response.status == 200) {
-
-                await AsyncStorage.clear()
-                    .then(() => {
-                        setUser(null)
-                    })
-                setLoadingAuth(false);
+            if (response.status === 401 || response.status === 200) {
+                await AsyncStorage.multiRemove(['token', 'user'])
+                setUser(null);
             }
-
-
         } catch (error) {
-            console.log('erro ao logar', error)
+            console.log('erro ao deslogar', error)
+        } finally {
             setLoadingAuth(false);
         }
-
-
     }
 
     async function loadStorage() {
+        // await AsyncStorage.clear();
         const token = await AsyncStorage.getItem('token');
         if (token != null) {
             setLoading(true)
@@ -78,23 +80,22 @@ function AuthProvider({ children }) {
         try {
             const { status, data } = await api.post('/login', obj);
 
-            if (status) {
-                if (status == 200) {
-                    const { token, user } = data
+            if (status === 200) {
+                const { token, user } = data
 
-                    await AsyncStorage.setItem('token', token);
+                await Promise.all([
+                    AsyncStorage.setItem('token', token),
+                    AsyncStorage.setItem('user', JSON.stringify(user))
+                ]);
 
-                    api.defaults.headers['Authorization'] = `Bearer ${token}`;
+                api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-                    setUser(user);
-                    setLoadingAuth(false);
-                    loadStorage()
-                }
-
+                setUser(user);
                 setLoadingAuth(false);
+                loadStorage();
             }
 
-
+            setLoadingAuth(false);
         } catch (error) {
             console.log('erro ao logar', error)
             setLoadingAuth(false);
@@ -104,7 +105,6 @@ function AuthProvider({ children }) {
     async function signUp(obj) {
         setLoadingAuth(true);
         try {
-
             if (obj.profile_id == 2) {
                 obj.type_schedule = null
             }
@@ -116,8 +116,6 @@ function AuthProvider({ children }) {
                 navigation.navigate('SignIn')
                 setLoadingAuth(false);
             }
-
-
         } catch (error) {
             console.log('erro ao cadastrar', error)
             setLoadingAuth(false);
@@ -127,22 +125,18 @@ function AuthProvider({ children }) {
     async function signInWithGoogle(data) {
         setLoadingAuth(true);
         try {
-            const { token, user, needsProfileCompletion } = data;
-
-            if (needsProfileCompletion) {
-                setLoadingAuth(false);
-                navigation.navigate('CompleteProfile');
-            } else {
-                navigation.navigate('Home');
-            }
+            const { token } = data;
 
             await AsyncStorage.setItem('token', token);
             api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-            setUser(user);
-            setLoadingAuth(false);
-            loadStorage();
+            const response = await api.get('/me');
 
+            if (response.status === 200) {
+                const userData = response.data;
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+            }
         } catch (error) {
             console.log('Erro no login com Google:', error);
             dispatch(setSnackbar({
@@ -150,6 +144,7 @@ function AuthProvider({ children }) {
                 title: 'Erro ao fazer login com Google',
                 type: 'error'
             }));
+        } finally {
             setLoadingAuth(false);
         }
     }
@@ -172,5 +167,6 @@ function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
+
 export default AuthProvider;
 

@@ -1,16 +1,26 @@
 import { useContext, useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal, Share, Linking, TextInput, Clipboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import CheckoutMercadoPago from '../../../services/paymentService/checkoutMercadoPago';
+import LinkCheckoutMercadoPago from '../../../services/paymentService/linkCheckoutMercadoPago';
 import { AuthContext } from '../../../contexts/auth';
 import Header from '../../../components/Header';
 import api from "../../../services";
 import theme from '../../../themes/theme.json';
+import { Button } from 'react-native-paper';
+import AlertSnackbar from '../../../components/Ui/Snackbar';
+import { useDispatch } from 'react-redux';
+import { setSnackbar } from '../../../store/globalSlice';
+
 export default function PaymentPlans({ route }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const { user } = useContext(AuthContext)
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentLink, setPaymentLink] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const { establishmentId, establishmentName } = route.params;
   const [removeAds, setRemoveAds] = useState(false);
@@ -89,53 +99,142 @@ export default function PaymentPlans({ route }) {
     }
   }
 
+
   async function handlePayment() {
     if (!selectedPlan || !paymentMethod) {
       Alert.alert('Atenção', 'Por favor, selecione um plano e método de pagamento para continuar.');
       return;
     }
 
-    // Check for active payment before proceeding
-    const hasActive = await checkActivePayment(establishmentId);
-    if (hasActive) {
-      Alert.alert('Atenção', 'Você já possui um plano ativo para este estabelecimento.');
-      return;
-    }
+    setIsLoading(true);
+    try {
+      // Check for active payment before proceeding
+      const hasActive = await checkActivePayment(establishmentId);
+      if (hasActive) {
+        Alert.alert('Atenção', 'Você já possui um plano ativo para este estabelecimento.');
+        return;
+      }
 
-    // Proceed with checkout if no active payment
-    const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
-    const priceString = removeAds
-      ? (paymentPeriod === 'yearly'
-        ? (paymentMethod === 'credit_card' 
-          ? selectedPlanData.withAdsRemoval.yearlyCreditPrice
-          : selectedPlanData.withAdsRemoval.yearlyPixPrice)
-        : (paymentMethod === 'credit_card'
-          ? selectedPlanData.withAdsRemoval.creditPrice
-          : selectedPlanData.withAdsRemoval.pixPrice))
-      : (paymentPeriod === 'yearly'
-        ? (paymentMethod === 'credit_card'
-          ? selectedPlanData.yearlyCreditPrice
-          : selectedPlanData.yearlyPixPrice)
-        : (paymentMethod === 'credit_card'
-          ? selectedPlanData.creditPrice
-          : selectedPlanData.pixPrice));
+      // Proceed with checkout if no active payment
+      const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
+      const priceString = removeAds
+        ? (paymentPeriod === 'yearly'
+          ? (paymentMethod === 'credit_card' 
+            ? selectedPlanData.withAdsRemoval.yearlyCreditPrice
+            : selectedPlanData.withAdsRemoval.yearlyPixPrice)
+          : (paymentMethod === 'credit_card'
+            ? selectedPlanData.withAdsRemoval.creditPrice
+            : selectedPlanData.withAdsRemoval.pixPrice))
+        : (paymentPeriod === 'yearly'
+          ? (paymentMethod === 'credit_card'
+            ? selectedPlanData.yearlyCreditPrice
+            : selectedPlanData.yearlyPixPrice)
+          : (paymentMethod === 'credit_card'
+            ? selectedPlanData.creditPrice
+            : selectedPlanData.pixPrice));
 
-    const data = {
-      payment_method: paymentMethod,
-      user_id: user.user.id,
-      plan_id: selectedPlan,
-      establishment_id: establishmentId,
-      payment_period: paymentPeriod,
-      plan_title: selectedPlanData.title,
-      quantity_professionals: selectedPlanData.quantity_professionals,
-      remove_ads_client: removeAds,
-      amount: formatPrice(priceString)
+      const data = {
+        payment_method: paymentMethod,
+        user_id: user.user.id,
+        plan_id: selectedPlan,
+        establishment_id: establishmentId,
+        payment_period: paymentPeriod,
+        plan_title: selectedPlanData.title,
+        quantity_professionals: selectedPlanData.quantity_professionals,
+        remove_ads_client: removeAds,
+        amount: formatPrice(priceString)
+      }
+      const link = await LinkCheckoutMercadoPago(data);
+      setPaymentLink(link);
+      setIsModalVisible(true);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível processar o pagamento. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
-    await CheckoutMercadoPago(data);
   }
+
+  // Adicione o Modal antes do return principal
+  const PaymentInstructionsModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isModalVisible}
+      onRequestClose={() => {
+        return null;
+      }}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Instruções de Pagamento</Text>
+          
+          <View style={styles.warningContainer}>
+            <MaterialIcons name="warning" size={24} color="#ff9800" />
+            <Text style={styles.warningText}>ATENÇÃO!</Text>
+          </View>
+          
+          <Text style={styles.instructionsText}>
+            Para realizar o pagamento com sucesso, siga estas instruções:
+          </Text>
+          
+          <View style={styles.instructionsList}>
+            <Text style={styles.instructionItem}>1. Copie o link abaixo</Text>
+            <Text style={styles.instructionItem}>2. Abra seu navegador (Chrome, Safari, etc.)</Text>
+            <Text style={styles.instructionItem}>3. Cole o link e acesse</Text>
+            <Text style={styles.instructionItem}>4. Complete o pagamento no navegador</Text>
+          </View>
+
+          <Text style={styles.warningNote}>
+            Importante: Não abra o link no aplicativo do Mercado Pago, pois isso pode causar erro no pagamento.
+          </Text>
+
+          <View style={styles.linkContainer}>
+            <TextInput
+              value={paymentLink}
+              style={styles.linkInput}
+              multiline
+              selectTextOnFocus
+            />
+            <TouchableOpacity 
+              style={styles.copyButton}
+              onPress={() => {
+                Clipboard.setString(paymentLink);
+                dispatch(setSnackbar({
+                  visible: true,
+                  title: 'Link copiado para a área de transferência!',
+                }));
+              }}
+            >
+              <MaterialIcons name="content-copy" size={20} color={theme.colors.primary} />
+              <Text style={styles.copyButtonText}>Copiar Link</Text>
+            </TouchableOpacity>
+            <Text style={styles.copyHint}>Toque e segure o texto acima para copiar</Text>
+          </View>
+
+          <View style={styles.postPaymentContainer}>
+            <MaterialIcons name="info" size={24} color={theme.colors.primary} />
+            <Text style={styles.postPaymentText}>
+              Após efetuar o pagamento, retorne para esta tela e atualize a página para verificar a aprovação do seu plano.
+            </Text>
+          </View>
+
+          <Button
+            mode="outlined"
+            style={styles.closeButton}
+            onPress={() => setIsModalVisible(false)}
+          >
+            Fechar
+          </Button>
+        </View>
+      </View>
+      <AlertSnackbar />
+
+    </Modal>
+  );
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+      <PaymentInstructionsModal />
       <Header title={'Escolha seu plano'} description={`Estabelecimento: ${establishmentName}`} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
@@ -245,16 +344,18 @@ export default function PaymentPlans({ route }) {
           ))}
         </View>
 
-        <TouchableOpacity
+        <Button
+          mode="contained"
+          loading={isLoading}
+          disabled={!selectedPlan || !paymentMethod || isLoading}
           style={[
             styles.paymentButton,
-            (!selectedPlan || !paymentMethod) && styles.paymentButtonDisabled,
+            (!selectedPlan || !paymentMethod || isLoading) && styles.paymentButtonDisabled,
           ]}
           onPress={handlePayment}
-          disabled={!selectedPlan || !paymentMethod}
         >
-          <Text style={styles.paymentButtonText}>Ir para o pagamento</Text>
-        </TouchableOpacity>
+          Gerar link de pagamento
+        </Button>
       </ScrollView>
     </SafeAreaView>
   );
@@ -324,19 +425,10 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   paymentButton: {
-    backgroundColor: theme.colors.primary,
-    padding: 14,
-    borderRadius: 8,
     margin: 10,
-    alignItems: 'center',
   },
   paymentButtonDisabled: {
-    backgroundColor: '#CCCCCC',
-  },
-  paymentButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    opacity: 0.7,
   },
   paymentMethodsContainer: {
     padding: 16,
@@ -431,5 +523,118 @@ const styles = StyleSheet.create({
   yearlyDiscount: {
     fontSize: 14,
     color: '#28a745',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: theme.colors.primary,
+  },
+  warningContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    backgroundColor: '#fff3e0',
+    padding: 12,
+    borderRadius: 8,
+  },
+  warningText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ff9800',
+    marginLeft: 8,
+  },
+  instructionsText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  instructionsList: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  instructionItem: {
+    fontSize: 14,
+    marginBottom: 8,
+    color: '#333',
+  },
+  warningNote: {
+    fontSize: 14,
+    color: '#f44336',
+    textAlign: 'center',
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  linkContainer: {
+    marginVertical: 16,
+    width: '100%',
+  },
+  linkInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+    minHeight: 60,
+    textAlignVertical: 'top',
+    color: '#000000',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  copyHint: {
+    fontSize: 12,
+    color: '#666666',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  closeButton: {
+    marginTop: 8,
+  },
+  postPaymentContainer: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: '#e3f2fd',
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  postPaymentText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+  },
+  copyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+    marginTop: 8,
+    borderRadius: 4,
+    backgroundColor: '#f0f0f0',
+    gap: 8,
+  },
+  copyButtonText: {
+    color: theme.colors.primary,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

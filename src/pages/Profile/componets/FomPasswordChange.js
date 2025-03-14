@@ -11,7 +11,6 @@ export default function ChangePassword({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // Estado para controlar a visibilidade da senha
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Estado para a visibilidade da confirmação da senha
-  const [showOldPassword, setShowOldPassword] = useState(false); // Estado para a visibilidade da confirmação da senha
   const { id } = route.params.user;
 
   async function savePassword(values) {
@@ -19,7 +18,6 @@ export default function ChangePassword({ navigation, route }) {
 
     const obj = {
       confirmaSenhaNova: values.confirmPassword,
-      senhaAntiga: values.oldPassword,
       senhaNova: values.newPassword,
       id:id
     }
@@ -39,8 +37,6 @@ export default function ChangePassword({ navigation, route }) {
   }
 
   const validationSchema = Yup.object().shape({
-    oldPassword: Yup.string()
-      .required('Campo obrigatório'),
     newPassword: Yup.string()
       .min(6, 'A senha deve ter pelo menos 6 caracteres')
       .required('Campo obrigatório'),
@@ -64,7 +60,6 @@ export default function ChangePassword({ navigation, route }) {
               initialValues={{
                 newPassword: '',
                 confirmPassword: '',
-                oldPassword: '',
               }}
               validationSchema={validationSchema}
               onSubmit={(values) => {
@@ -73,27 +68,6 @@ export default function ChangePassword({ navigation, route }) {
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                 <View>
-                  <TextInput
-                    outlineStyle={{ borderRadius: 10 }}
-                    style={styles.input}
-                    onChangeText={handleChange('oldPassword')}
-                    onBlur={handleBlur('oldPassword')}
-                    value={values.oldPassword}
-                    mode="outlined"
-                    label="Senha Antiga"
-                    secureTextEntry={!showOldPassword}
-                    right={
-                      <TextInput.Icon
-                        icon={showOldPassword ? "eye-off-outline" : "eye-outline"}
-                        onPress={() => setShowOldPassword(!showOldPassword)}
-                      />
-                    }
-                    error={touched.oldPassword && Boolean(errors.oldPassword)}
-                  />
-                  {touched.oldPassword && errors.oldPassword && (
-                    <Text style={styles.errorText}>{errors.oldPassword}</Text>
-                  )}
-
                   <TextInput
                     outlineStyle={{ borderRadius: 10 }}
                     style={styles.input}

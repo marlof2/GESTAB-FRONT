@@ -266,7 +266,7 @@ export default function EstablishmentInfo({ route }) {
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
       <Header 
-        title='Informações do plano'
+        title='Meus planos'
         description={establishmentName}  
       />
       

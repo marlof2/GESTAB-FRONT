@@ -31,6 +31,23 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = React.useState(false);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    // Configura o listener para URLs recebidas
+    const subscription = Linking.addEventListener('url', handleUrl);
+
+    // Verifica se o app foi aberto por uma URL
+    Linking.getInitialURL().then(url => {
+      if (url) {
+        handleUrl({ url });
+      }
+    });
+
+    // Cleanup: remove o listener quando o componente for desmontado
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   function handleLogin(value) {
     signIn(value)
   }
@@ -52,47 +69,65 @@ export default function SignIn() {
   async function handleGoogleLogin() {
     try {
       setIsLoading(true);
-      const redirectUrl = Linking.createURL('SignIn');
 
-      // Inicia o processo de autenticação
-      const { data: { auth_url } } = await api.get('/google/auth');
-
-      // Abre o navegador para autenticação
-      const result = await WebBrowser.openBrowserAsync(auth_url, redirectUrl, {
-        showTitle: true,
-        toolbarColor: theme.colors.primary,
+      const redirectUrl = Linking.createURL('SignIn', {
+        scheme: 'com.marlof2.gestab'
       });
 
-      if (result.type === 'success') {
-        // Extrai o código de autorização da URL de callback
-        const code = new URL(result.url).searchParams.get('code');
+      const { data: { auth_url } } = await api.get('/google/auth');
 
-        // Troca o código pelo token e informações do usuário
-        const { data } = await api.get(`/google/callback?code=${code}`);
-
-        // Verifica se recebemos os dados necessários
-        if (!data || !data.token) {
-          throw new Error('Dados de autenticação inválidos');
+      const result = await WebBrowser.openAuthSessionAsync(
+        auth_url,
+        redirectUrl,
+        {
+          showTitle: true,
+          toolbarColor: theme.colors.primary,
+          dismissButtonStyle: 'close',
+          preferEphemeralSession: true,
         }
+      );
 
-        // Salva os dados do usuário no contexto
-        await signInWithGoogle(data);
-
-        dispatch(setSnackbar({
-          visible: true,
-          title: 'Login realizado com sucesso!',
-          type: 'success'
-        }));
+      if (result.type === 'success') {
+        await handleUrl({ url: result.url });
       }
+
     } catch (error) {
-      console.error('Erro no login com Google:', error);
       dispatch(setSnackbar({
         visible: true,
-        title: error.response?.data?.message || 'Erro ao fazer login com Google',
+        title: 'Erro ao fazer login com Google',
         type: 'error'
       }));
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleUrl({ url }) {
+    try {
+      const parsedUrl = new URL(url);
+
+      const error = parsedUrl.searchParams.get('error');
+      if (error) {
+        dispatch(setSnackbar({
+          visible: true,
+          title: decodeURIComponent(error),
+          type: 'error'
+        }));
+        return;
+      }
+
+      const token = parsedUrl.searchParams.get('token');
+
+      if (token) {
+        await signInWithGoogle({ token });
+      }
+
+    } catch (error) {
+      dispatch(setSnackbar({
+        visible: true,
+        title: 'Erro ao processar retorno do login',
+        type: 'error'
+      }));
     }
   }
 
@@ -186,34 +221,21 @@ export default function SignIn() {
         <View style={styles.footer}>
           <View style={styles.dividerContainer}>
             <View style={styles.divider} />
-            <Text style={styles.dividerText}>ou continue com</Text>
-            <View style={styles.divider} />
           </View>
 
           <View style={styles.socialButtons}>
-            <IconButton
+            <Button
+              mode="outlined"
               icon="google"
-              mode="contained-tonal"
-              size={24}
               onPress={handleGoogleLogin}
-              style={styles.socialButton}
               loading={isLoading}
               disabled={isLoading}
-            />
-            {/* <IconButton
-              icon="apple"
-              mode="contained-tonal"
-              size={24}
-              onPress={() => {}}
-              style={styles.socialButton}
-            />
-            <IconButton
-              icon="facebook"
-              mode="contained-tonal"
-              size={24}
-              onPress={() => {}}
-              style={styles.socialButton}
-            /> */}
+              contentStyle={styles.googleButtonContent}
+              style={styles.googleButton}
+              labelStyle={styles.googleButtonLabel}
+            >
+              Logar com Google
+            </Button>
           </View>
 
           <View style={styles.signUpContainer}>

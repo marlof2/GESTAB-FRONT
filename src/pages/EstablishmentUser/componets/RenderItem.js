@@ -10,13 +10,16 @@ import { useDispatch } from 'react-redux';
 import { infoModal, infoModalDelete, reloadItemsCard } from '../reducer';
 import { setSnackbar } from '../../../store/globalSlice';
 import api from "../../../services";
+import { usePayment } from '../../../contexts/PaymentContext';
 
 export default function RenderItem({ data }) {
     const item = data.item.user
     const id = data.item.id
     const dispatch = useDispatch();
     const [isInPlan, setIsInPlan] = useState(data.item.have_plan_establishment || false);
-
+    const { isPaymentActive } = usePayment();
+    const [isLoading, setIsLoading] = useState(false);
+    
     async function openModalDelete(establishment_user_id) {
         const obj = { id: establishment_user_id }
         dispatch(infoModalDelete({ data: obj, visible: true }));
@@ -24,12 +27,14 @@ export default function RenderItem({ data }) {
 
     const handlePlanChange = async (boolean) => {
         try {
+            setIsLoading(true);
             const response = await api.put(`/establishment_user/change-plan/${id}`, {
                 have_plan_establishment: boolean,
                 payment_id: data.item.establishment_user.payment?.id
             });
 
             if (response.status === 200) {
+                setIsLoading(false);
                 setIsInPlan(boolean);
                 dispatch(setSnackbar({
                     visible: true,
@@ -41,6 +46,7 @@ export default function RenderItem({ data }) {
                 visible: true,
                 title: 'Erro ao atualizar status do plano',
             }));
+            setIsLoading(false);
         }
     };
 
@@ -57,27 +63,25 @@ export default function RenderItem({ data }) {
                         <Text style={{ fontWeight: 'bold' }}> Tipo de agenda: </Text>
                         {helper.formatTypeSchedule(item.type_schedule) || 'Carregando...'}
                     </Paragraph>
-                    <Paragraph>
-                        <Text style={{ fontWeight: 'bold' }}> Status do plano: </Text>
-                        <Text style={{ color: isInPlan ? theme.colors.success : theme.colors.error }}>
-                            {isInPlan ? 'Incluso no plano' : 'Não incluso no plano'}
-                        </Text>
-                    </Paragraph>
+                    {isPaymentActive && <Paragraph>
+                        <Text style={{ fontWeight: 'bold' }}> Incluso no plano: </Text>
+                        {isInPlan ? 'Sim' : 'Não'} <Icon name={isInPlan ? "check-circle" : "close-circle"} size={15} color={isInPlan ? theme.colors.action.active : "#722F37"} />
+                    </Paragraph>}
                 </View>
             </Card.Content>
-            <Card.Actions>
-                {data.item.establishment_user.payment != null && (
+            <Card.Actions style={{ marginTop: 20 }}>
+                {isPaymentActive && (
                     <Button
+                        loading={isLoading}
                         mode="contained"
                         onPress={() => handlePlanChange(!isInPlan)}
-                    style={{
-                        backgroundColor: isInPlan ? theme.colors.error : theme.colors.action.active,
-                        borderRadius: 20,
-                        marginRight: 8
-                    }}
-                    labelStyle={{ fontSize: 15 }}
-                    icon={isInPlan ? 'close-circle' : 'check-circle'}
-                >
+                        style={{
+                            backgroundColor: isInPlan ? "#722F37" : theme.colors.action.active,
+                            borderRadius: 10,
+                        }}
+                        labelStyle={{ fontSize: 15 }}
+                        icon={isInPlan ? 'close-circle' : 'check-circle'}
+                    >
                         {isInPlan ? 'Remover do Plano' : 'Adicionar ao Plano'}
                     </Button>
                 )}

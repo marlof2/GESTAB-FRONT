@@ -56,7 +56,7 @@ export default StyleSheet.create({
     color: theme.colors.primary,
   },
   loginButton: {
-    marginTop: 16,
+    marginTop: 10,
     borderRadius: 12,
     height: 56,
   },
@@ -64,12 +64,12 @@ export default StyleSheet.create({
     height: 56,
   },
   footer: {
-    marginTop: 32,
+    marginTop: 0,
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 10,
   },
   divider: {
     flex: 1,
@@ -82,10 +82,8 @@ export default StyleSheet.create({
     fontSize: 14,
   },
   socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginBottom: 24,
+    width: '100%',
+    marginVertical: 16,
   },
   socialButton: {
     backgroundColor: '#F5F5F5',
@@ -107,5 +105,21 @@ export default StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginLeft: 12,
+  },
+  googleButton: {
+    borderRadius: 12,
+    borderColor: '#E3E3E3',
+    backgroundColor: '#FFFFFF',
+    elevation: 1,
+  },
+  googleButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  googleButtonLabel: {
+    color: '#757575',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });

@@ -27,7 +27,6 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="gestab.app.scheme"/>
         <data android:scheme="com.marlof2.gestab"/>
         <data android:scheme="exp+gestab"/>
       </intent-filter>

@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Establishment from "../pages/Establishment";
 import EstablishmentUser from "../pages/EstablishmentUser";
 import Service from "../pages/Service/";
-import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/componets/BindProfessional";
+import EstablishmentUserBindProfessional from "../pages/EstablishmentUser/componets/bindProfessional";
 import MyEstablishments from "../pages/MyEstablishments";
 import MyEstablishmentUserBindCliente from "../pages/MyEstablishments/componets/BindClient";
 import ListScheduleDay from "../pages/Schedule/components/ListScheduleDay";
@@ -21,21 +21,24 @@ import TabRoutes from '../routes/app.routes.tab'
 import { SchedulingHistory } from '../pages/SchedulingHistory';
 import BlockCalendarTabs from '../pages/BlockCalendar/routes/tabs';
 import CompleteProfile from '../pages/CompleteProfile';
-
+import { AuthContext } from '../contexts/auth';
 const Stack = createStackNavigator();
 
 
 function Routes() {
     const [initialRoute, setInitialRoute] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(true);
+    const { user } = useContext(AuthContext);
 
-    async function verifyEstablishmentLogged() {
+    async function existsEstablishmentLogged() {
         try {
             const estabelecimentoLogado = await getEstablishmentStorage();
             if (estabelecimentoLogado) {
                 if (estabelecimentoLogado.id) {
                     setInitialRoute('TabRoutes');
                 }
+            } else if (user.user.need_profile_complete) {
+                setInitialRoute('CompleteProfile');
             } else {
                 setInitialRoute('SelectEstablishment');
             }
@@ -49,7 +52,7 @@ function Routes() {
     }
 
     React.useEffect(() => {
-        verifyEstablishmentLogged();
+        existsEstablishmentLogged();
     }, []);
 
     if (isLoading) {

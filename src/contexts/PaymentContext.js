@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { checkEstablishmentPayment } from '../helpers/checkPayment';
 import { useRewardedAd } from '../components/AdsMob/hooks/useRewardedAd';
@@ -8,8 +7,15 @@ const PaymentContext = createContext({});
 
 export function PaymentProvider({ children }) {
   const [isPaymentActive, setIsPaymentActive] = useState(true);
+  const [userInPlan, setUserInPlan] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const { showAd, isLoading: isAdLoading } = useRewardedAd();
+
+
+  const getUser = async () => {
+    const user = await AsyncStorage.getItem('user');
+    return JSON.parse(user);
+  }
 
   const checkPayment = async () => {
     try {
@@ -19,9 +25,11 @@ export function PaymentProvider({ children }) {
         return false;
       }
 
-      const status = await checkEstablishmentPayment();
-      setIsPaymentActive(status);
-      return status;
+      const user = await getUser();
+      const data = await checkEstablishmentPayment(user.user.id);
+      setIsPaymentActive(data.isActive);
+      setUserInPlan(data.userInPlan);
+      return data.isActive;
     } catch (error) {
       console.error('Erro ao verificar pagamento:', error);
       return false;
@@ -45,7 +53,8 @@ export function PaymentProvider({ children }) {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         checkPayment();
-        interval = setInterval(checkPayment, 30000);
+        // 12 horas em milissegundos = 12 * 60 * 60 * 1000 = 43200000
+        interval = setInterval(checkPayment, 43200000); // 12 horas
       }
     };
 
@@ -64,7 +73,8 @@ export function PaymentProvider({ children }) {
         isPaymentActive, 
         isLoading, 
         checkPayment,
-        RewardedAd
+        RewardedAd,
+        userInPlan,
       }}
     >
       {children}

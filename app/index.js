@@ -13,11 +13,10 @@ import { PaymentProvider } from '../src/contexts/PaymentContext';
 
 initializeAdMob();
 
-
 export default function App() {
   return (
     <StoreProvider store={store}>
-      <NavigationContainer independent={true}>
+      <NavigationContainer>
         <PaperProvider theme={theme}>
           <AuthProvider>
             <PaymentProvider>

@@ -13,6 +13,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Dropdown from '../../../components/Ui/Input/DropdownFormik';
 import { useRewardedAd } from '../../../components/AdsMob/hooks/useRewardedAd';
 import { checkEstablishmentPayment } from '../../../helpers/checkPayment';
+import { AuthContext } from '../../../contexts/auth';
 
 export default function Form() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function Form() {
   const modalForm = useSelector((state) => state.schedule.modal);
   const { showAd, isLoading } = useRewardedAd();
   const typeSchedule = modalForm?.data?.typeSchedule;
+  const { user } = useContext(AuthContext);
 
   const validationSchema = Yup.object().shape({
     time: typeSchedule == 'HM' ? Yup.string().required('Campo obrigatório') : Yup.string(),
@@ -75,7 +77,8 @@ export default function Form() {
         ? await api.post('/list', obj)
         : await api.put(`/list/${modalForm.data.id}`, obj);
       if (response.status == 201 || response.status == 200) {
-        if (!await checkEstablishmentPayment()) {
+        const data = await checkEstablishmentPayment(user.user.id)
+        if (!data.userInPlan) {
           handleShowRewardedAd();
         }
         dispatch(reloadItemsCard(true));

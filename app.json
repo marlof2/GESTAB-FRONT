@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo/gestab.jpg",
-    "scheme": "gestab.app.scheme",
+    "scheme": "com.marlof2.gestab",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.marlof2.gestab"
+      "bundleIdentifier": "com.marlof2.gestab",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "associatedDomains": ["applinks:orange-manatee-370597.hostingersite.com"]
     },
     "android": {
       "adaptiveIcon": {
@@ -22,21 +26,22 @@
         "backgroundColor": "#ffffff"
       },
       "versionCode": 1,
-      "userTrackingPermission": false,
       "package": "com.marlof2.gestab",
       "intentFilters": [
         {
           "action": "VIEW",
+          "autoVerify": true,
           "data": [
             {
-              "scheme": "gestab.app.shecme",
-              "host": "*"
+              "scheme": "com.marlof2.gestab"
+            },
+            {
+              "scheme": "https",
+              "host": "orange-manatee-370597.hostingersite.com",
+              "pathPrefix": "/api/google/callback"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
@@ -46,7 +51,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
       [
         "react-native-google-mobile-ads",
         {
@@ -59,9 +63,6 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
       "eas": {
         "projectId": "944125af-38a9-410d-9e61-82f6365d1193"
       }

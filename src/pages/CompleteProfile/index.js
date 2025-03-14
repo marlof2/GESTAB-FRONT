@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Button, TextInput, Text, Surface, SegmentedButtons } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
@@ -9,10 +9,17 @@ import { AuthContext } from '../../contexts/auth';
 import InputCpf from '../../components/Ui/Input/inputCpf';
 import { helper } from '../../helpers/inputs';
 import theme from '../../themes/theme.json';
+import { StyleSheet } from 'react-native';
+import api from '../../services';
+import { setSnackbar } from '../../store/globalSlice';
+import { useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
-export default function CompleteProfile({ route }) {
-  const { completeGoogleProfile, loadingAuth } = useContext(AuthContext);
-  const { googleData } = route.params;
+export default function CompleteProfile() {
+  const { user } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     profile_id: Yup.number().required('Campo obrigatório'),
@@ -28,61 +35,82 @@ export default function CompleteProfile({ route }) {
       otherwise: (schema) => schema.notRequired(),
     }),
   });
+  async function handleUpdateProfile(data) {
+    try {
+      setLoading(true);
+      data.cpf = data.cpf.replace(/[-.]/g, '');
+      data.phone = data.phone.replace(/[()-\s]/g, '');
+      data.need_profile_complete = false;
+      delete data.need_update_password;
 
-  const handleComplete = async (values) => {
-    const data = {
-      ...values,
-      ...googleData,
-      cpf: values.cpf.replace(/[-.]/g, ''),
-    };
-    await completeGoogleProfile(data);
-  };
+      const result = await api.patch(`/users/${user.user.id}`, data);
+
+      if (result?.status === 200) {
+        navigation.navigate('SelectEstablishment');
+      }
+    } catch (error) {
+      dispatch(setSnackbar({
+        visible: true,
+        title: 'Erro ao atualizar perfil',
+        type: 'error',
+      }));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={styles.container}
       >
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
-          <Surface style={{ padding: 16, marginBottom: 24 }}>
-            <Text variant="headlineMedium">Complete seu perfil</Text>
-            <Text variant="bodyMedium">
-              Precisamos de algumas informações adicionais para continuar
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Surface style={styles.header}>
+            <Text variant="headlineMedium" style={styles.title}>Completar Perfil</Text>
+            <Text variant="bodyMedium" style={styles.subtitle}>
+              Atualize suas informações
             </Text>
           </Surface>
 
           <Formik
             initialValues={{
-              profile_id: null,
-              cpf: '',
-              phone: '',
-              type_schedule: null,
+              profile_id: user?.profile_id || null,
+              cpf: user?.cpf ? helper.maskCpf(user.cpf) : '',
+              phone: user?.phone ? helper.maskPhone(user.phone) : '',
+              type_schedule: user?.type_schedule || null,
             }}
             validationSchema={validationSchema}
-            onSubmit={handleComplete}
+            onSubmit={handleUpdateProfile}
           >
             {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
-              <View>
-                <Text variant="titleMedium" style={{ marginBottom: 8 }}>Tipo de Conta</Text>
+              <View style={styles.formContainer}>
+                <Text variant="titleMedium" style={styles.sectionTitle}>Tipo de Conta</Text>
                 <SegmentedButtons
                   value={values.profile_id}
                   onValueChange={value => {
                     setFieldValue('profile_id', value);
-                    if (value === 2) setFieldValue('type_schedule', null);
+                    if (value === 2) {
+                      setFieldValue('type_schedule', null);
+                    }
                   }}
                   buttons={[
                     { value: 3, label: 'Profissional' },
                     { value: 2, label: 'Cliente' },
                   ]}
+                  style={styles.segmentedButton}
                 />
+                {touched.profile_id && errors.profile_id && (
+                  <Text style={styles.errorText}>{errors.profile_id}</Text>
+                )}
 
                 {values.profile_id === 3 && (
                   <>
-                    <Text variant="titleMedium" style={{ marginTop: 16, marginBottom: 8 }}>
-                      Tipo de Agenda
-                    </Text>
+                    <Text variant="titleMedium" style={styles.sectionTitle}>Tipo de Agenda</Text>
                     <SegmentedButtons
                       value={values.type_schedule}
                       onValueChange={value => setFieldValue('type_schedule', value)}
@@ -90,37 +118,52 @@ export default function CompleteProfile({ route }) {
                         { value: 'HM', label: 'Horário Marcado' },
                         { value: 'OC', label: 'Ordem de Chegada' },
                       ]}
+                      style={styles.segmentedButton}
                     />
+                    {touched.type_schedule && errors.type_schedule && (
+                      <Text style={styles.errorText}>{errors.type_schedule}</Text>
+                    )}
                   </>
                 )}
 
-                <InputCpf
-                  label="CPF"
-                  name="cpf"
-                  style={{ marginTop: 16 }}
-                  leftColor={theme.colors.primary}
-                />
+                <View style={styles.inputGroup}>
+                  <InputCpf
+                    label="CPF"
+                    name="cpf"
+                    leftColor={theme.colors.primary}
+                    initialValue={values.cpf}
+                  />
 
-                <TextInput
-                  style={{ marginTop: 16 }}
-                  mode="outlined"
-                  label="Celular"
-                  value={values.phone}
-                  onChangeText={(text) => setFieldValue('phone', helper.maskPhone(text))}
-                  error={touched.phone && errors.phone}
-                  left={<TextInput.Icon icon="phone" />}
-                  keyboardType="numeric"
-                  maxLength={15}
-                />
+                  <TextInput
+                    outlineStyle={{ borderRadius: 10 }}
+                    style={styles.input}
+                    onChangeText={(text) => setFieldValue('phone', helper.maskPhone(text))}
+                    onBlur={handleBlur('phone')}
+                    value={values.phone}
+                    mode="outlined"
+                    label="Celular"
+                    dense
+                    error={touched.phone && Boolean(errors.phone)}
+                    left={<TextInput.Icon icon="phone-outline" color={theme.colors.primary} />}
+                    keyboardType="numeric"
+                    maxLength={15}
+                  />
+                  {touched.phone && errors.phone && (
+                    <Text style={styles.errorText}>{errors.phone}</Text>
+                  )}
+                </View>
 
-                <Button
-                  mode="contained"
-                  onPress={handleSubmit}
-                  loading={loadingAuth}
-                  style={{ marginTop: 24 }}
-                >
-                  Concluir cadastro
-                </Button>
+                <View style={styles.buttonContainer}>
+                  <Button
+                    mode="contained"
+                    onPress={handleSubmit}
+                    style={styles.submitButton}
+                    contentStyle={styles.buttonContent}
+                    loading={loading}
+                  >
+                    Atualizar Perfil
+                  </Button>
+                </View>
               </View>
             )}
           </Formik>
@@ -128,4 +171,68 @@ export default function CompleteProfile({ route }) {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  header: {
+    backgroundColor: 'transparent',
+    elevation: 0,
+    marginBottom: 24,
+  },
+  title: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: theme.colors.secondary,
+  },
+  formContainer: {
+    gap: 16,
+  },
+  sectionTitle: {
+    marginBottom: 8,
+    color: theme.colors.primary,
+  },
+  segmentedButton: {
+    marginBottom: 16,
+  },
+  inputGroup: {
+    gap: 16,
+  },
+  input: {
+    backgroundColor: '#fff',
+  },
+  errorText: {
+    color: theme.colors.error,
+    fontSize: 12,
+    marginTop: -12,
+    marginLeft: 8,
+  },
+  buttonContainer: {
+    gap: 12,
+    marginTop: 24,
+  },
+  submitButton: {
+    borderRadius: 10,
+  },
+  buttonContent: {
+    paddingVertical: 6,
+  },
+});
+
+
+
+
+

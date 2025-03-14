@@ -4,13 +4,14 @@ import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { adUnitIds } from '../config/adUnitIds';
 import { usePayment } from '../../../contexts/PaymentContext';
 
-export function BannerAdComponent() {
-  const { isPaymentActive, isLoading } = usePayment();
 
-  if (isLoading || isPaymentActive) {
-    return null;
+export function BannerAdComponent() {
+  const { isPaymentActive, isLoading, userInPlan } = usePayment();
+
+  if (isLoading || (isPaymentActive && userInPlan)) {
+      return null;
   }
-  
+
   return (
     <View style={styles.bannerContainer}>
       <BannerAd
