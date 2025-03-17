@@ -1,74 +1,58 @@
 {
   "cli": {
-    "version": ">= 11.0.2"
+    "version": ">= 5.9.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "intentFilters": [
-          {
-            "action": "VIEW",
-            "autoVerify": true,
-            "data": [
-              {
-                "scheme": "seuapp",
-                "host": "signin"
-              }
-            ],
-            "category": [
-              "BROWSABLE",
-              "DEFAULT"
-            ]
-          }
-        ]
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://192.168.0.156:8000",
+        "APP_VARIANT": "development",
+        "EXPO_PUBLIC_MP_PUBLIC_KEY": "APP_USR-53f77d0b-b4fe-4c2b-984f-68776184df28",
+        "EXPO_PUBLIC_MP_ACCESS_TOKEN": "APP_USR-6837006889445076-112522-183860ff025168d807766e8ad9f748ae-102656575"
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "app-bundle",
-        "gradleCommand": ":app:bundleRelease",
-        "intentFilters": [
-          {
-            "action": "VIEW",
-            "autoVerify": true,
-            "data": [
-              {
-                "scheme": "seuapp",
-                "host": "signin"
-              }
-            ],
-            "category": [
-              "BROWSABLE",
-              "DEFAULT"
-            ]
-          }
-        ]
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "APP_VARIANT": "preview"
       }
     },
     "production": {
+      "autoIncrement": true,
       "android": {
         "buildType": "app-bundle",
-        "gradleCommand": ":app:bundleRelease",
-        "releaseChannel": "production",
-        "intentFilters": [
-          {
-            "action": "VIEW",
-            "autoVerify": true,
-            "data": [
-              {
-                "scheme": "seuapp",
-                "host": "signin"
-              }
-            ],
-            "category": [
-              "BROWSABLE",
-              "DEFAULT"
-            ]
-          }
-        ]
+        "gradleCommand": ":app:bundleRelease"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://orange-manatee-370597.hostingersite.com/api",
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_MP_PUBLIC_KEY": "APP_USR-53f77d0b-b4fe-4c2b-984f-68776184df28",
+        "EXPO_PUBLIC_MP_ACCESS_TOKEN": "APP_USR-6837006889445076-112522-183860ff025168d807766e8ad9f748ae-102656575"
+      }
+    },
+    "test": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://orange-manatee-370597.hostingersite.com/api",
+        "APP_VARIANT": "test"
       }
     }
   },

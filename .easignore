@@ -1,0 +1,48 @@
+# Dependências
+node_modules/
+
+# Arquivos de desenvolvimento
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+
+# Arquivos de build
+android/app/build/
+ios/build/
+web-build/
+dist/
+
+# Arquivos de teste
+__tests__/
+*.test.js
+*.spec.js
+
+# Arquivos de documentação
+docs/
+*.md
+
+# Arquivos de debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Arquivos temporários
+.DS_Store
+*.swp
+*.swo
+.env.*
+!.env.production
+
+# Assets não utilizados no build
+assets/raw/
+*.psd
+*.ai
+*.sketch
+
+# Outros
+.expo/
+.expo-shared/
+coverage/
+.tmp/ 

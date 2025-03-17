@@ -1,54 +1,34 @@
 {
   "expo": {
-    "name": "Gestab",
+    "name": "GestAB",
     "slug": "gestab",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo/gestab.jpg",
-    "scheme": "com.marlof2.gestab",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.marlof2.gestab",
-      "config": {
-        "usesNonExemptEncryption": false
-      },
-      "associatedDomains": ["applinks:orange-manatee-370597.hostingersite.com"]
+      "bundleIdentifier": "com.marlof2.gestab"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo/gestab.jpg",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 1,
-      "package": "com.marlof2.gestab",
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": [
-            {
-              "scheme": "com.marlof2.gestab"
-            },
-            {
-              "scheme": "https",
-              "host": "orange-manatee-370597.hostingersite.com",
-              "pathPrefix": "/api/google/callback"
-            }
-          ],
-          "category": ["BROWSABLE", "DEFAULT"]
-        }
-      ]
+      "package": "com.marlof2.gestab"
     },
+    "scheme": "com.marlof2.gestab",
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
@@ -59,14 +39,24 @@
         }
       ]
     ],
-    "experiments": {
-      "typedRoutes": true
+    "linking": {
+      "enabled": true,
+      "prefixes": [
+        "com.marlof2.gestab://",
+        "https://orange-manatee-370597.hostingersite.com/api/google"
+      ],
+      "config": {
+        "screens": {
+          "SignIn": "SignIn",
+          "SelectEstablishment": "SelectEstablishment",
+          "CompleteProfile": "CompleteProfile"
+        }
+      }
     },
     "extra": {
       "eas": {
         "projectId": "944125af-38a9-410d-9e61-82f6365d1193"
       }
-    },
-    "owner": "marlof2"
+    }
   }
 }
