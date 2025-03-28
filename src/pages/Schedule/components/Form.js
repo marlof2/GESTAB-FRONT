@@ -13,7 +13,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Dropdown from '../../../components/Ui/Input/DropdownFormik';
 import { useRewardedAd } from '../../../components/AdsMob/hooks/useRewardedAd';
 import { checkEstablishmentPayment } from '../../../helpers/checkPayment';
-import { AuthContext } from '../../../contexts/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Form() {
   const dispatch = useDispatch();
@@ -24,7 +24,7 @@ export default function Form() {
   const modalForm = useSelector((state) => state.schedule.modal);
   const { showAd, isLoading } = useRewardedAd();
   const typeSchedule = modalForm?.data?.typeSchedule;
-  const { user } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
 
   const validationSchema = Yup.object().shape({
     time: typeSchedule == 'HM' ? Yup.string().required('Campo obrigatório') : Yup.string(),
@@ -39,9 +39,14 @@ export default function Form() {
       await showAd();
     }
   };
+  const dataUser = async () => {
+    const user = JSON.parse(await AsyncStorage.getItem('user'))
+    setUser(user)
+  };
 
   useEffect(() => {
     if (isFocused) {
+      dataUser();
       getServices();
       getAllUsers();
     }
@@ -86,7 +91,8 @@ export default function Form() {
         dispatch(setSnackbar({ visible: true, title: 'Agendado com sucesso!' }));
       }
     } catch (error) {
-      console.log('erro ao salvar estabelecimento', error);
+      console.log('erro ao salvar agendamento', error);
+      dispatch(setSnackbar({ visible: true, title: 'Erro ao agendar!' }));
     } finally {
       setLoading(false);
     }

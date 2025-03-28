@@ -10,7 +10,7 @@ import { useIsFocused } from '@react-navigation/native'
 import { AuthContext } from '../../contexts/auth';
 import Dropdown from '../../components/Ui/Input/Dropdown';
 import LocaleConfigPt from '../../util/calendar/LocaleConfigPt';
-import { Card, Button, Divider } from 'react-native-paper';
+import { Card, Button } from 'react-native-paper';
 import { BannerAdComponent } from '../../components/AdsMob/components/BannerAdComponent';
 import { getEstablishmentStorage } from '../../helpers';
 import { usePayment } from '../../contexts/PaymentContext';
@@ -334,6 +334,7 @@ const AppointmentsScreen = () => {
                   firstDay={1}
                   style={styles.calendar}
                   markingType={'multi-dot'}
+                  minDate={moment().format('YYYY-MM-DD')}
                   theme={{
                     backgroundColor: '#ffffff',
                     calendarBackground: '#ffffff',
@@ -353,6 +354,7 @@ const AppointmentsScreen = () => {
                   onPress={handleNavigateToSchedule}
                   style={styles.scheduleButton}
                   disabled={!selectedDate}
+                  icon="calendar-check"
                 >
                   Ir para agenda
                 </Button>
@@ -437,14 +439,12 @@ const styles = StyleSheet.create({
   },
   cardActions: {
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    marginTop: 16,
+    padding: 16,
   },
   scheduleButton: {
-    flex: 1,
-    backgroundColor: 'rgb(0, 104, 116)',
-    borderRadius: 25,
-    padding: 4,
+    borderRadius: 10,
+    padding: 2,
+    width: '100%',
   },
   blockedTimesContainer: {
     backgroundColor: '#ffffff',

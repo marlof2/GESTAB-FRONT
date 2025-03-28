@@ -136,7 +136,7 @@ export default function RenderItem({ data, dataUser }) {
             />
             <Card.Content style={styles.contentCard}>
                 <View style={styles.iconText}>
-                    <Paragraph > <Text style={styles.titleCardContent}> Responsável: </Text>{item.responsible.name}</Paragraph>
+                    <Paragraph > <Text style={styles.titleCardContent}> Responsável: </Text>{item.responsible?.name ?? 'Não cadastrado'}</Paragraph>
                 </View>
 
                 <View style={styles.iconText}>

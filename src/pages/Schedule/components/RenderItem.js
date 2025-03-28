@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { helper } from '../../../helpers/inputs';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import moment from 'moment';
 import { useState } from 'react';
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';

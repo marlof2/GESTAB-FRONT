@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, Pressable } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Pressable, Image } from 'react-native';
 import { Avatar, Surface, useTheme, List, Text } from 'react-native-paper';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import Header from '../../components/Header';
@@ -41,18 +41,25 @@ export default function UserProfileView({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Header title="Perfil" />
+      <Header title="Informações do usuário" />
 
       {/* Profile Header - Simplified */}
       <Animated.View
         entering={FadeInDown.delay(100).springify()}
         style={[styles.headerCard]}
       >
-        <Avatar.Text
-          size={80}
-          label={user?.name?.[0]}
-          style={styles.avatar}
-        />
+        {user?.avatar ? (
+          <Image 
+            source={{ uri: user.avatar }}
+            style={[styles.avatarImage, { borderColor: theme.colors.primary }]}
+          />
+        ) : (
+          <Avatar.Text
+            size={80}
+            label={user?.name?.[0]}
+            style={styles.avatar}
+          />
+        )}
         <View style={styles.profileInfo}>
           <Text style={styles.userName} numberOfLines={2}>
             {user?.name}
@@ -71,6 +78,11 @@ export default function UserProfileView({ navigation }) {
         style={styles.infoContainer}
       >
         <Surface style={styles.infoCard}>
+          <InfoRow icon="card-account-details-outline" 
+            label="Perfil"
+            value={user?.profile.name || 'Carregando...'}
+            theme={theme}
+          />
           <InfoRow icon="card-account-details-outline" 
             label="CPF"
             value={helper.maskCpf(user?.cpf) || 'Carregando...'}
@@ -241,6 +253,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
   },
 });
 

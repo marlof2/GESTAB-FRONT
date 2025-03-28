@@ -53,9 +53,9 @@ export default function SignIn() {
   }
 
   const validationSchema = Yup.object().shape({
-    cpf: Yup.string()
-      .required('Campo obrigatório')
-      .min(14, 'CPF incompleto'),
+    email: Yup.string()
+      .email('Digite um email válido')
+      .required('Campo obrigatório'),
     password: Yup.string()
       .required('Campo obrigatório'),
   });
@@ -153,21 +153,29 @@ export default function SignIn() {
         </View>
 
         <Formik
-          initialValues={{ cpf: '032.962.445-81', password: '123' }}
+          initialValues={{ email: 'marlosilva.f3@gmail.com', password: '123' }}
           validationSchema={validationSchema}
           onSubmit={handleLogin}
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <View style={styles.form}>
               <Surface style={styles.inputContainer} elevation={0}>
-                <InputCpf
-                  label="CPF"
-                  name="cpf"
+                <TextInput
+                  label="Email"
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  value={values.email}
                   style={styles.input}
                   contentStyle={styles.inputContent}
                   mode="contained"
-                  leftColor={theme.colors.primary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  error={touched.email && Boolean(errors.email)}
+                  left={<TextInput.Icon icon="email" color={theme.colors.primary} />}
                 />
+                {touched.email && errors.email && (
+                  <Text style={styles.errorText}>{errors.email}</Text>
+                )}
               </Surface>
 
               <Surface style={styles.inputContainer} elevation={0}>

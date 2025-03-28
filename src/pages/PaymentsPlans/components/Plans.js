@@ -173,13 +173,13 @@ export default function PaymentPlans({ route }) {
           </Text>
 
           <View style={styles.instructionsList}>
-            <Text style={styles.instructionItem}>1. Copie o link abaixo ou abra direto no navegador</Text>
-            <Text style={[styles.instructionItem, { color: '#f44336' }]}>
-              2. Importante: Se caso o link ou o navegador redirecionar para o aplicativo do Mercado Pago, não continue pelo aplicativo pois esta com problema.
-            </Text>
-            {/* <Text style={styles.instructionItem}>2. Abra seu navegador (Chrome, Safari, etc.)</Text>
+            <Text style={styles.instructionItem}>1. Copie o link abaixo</Text>
+            <Text style={styles.instructionItem}>2. Abra seu navegador (Chrome, Safari, etc.)</Text>
             <Text style={styles.instructionItem}>3. Cole o link e acesse</Text>
-            <Text style={styles.instructionItem}>4. Complete o pagamento no navegador</Text> */}
+            <Text style={styles.instructionItem}>4. Complete o pagamento no navegador</Text>
+            <Text style={[styles.instructionItem, { color: '#f44336' }]}>
+              5. Importante: Se caso o link ou o navegador redirecionar para o aplicativo do mercado pago, não continue pelo aplicativo pois, esta gerando um erro na hora de pagar.
+            </Text>
           </View>
 
 
@@ -204,9 +204,9 @@ export default function PaymentPlans({ route }) {
                 <MaterialIcons name="content-copy" size={20} color={theme.colors.primary} />
                 <Text style={styles.copyButtonText}>Copiar Link</Text>
               </TouchableOpacity>
-              
 
-              <TouchableOpacity
+
+              {/* <TouchableOpacity
                 style={styles.openButton}
                 onPress={() => {
                   Linking.openURL(paymentLink);
@@ -214,7 +214,7 @@ export default function PaymentPlans({ route }) {
               >
                 <MaterialIcons name="open-in-browser" size={20} color={theme.colors.primary} />
                 <Text style={styles.copyButtonText}>Abrir no Navegador</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
 

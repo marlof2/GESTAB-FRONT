@@ -123,6 +123,7 @@ export default function ListBlockCalendar() {
       }
     } catch (error) {
       console.error('Erro ao carregar bloqueios:', error);
+      dispatch(setSnackbar({ visible: true, title: 'Erro ao carregar bloqueios!' }));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -138,6 +139,7 @@ export default function ListBlockCalendar() {
           await loadBlocks(null, establishmentData.id);
         } catch (error) {
           console.error('Erro ao inicializar dados:', error);
+          dispatch(setSnackbar({ visible: true, title: 'Erro ao inicializar dados!' }));
         }
       }
     }
@@ -181,8 +183,8 @@ export default function ListBlockCalendar() {
         loadBlocks();
       }
     } catch (error) {
-      dispatch(setSnackbar({ visible: true, title: 'Erro ao deletar bloqueio!' }));
       console.error('Erro ao deletar bloqueio:', error);
+      dispatch(setSnackbar({ visible: true, title: 'Erro ao deletar bloqueio!' }));
     } finally {
       setModalDelete({ visible: false, id: null });
     }

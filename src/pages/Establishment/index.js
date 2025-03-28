@@ -14,6 +14,7 @@ import EmptyListMessage from '../../components/Ui/EmptyListMessage';
 import ModalDelete from './componets/modalDelete'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AuthContext } from '../../contexts/auth'
+import { setSnackbar } from '../../store/globalSlice';
 
 export default function Index() {
   const dispatch = useDispatch();
@@ -60,7 +61,8 @@ export default function Index() {
       setItems([...items, ...res.data.data]);
       setNextPageUrl(res.data.next_page_url);
     } catch (error) {
-      console.log('erro ao consultar: ' + error)
+      console.error('Erro ao consultar estabelecimentos:', error);
+      dispatch(setSnackbar({ visible: true, title: 'Erro ao consultar estabelecimentos!' }));
     } finally {
       setLoadingMore(false);
     }

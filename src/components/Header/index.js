@@ -39,7 +39,7 @@ export default function Header({ title, subtitle = null, description = null, sho
 
     return (
         <SafeAreaView>
-            <Appbar.Header elevated style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+            <Appbar.Header elevated style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20, marginTop:10 }}>
                 {IconBack()}
                 <View style={styles.container}>
                     <Text style={styles.title}>{title}</Text>

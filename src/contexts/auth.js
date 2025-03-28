@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { setSnackbar } from '../store/globalSlice';
 import { useDispatch } from 'react-redux';
-import { AppState } from 'react-native';
 
 export const AuthContext = createContext({});
 
@@ -19,33 +18,27 @@ export function AuthProvider({ children }) {
         loadStorage();
     }, []);
 
-    useEffect(() => {
-        const subscription = AppState.addEventListener('change', nextAppState => {
-            if (nextAppState === 'active') {
-                loadStorage();
-            }
-        });
-
-        return () => {
-            subscription.remove();
-        };
-    }, []);
-
     async function signOut() {
         setLoadingAuth(true);
 
         try {
+
             const response = await api.post('/logout');
 
-            if (response.status === 401 || response.status === 200) {
-                await AsyncStorage.multiRemove(['token', 'user'])
-                setUser(null);
+            if (response.status == 401 || response.status == 200) {
+
+                await AsyncStorage.clear()
+                setUser(null)
+                setLoadingAuth(false);
             }
+
+
         } catch (error) {
-            console.log('erro ao deslogar', error)
-        } finally {
+            console.log('erro ao logar', error)
             setLoadingAuth(false);
         }
+
+
     }
 
     async function loadStorage() {
@@ -65,6 +58,7 @@ export function AuthProvider({ children }) {
                 setUser(response.data);
                 setLoading(false)
             }
+
         } else {
             setUser(null)
             setLoading(false)
