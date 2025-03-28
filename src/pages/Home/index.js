@@ -64,7 +64,7 @@ export default function Home({ navigation }) {
   };
 
   const handleWhatsApp = () => {
-    Linking.openURL('whatsapp://send?phone=5571991717209');
+    Linking.openURL('https://wa.me/5571991717209');
   };
 
   const updateTermsAcceptance = async (userId) => {
